@@ -36,8 +36,6 @@ for command in i[1:]:
             if n.name == dirname:
                 currentNode = n
                 break
-        else:
-            assert True == False # confirming ls always appears for moving directory
 
 # foreach folder, size += file sizes of its children recursively
 def setNodeTotalSize(node):

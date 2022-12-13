@@ -21,7 +21,6 @@ for x in range(len(c) - 1, -1, -1):
 
 moves = movestext.split("\n")
 
-
 for move in moves:
     splits = move.split(" ")
     print(splits)

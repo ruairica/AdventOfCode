@@ -1,9 +1,9 @@
 #https://adventofcode.com/2022/day/13
-###PART 1+2
+###PART 1+2 currently broken, sort doesn't work
 from collections import Counter, defaultdict, deque
 from functools import cmp_to_key
 
-blocks =  [x for x  in open("ex.txt").read().strip().split("\n\n")]
+blocks =  [x for x  in open("input.txt").read().strip().split("\n\n")]
 
 #If the left list runs out of items first, the inputs are in the right order. If the right list runs out of items first, the inputs are not in the right order
 def compare(l, r):
@@ -78,14 +78,6 @@ def bubbleSort(arr):
             # if we haven't needed to make a single swap, we
             # can just exit the main loop.
             return
-
-
-def bubbleSortTest(arr):
-    for j in range(len(arr)):
-        for k in range(len(arr)-1):
-            if compare(arr[k], arr[k+1]) == 1:
-                arr[k], arr[k+1] = arr[k+1], arr[k]
-
 
 # part2copy = part2in[:]
 # bubbleSortTest(part2copy)

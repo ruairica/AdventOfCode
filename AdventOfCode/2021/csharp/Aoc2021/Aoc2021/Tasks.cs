@@ -55,13 +55,13 @@ public class Tasks
         var mind = 0;
         for (int m = 0; m < mins.Count; m++)
         {
-            mind += mins[m] * (int)Math.Pow(2, mins.Count - 1 - m);
+            mind += mins[m] * Helpers.ConvertToDecimal(mins); ;
         }
 
         var maxd = 0;
         for (int m = 0; m < maxs.Count; m++)
         {
-            maxd += maxs[m] * (int)Math.Pow(2, maxs.Count - 1 - m);
+            maxd += maxs[m] * Helpers.ConvertToDecimal(maxs);
         }
 
         Console.WriteLine(mind * maxd);

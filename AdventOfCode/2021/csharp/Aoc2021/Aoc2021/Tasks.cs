@@ -133,4 +133,131 @@ public class Tasks
         }
         Console.WriteLine(Helpers.ConvertToDecimal(finalMax.Select(x => int.Parse(x.ToString())).ToList()) * Helpers.ConvertToDecimal(finalMin.Select(x => int.Parse(x.ToString())).ToList()));
     }
+
+    [Test]
+    public void day4_1_2()
+    {
+        var text = File.ReadAllText(inputPath + "/day4.txt").Trim();
+
+        var splits = text.Replace("\r\n", "\n").Split("\n\n");
+        var bingoCalls = splits[0].Trim();
+        var bingoCardSplits = splits[1..]
+            .Select(x => x.Replace("  ", " ").Trim());
+
+        var bingoCards = bingoCardSplits
+            .Select(x => x.Split('\n')
+                .Select(x => x.Trim().Split(' ')
+                    .Select(x => new ValueTuple<int, bool>(int.Parse(x), false))
+                    .ToList())
+                .ToList())
+            .ToList()
+            .Select(x => new BingoCard(x)).ToList();
+
+        BingoCard lastCardRemaining = null;
+        var firstOnefound = false;
+        foreach (var call in bingoCalls.Split(',').Select(int.Parse))
+        {
+            foreach (var bc in bingoCards)
+            {
+                var hasWons = bingoCards.Where(x => x.HasWon);
+                if (hasWons.Count() == bingoCards.Count - 1)
+                {
+                    var remaining = bingoCards.Except(hasWons);
+                    lastCardRemaining = remaining.Single();
+                }
+
+                var marked = bc.MarkItem(call);
+
+                if (!marked)
+                {
+                    continue;
+                }
+
+                var bingo = bc.CheckForRowOrColumnComplete();
+
+                if (bingo && !firstOnefound)
+                {
+                    firstOnefound = true;
+                    Console.WriteLine($"PART1: {bc.SumOfUnmarkedNumbers() * call}");
+                }
+
+                if (bingo && bc == lastCardRemaining)
+                {
+                    Console.WriteLine($"PART2: {bc.SumOfUnmarkedNumbers() * call}");
+                    return;
+                }
+            }
+        }
+
+    }
+
+    public class BingoCard
+    {
+        public BingoCard(List<List<(int number, bool marked)>> numbers)
+        {
+            this.Numbers = numbers;
+        }
+        public List<List<(int number, bool marked)>> Numbers { get; set; }
+
+        public bool HasWon { get; set; }
+
+        public bool MarkItem(int bingoCall)
+        {
+            for (var row = 0; row < this.Numbers.Count; row++)
+            {
+                var items = this.Numbers[row];
+                for (var column = 0; column < items.Count; column++)
+                {
+                    var (number, _) = items[column];
+                    if (number == bingoCall)
+                    {
+                        this.Numbers[row][column] = new ValueTuple<int, bool>(number, true);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public bool CheckForRowOrColumnComplete()
+        {
+            if (this.HasWon)
+            {
+                return true;
+            }
+
+            if (this.Numbers.Any(x => x.All(x => x.marked)))
+            {
+                this.HasWon = true;
+                return true;
+            }
+
+            if (this.GetAllColumns().Any(x => x.All(x => x.marked)))
+            {
+                this.HasWon = true;
+                return true;
+            }
+
+            return false;
+
+        }
+
+        public int SumOfUnmarkedNumbers()
+        {
+            var sum = this.Numbers.SelectMany(x => x).Where(x => !x.marked).Select(x => x.number).Sum();
+            return sum;
+        }
+
+        private List<List<(int number, bool marked)>> GetAllColumns()
+        {
+            var columns = new List<List<(int number, bool marked)>>();
+            for (int column = 0; column < this.Numbers[0].Count; column++)
+            {
+                columns.Add(Enumerable.Range(0, this.Numbers.Count).Select(row => this.Numbers[row][column]).ToList());
+            }
+
+            return columns;
+        }
+    }
 }

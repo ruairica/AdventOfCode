@@ -2,7 +2,9 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -189,6 +191,86 @@ public class Tasks
         }
 
     }
+
+    [Test]
+    public async Task day5_1_2()
+    {
+        var textLines = File.ReadAllText(inputPath + "/day5.txt")
+             .Trim()
+             .Split("\n")
+             .ToList();
+
+
+        var lines = textLines.Select(l =>
+        {
+            var (start, end)= l.Trim().Split(" -> ");
+            var (sx, sy) = start.Split(',').Select(int.Parse).ToList();
+            var (ex, ey) = end.Split(',').Select(int.Parse).ToList();
+            return new CoordPair(sx, sy, ex, ey);
+        })//.Where(c => c.startX == c.endX || c.startY == c.endY) // uncomment for part 1
+        .ToList();
+
+        var pointCounter = new Dictionary<(int, int), int>();
+
+        foreach(var line in lines)
+        {
+            // vert
+            if (line.endY != line.startY && line.startX == line.endX)
+            {
+                var start = Math.Min(line.startY, line.endY);
+                var end = Math.Max(line.startY, line.endY);
+
+                for (var y = start; y <= end; y++)
+                {
+                    var point = new ValueTuple<int, int>(line.startX, y);
+                    pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
+                }
+            }
+
+            // horizontal
+            if (line.startX != line.endX && line.startY == line.endY)
+            {
+                var start = Math.Min(line.startX, line.endX);
+                var end = Math.Max(line.startX, line.endX);
+
+                for (var x = start; x <= end; x++)
+                {
+                    var point = new ValueTuple<int, int>(x, line.startY);
+                    pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
+                }
+            }
+
+            // edge case 0 lenght line
+            if (line.startY == line.endY && line.startX == line.endX)
+            {
+                var point = new ValueTuple<int, int>(line.startX, line.startY);
+                pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
+            }
+
+            // for part 2 diags
+            if (line.startX != line.endX && line.startY != line.endY)
+            {
+                var xDiff = Math.Abs(line.endX - line.startX) + 1;
+
+                var (x1, x2, y1, y2) = (line.startX, line.endX, line.startY, line.endY);
+                var yPos = y1 < y2;
+                var xPos = x1 < x2;
+
+                var diagPoints = Enumerable.Range(x1, xDiff).Select(_ => (xPos ? x1++ : x1--, yPos ? y1++ : y1--));
+                
+                foreach(var (x,y) in diagPoints)
+                {
+                    var point = new ValueTuple<int, int>(x, y);
+                    pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
+                }
+            }
+        }
+
+        var result = pointCounter.Count(p => p.Value >= 2);
+        result.Dump();
+    }
+
+    public record CoordPair(int startX, int startY, int endX, int endY);
 
     public class BingoCard
     {

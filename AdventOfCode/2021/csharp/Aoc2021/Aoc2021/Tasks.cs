@@ -173,8 +173,7 @@ public class Tasks
                     continue;
                 }
 
-                var bingo = bc.CheckForRowOrColumnComplete();
-
+                var bingo = bc.CheckForWin();
                 if (bingo && !firstOnefound)
                 {
                     firstOnefound = true;
@@ -220,7 +219,7 @@ public class Tasks
             return false;
         }
 
-        public bool CheckForRowOrColumnComplete()
+        public bool CheckForWin()
         {
             if (this.HasWon)
             {
@@ -245,19 +244,14 @@ public class Tasks
 
         public int SumOfUnmarkedNumbers()
         {
-            var sum = this.Numbers.SelectMany(x => x).Where(x => !x.marked).Select(x => x.number).Sum();
-            return sum;
+            return this.Numbers.SelectMany(x => x).Where(x => !x.marked).Select(x => x.number).Sum();
         }
 
         private List<List<(int number, bool marked)>> GetAllColumns()
         {
-            var columns = new List<List<(int number, bool marked)>>();
-            for (int column = 0; column < this.Numbers[0].Count; column++)
-            {
-                columns.Add(Enumerable.Range(0, this.Numbers.Count).Select(row => this.Numbers[row][column]).ToList());
-            }
-
-            return columns;
+            return Enumerable.Range(0, this.Numbers[0].Count)
+                .Select(column => Enumerable.Range(0, this.Numbers.Count).Select(row => this.Numbers[row][column]).ToList())
+                .ToList();
         }
     }
 }

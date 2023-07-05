@@ -3,6 +3,8 @@ using NUnit.Framework;
 
 namespace Aoc2021;
 
+
+// Note: can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
 [TestFixture]
 public class Tasks
 {
@@ -399,6 +401,30 @@ public class Tasks
             .Select(pos => allPositions.Sum(p => Enumerable.Range(0, Math.Abs(p - pos) + 1).Sum(x => 1 * x)))
             .Min()
             .Dump();
+    }
+
+    [Test]
+    public void day8_1()
+    {
+        File.ReadAllText(inputPath + "/day8.txt")
+                         .Trim()
+                         .Split("\n")
+                         .Select(x => x.Split('|')[1].Trim().Split(' '))
+                         .SelectMany(x => x)
+                         .Count(x => new List<int> { 2, 4, 3, 7 }.Contains(x.Length))
+                         .Dump();
+    }
+    /*
+     Note can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
+     */
+
+    [Test]
+    public void day8_2() // TODO
+    {
+        var uniques = new List<int> { 2, 4, 3, 7 };
+        File.ReadAllText(inputPath + "/day8.txt")
+                         .Trim()
+                         .Split("\n");
     }
 
     public record CoordPair(int startX, int startY, int endX, int endY);

@@ -270,6 +270,92 @@ public class Tasks
         result.Dump();
     }
 
+    [Test]
+    public void day6_1()
+    {
+        var timers = File.ReadAllText(inputPath + "/day6.txt")
+                         .Trim()
+                         .Split(",")
+                         .Select(int.Parse)
+                         .ToList();
+
+        var resetDay = 6;
+        var newFishResetDay = 8;
+        var days = 80;
+
+        for (var i = 0; i < days; i++)
+        {
+            var newFishCount = 0;
+            for (var f =0; f< timers.Count; f++)
+            {
+                timers[f] -= 1;
+                if (timers[f] <0 )
+                {
+                    timers[f] = resetDay;
+                    newFishCount++;
+                }
+            }
+            timers.AddRange(Enumerable.Repeat(newFishResetDay, newFishCount));
+        }
+
+        timers.Count.Dump();
+    }
+
+    [Test]
+    public void day6_2()
+    {
+        var initialTimers = File.ReadAllText(inputPath + "/day6.txt")
+                         .Trim()
+                         .Split(",")
+                         .Select(int.Parse)
+                         .ToList();
+
+        var resetDay = 6;
+        var newFishResetDay = 8;
+        var days = 256;
+
+        var timers = Enumerable.Range(0,9).ToDictionary(x => x, x => (long)0);
+        initialTimers.ForEach(x => timers[x] += 1);
+
+        for (var i = 0; i < days; i++)
+        {
+            var zeroCount = timers[0];
+            for (var f = 0; f < 8; f++)
+            {
+                timers[f] = timers[f + 1];
+            }
+            timers[resetDay] += zeroCount;
+            timers[newFishResetDay] = zeroCount;
+        }
+
+        timers.Select(x => x.Value).Sum().Dump();
+    }
+
+    [Test]
+    public void day6_2_ListInsteadOfDict()
+    {
+        var resetDay = 6;
+        var newFishResetDay = 9;
+        var days = 256;
+        var fish = File.ReadAllLines(inputPath + "/day6.txt")
+            .SelectMany(input => 
+                input.Split(',')
+                .Select(int.Parse))
+            .GroupBy(f => f)
+            .Aggregate(new List<long>(new long[newFishResetDay]), (list, kv) => { list[kv.Key] = kv.Count();
+                return list; });
+
+        for (var i = 0; i < days; i++)
+        {
+            var zeroCount = fish.First();
+            fish.RemoveAt(0);
+            fish[resetDay] += zeroCount;
+            fish.Add(zeroCount);
+        }
+
+        fish.Sum().Dump();
+    }
+
     public record CoordPair(int startX, int startY, int endX, int endY);
 
     public class BingoCard

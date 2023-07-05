@@ -1,12 +1,5 @@
 ﻿using Dumpify;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Aoc2021;
 
@@ -354,6 +347,58 @@ public class Tasks
         }
 
         fish.Sum().Dump();
+    }
+
+    [Test]
+    public void day7_1()
+    {
+        var positions = File.ReadAllText(inputPath + "/day7.txt")
+                         .Trim()
+                         .Split(",")
+                         .Select(int.Parse)
+                         .ToList();
+
+        var minFuelcost = int.MaxValue;
+        foreach(var pos in positions)
+        {
+            var fuel = positions.Select(p => Math.Abs(p - pos)).Sum();
+            minFuelcost = Math.Min(minFuelcost, fuel);
+        }
+
+        minFuelcost.Dump();
+    }
+
+    [Test]
+    public void day7_2()
+    {
+        var positions = File.ReadAllText(inputPath + "/day7.txt")
+                         .Trim()
+                         .Split(",")
+                         .Select(int.Parse)
+                         .ToList();
+
+        var minFuelcost = long.MaxValue;
+        foreach (var pos in Enumerable.Range(0, positions.Max()))
+        {
+            var currentFuel = positions.Sum(p => Enumerable.Range(0, Math.Abs(p - pos)+1).Sum(x => 1*x));
+            minFuelcost = Math.Min(minFuelcost, currentFuel);
+        }
+
+        minFuelcost.Dump();
+    }
+
+    [Test]
+    public void day7_2_TwoLiner()
+    {
+        var allPositions = File.ReadAllText(inputPath + "/day7.txt")
+                         .Trim()
+                         .Split(",")
+                         .Select(int.Parse)
+                         .ToList();
+        Enumerable.Range(0, allPositions.Max())
+            .Select(pos => allPositions.Sum(p => Enumerable.Range(0, Math.Abs(p - pos) + 1).Sum(x => 1 * x)))
+            .Min()
+            .Dump();
     }
 
     public record CoordPair(int startX, int startY, int endX, int endY);

@@ -1,5 +1,8 @@
 ﻿using Dumpify;
 using NUnit.Framework;
+using System.Globalization;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Aoc2021;
 
@@ -414,18 +417,42 @@ public class Tasks
                          .Count(x => new List<int> { 2, 4, 3, 7 }.Contains(x.Length))
                          .Dump();
     }
-    /*
-     Note can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
-     */
 
     [Test]
-    public void day8_2() // TODO
+    public void day8_2()
     {
-        var uniques = new List<int> { 2, 4, 3, 7 };
         File.ReadAllText(inputPath + "/day8.txt")
-                         .Trim()
-                         .Split("\n");
+                 .Trim()
+                 .Split("\n")
+                 .Select(line =>
+                 {
+                     var (s, o) = line.Split('|');
+                     var signals = s.Trim().Split(' ').Select(x => string.Join("", x.OrderBy(x => x)));
+                     var lineOut = o.Trim().Split(' ').Select(x => string.Join("", x.OrderBy(x => x)));
+                     var numberMatches = new List<string> { "", "", "", "", "", "", "", "", "", "" };
+                     numberMatches[1] = signals.Single(x => x.Count() == 2);
+                     numberMatches[4] = signals.Single(x => x.Count() == 4);
+                     numberMatches[7] = signals.Single(x => x.Count() == 3);
+                     numberMatches[8] = signals.Single(x => x.Count() == 7);
+
+                     numberMatches[9] = signals.Single(x => x.Count() == 6 && x.Intersect(numberMatches[4]).Count() == 4);
+                     numberMatches[9] = signals.Single(x => x.Count() == 6 && x.Intersect(numberMatches[4]).Count() == 4);
+                     numberMatches[6] = signals.Single(x => x.Count() == 6 && x.Intersect(numberMatches[4]).Count() == 3 && x.Intersect(numberMatches[1]).Count() == 1);
+                     numberMatches[0] = signals.Single(x => x.Count() == 6 && x.Intersect(numberMatches[4]).Count() == 3 && x.Intersect(numberMatches[1]).Count() == 2);
+
+                     numberMatches[3] = signals.Single(x => x.Count() == 5 && x.Intersect(numberMatches[1]).Count() == 2);
+                     numberMatches[5] = signals.Single(x => x.Count() == 5 && x.Intersect(numberMatches[4]).Count() == 3 && x.Intersect(numberMatches[1]).Count() != 2);
+                     numberMatches[2] = signals.Single(x => x.Count() == 5 && x.Intersect(numberMatches[4]).Count() == 2);
+
+                     return long.Parse(string.Join("", (lineOut.Select(x => numberMatches.IndexOf(x)))));
+                 })
+                 .Sum()
+                 .Dump();
     }
+
+    /*
+ Note can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
+ */
 
     public record CoordPair(int startX, int startY, int endX, int endY);
 

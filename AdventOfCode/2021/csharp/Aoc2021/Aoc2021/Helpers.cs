@@ -8,6 +8,14 @@ namespace Aoc2021
 {
     public static class Helpers
     {
+        public static IEnumerable<(T, int)> Enumerate<T>(this IEnumerable<T> list)
+        {
+            var i = 0;
+            foreach (var item in list)
+            {
+                yield return new(item, i++);
+            }
+        }
         public static int ConvertToDecimal(List<int> binary)
         {
             var result = 0;

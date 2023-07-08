@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml.Schema;
 
 namespace Aoc2021;
 
@@ -453,6 +454,113 @@ public class Tasks
     /*
  Note can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
  */
+
+    [Test]
+    public void day9_1()
+    {
+        var grid = File.ReadAllText(inputPath + "/day9.txt")
+         .Trim()
+         .Split("\n")
+         .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
+         .ToList();
+
+        var total = 0;
+        for (var x=0; x < grid.Count; x++)
+        {
+            for (var y = 0; y < grid[0].Count; y++)
+            {
+
+                var val = grid[x][y];
+                if (new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1,0) }
+                .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
+                .All(e => val < grid[x + e.Item1][y +e.Item2]))
+                {
+                    total += (1 + val);
+                }
+            }
+        }
+
+        total.Dump();
+    }
+
+    [Test]
+    public void day9_1_Linqier()
+    {
+        var grid = File.ReadAllText(inputPath + "/day9.txt")
+         .Trim()
+         .Split("\n")
+         .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
+         .ToList();
+
+        Enumerable.Range(0, grid.Count)
+            .SelectMany(x => Enumerable.Range(0, grid[x].Count)
+                .Select(y => new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
+                    .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
+                    .All(e => grid[x][y] < grid[x + e.Item1][y + e.Item2]) ? 1 + grid[x][y] : 0))
+            .Sum()
+            .Dump();
+    }
+
+    [Test]
+    public void day9_2()
+    {
+        var grid = File.ReadAllText(inputPath + "/day9.txt")
+         .Trim()
+         .Split("\n")
+         .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
+         .ToList();
+
+        var basins = new List<(int x, int y)>();
+        for (var x = 0; x < grid.Count; x++)
+        {
+            for (var y = 0; y < grid[0].Count; y++)
+            {
+
+                var val = grid[x][y];
+                if (new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
+                .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
+                .All(e => val < grid[x + e.Item1][y + e.Item2]))
+                {
+                    basins.Add(new(x, y));
+                }
+            }
+        }
+
+        var basinTotals = new List<int>();
+        foreach(var (bx,by) in basins)
+        {
+            // BFS and just don't add 9s
+            var visited = new HashSet<(int, int)>();
+            var tail = new Queue<(int, int)>();
+            tail.Enqueue(new(bx, by));
+
+            while (tail.Count > 0)
+            {
+                var (cx, cy) = tail.Dequeue();
+                if (visited.Contains(new(cx,cy)))
+                {
+                    continue;
+                }
+                visited.Add(new(cx,cy));
+
+                new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
+                .Where(e => e.Item1 + cx >= 0 && e.Item1 + cx < grid.Count && e.Item2 + cy >= 0 && e.Item2 + cy < grid[0].Count)
+                .Where(e => grid[cx + e.Item1][cy + e.Item2] != 9)
+                .ToList()
+                .ForEach(e =>
+                {
+                    tail.Enqueue(new(cx + e.Item1, cy + e.Item2));
+                });
+            }
+            basinTotals.Add(visited.Count);
+        }
+
+        basinTotals
+            .OrderByDescending(x => x)
+            .Take(3)
+            .Aggregate(1, (total, cur) => total * cur)
+            .Dump();
+    }
 
     public record CoordPair(int startX, int startY, int endX, int endY);
 

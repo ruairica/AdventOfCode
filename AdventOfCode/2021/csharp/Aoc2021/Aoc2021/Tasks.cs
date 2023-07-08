@@ -510,21 +510,16 @@ public class Tasks
          .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
          .ToList();
 
-        var basins = new List<(int x, int y)>();
-        for (var x = 0; x < grid.Count; x++)
-        {
-            for (var y = 0; y < grid[0].Count; y++)
-            {
-
-                var val = grid[x][y];
-                if (new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
-                .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
-                .All(e => val < grid[x + e.Item1][y + e.Item2]))
-                {
-                    basins.Add(new(x, y));
-                }
-            }
-        }
+        // adapted part 1
+        var basins = Enumerable.Range(0, grid.Count)
+            .SelectMany(x => Enumerable.Range(0, grid[x].Count)
+                .Select(y => new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
+                    .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
+                    .All(e => grid[x][y] < grid[x + e.Item1][y + e.Item2]) 
+                        ? new ValueTuple<int, int>(x, y) 
+                        : new ValueTuple<int,int>(-100, -100)))
+            .Where(x => x.Item1 != -100 && x.Item2 != -100)
+            .ToList();
 
         var basinTotals = new List<int>();
         foreach(var (bx,by) in basins)

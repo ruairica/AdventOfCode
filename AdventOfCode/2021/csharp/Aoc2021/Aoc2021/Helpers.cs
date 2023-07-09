@@ -1,13 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Aoc2021
+﻿namespace Aoc2021
 {
     public static class Helpers
     {
+        public static double Median<T>(this IEnumerable<T> items) where T : struct, IComparable<T>
+        {
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+
+            var sortedList = items.OrderBy(x => x).ToList();
+            int count = sortedList.Count;
+            int middleIndex = count / 2;
+
+            if (count % 2 == 0)
+            {
+                dynamic value1 = sortedList[middleIndex - 1];
+                dynamic value2 = sortedList[middleIndex];
+                return (value1 + value2) / 2.0;
+            }
+
+            return Convert.ToDouble(sortedList[middleIndex]);
+        }
+
         public static IEnumerable<(T, int)> Enumerate<T>(this IEnumerable<T> list)
         {
             var i = 0;

@@ -1,9 +1,5 @@
 ﻿using Dumpify;
 using NUnit.Framework;
-using System.Globalization;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml.Schema;
 
 namespace Aoc2021;
 
@@ -202,7 +198,7 @@ public class Tasks
 
         var lines = textLines.Select(l =>
         {
-            var (start, end)= l.Trim().Split(" -> ");
+            var (start, end) = l.Trim().Split(" -> ");
             var (sx, sy) = start.Split(',').Select(int.Parse).ToList();
             var (ex, ey) = end.Split(',').Select(int.Parse).ToList();
             return new CoordPair(sx, sy, ex, ey);
@@ -211,7 +207,7 @@ public class Tasks
 
         var pointCounter = new Dictionary<(int, int), int>();
 
-        foreach(var line in lines)
+        foreach (var line in lines)
         {
             // vert
             if (line.endY != line.startY && line.startX == line.endX)
@@ -256,8 +252,8 @@ public class Tasks
                 var xPos = x1 < x2;
 
                 var diagPoints = Enumerable.Range(x1, xDiff).Select(_ => (xPos ? x1++ : x1--, yPos ? y1++ : y1--));
-                
-                foreach(var (x,y) in diagPoints)
+
+                foreach (var (x, y) in diagPoints)
                 {
                     var point = new ValueTuple<int, int>(x, y);
                     pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
@@ -285,10 +281,10 @@ public class Tasks
         for (var i = 0; i < days; i++)
         {
             var newFishCount = 0;
-            for (var f =0; f< timers.Count; f++)
+            for (var f = 0; f < timers.Count; f++)
             {
                 timers[f] -= 1;
-                if (timers[f] <0 )
+                if (timers[f] < 0)
                 {
                     timers[f] = resetDay;
                     newFishCount++;
@@ -313,7 +309,7 @@ public class Tasks
         var newFishResetDay = 8;
         var days = 256;
 
-        var timers = Enumerable.Range(0,9).ToDictionary(x => x, x => (long)0);
+        var timers = Enumerable.Range(0, 9).ToDictionary(x => x, x => (long)0);
         initialTimers.ForEach(x => timers[x] += 1);
 
         for (var i = 0; i < days; i++)
@@ -337,12 +333,15 @@ public class Tasks
         var newFishResetDay = 9;
         var days = 256;
         var fish = File.ReadAllLines(inputPath + "/day6.txt")
-            .SelectMany(input => 
+            .SelectMany(input =>
                 input.Split(',')
                 .Select(int.Parse))
             .GroupBy(f => f)
-            .Aggregate(new List<long>(new long[newFishResetDay]), (list, kv) => { list[kv.Key] = kv.Count();
-                return list; });
+            .Aggregate(new List<long>(new long[newFishResetDay]), (list, kv) =>
+            {
+                list[kv.Key] = kv.Count();
+                return list;
+            });
 
         for (var i = 0; i < days; i++)
         {
@@ -365,7 +364,7 @@ public class Tasks
                          .ToList();
 
         var minFuelcost = int.MaxValue;
-        foreach(var pos in positions)
+        foreach (var pos in positions)
         {
             var fuel = positions.Select(p => Math.Abs(p - pos)).Sum();
             minFuelcost = Math.Min(minFuelcost, fuel);
@@ -386,7 +385,7 @@ public class Tasks
         var minFuelcost = long.MaxValue;
         foreach (var pos in Enumerable.Range(0, positions.Max()))
         {
-            var currentFuel = positions.Sum(p => Enumerable.Range(0, Math.Abs(p - pos)+1).Sum(x => 1*x));
+            var currentFuel = positions.Sum(p => Enumerable.Range(0, Math.Abs(p - pos) + 1).Sum(x => 1 * x));
             minFuelcost = Math.Min(minFuelcost, currentFuel);
         }
 
@@ -465,15 +464,15 @@ public class Tasks
          .ToList();
 
         var total = 0;
-        for (var x=0; x < grid.Count; x++)
+        for (var x = 0; x < grid.Count; x++)
         {
             for (var y = 0; y < grid[0].Count; y++)
             {
 
                 var val = grid[x][y];
-                if (new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1,0) }
+                if (new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
                 .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
-                .All(e => val < grid[x + e.Item1][y +e.Item2]))
+                .All(e => val < grid[x + e.Item1][y + e.Item2]))
                 {
                     total += (1 + val);
                 }
@@ -486,7 +485,7 @@ public class Tasks
     [Test]
     public void day9_1_Linqier()
     {
-        var grid = File.ReadAllText(inputPath + "/day9.txt")
+        var grid = File.ReadAllText("./inputs/day9.txt")
          .Trim()
          .Split("\n")
          .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
@@ -504,7 +503,7 @@ public class Tasks
     [Test]
     public void day9_2()
     {
-        var grid = File.ReadAllText(inputPath + "/day9.txt")
+        var grid = File.ReadAllText("./inputs/day9.txt")
          .Trim()
          .Split("\n")
          .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
@@ -515,14 +514,14 @@ public class Tasks
             .SelectMany(x => Enumerable.Range(0, grid[x].Count)
                 .Select(y => new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
                     .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
-                    .All(e => grid[x][y] < grid[x + e.Item1][y + e.Item2]) 
-                        ? new ValueTuple<int, int>(x, y) 
-                        : new ValueTuple<int,int>(-100, -100)))
+                    .All(e => grid[x][y] < grid[x + e.Item1][y + e.Item2])
+                        ? new ValueTuple<int, int>(x, y)
+                        : new ValueTuple<int, int>(-100, -100)))
             .Where(x => x.Item1 != -100 && x.Item2 != -100)
             .ToList();
 
         var basinTotals = new List<int>();
-        foreach(var (bx,by) in basins)
+        foreach (var (bx, by) in basins)
         {
             // BFS and just don't add 9s
             var visited = new HashSet<(int, int)>();
@@ -532,11 +531,11 @@ public class Tasks
             while (tail.Count > 0)
             {
                 var (cx, cy) = tail.Dequeue();
-                if (visited.Contains(new(cx,cy)))
+                if (visited.Contains(new(cx, cy)))
                 {
                     continue;
                 }
-                visited.Add(new(cx,cy));
+                visited.Add(new(cx, cy));
 
                 new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
                 .Where(e => e.Item1 + cx >= 0 && e.Item1 + cx < grid.Count && e.Item2 + cy >= 0 && e.Item2 + cy < grid[0].Count)
@@ -557,6 +556,193 @@ public class Tasks
             .Dump();
     }
 
+    [Test]
+    public void day10_1()
+    {
+        var lines = File.ReadAllText("./inputs/day10.txt")
+            .Trim()
+            .Split("\n")
+            .Select(x => x.ToList())
+            .ToList();
+
+        var scores = new Dictionary<char, long>()
+        {
+            { ')', 3 },
+            { ']', 57 },
+            { '}', 1197 },
+            { '>', 25137 }
+        };
+
+        var matches = new Dictionary<char, char>()
+        {
+            { ')', '(' },
+            { ']', '[' },
+            { '}' , '{'},
+            { '>' , '<'}
+        };
+
+        var invalidChars = new List<char>();
+        foreach (var line in lines)
+        {
+            var stack = new Stack<char>();
+            foreach (var letter in line)
+            {
+                //  first invalid character
+                if (matches.Values.Contains(letter))
+                {
+                    stack.Push(letter);
+                }
+                else
+                {
+                    if (stack.Peek() == matches[letter])
+                    {
+                        stack.Pop();
+                    }
+                    else
+                    {
+                        invalidChars.Add(letter);
+                        break;
+                    }
+                }
+            }
+        }
+
+        invalidChars.Sum(x => scores[x]).Dump();
+    }
+
+    [Test]
+    public void day10_1_Linqier()
+    {
+        var scores = new Dictionary<char, long>()
+        {
+            { ')', 3 },
+            { ']', 57 },
+            { '}', 1197 },
+            { '>', 25137 }
+        };
+
+        var matches = new Dictionary<char, char>()
+        {
+            { '(', ')' },
+            { '[', ']' },
+            { '{' , '}'},
+            { '<' , '>'}
+        };
+
+        File.ReadAllText("./inputs/day10.txt")
+            .Trim()
+            .Split("\n")
+            .Select(x => x.ToList())
+            .Select(line =>
+            {
+                var stack = new Stack<char>();
+                foreach (var letter in line)
+                {
+                    if (matches.Keys.Contains(letter))
+                    {
+                        stack.Push(letter);
+                    }
+                    else
+                    {
+                        if (matches[stack.Peek()] == letter)
+                        {
+                            stack.Pop();
+                        }
+                        else
+                        {
+                            return scores[letter];
+                        }
+                    }
+                }
+
+                return 0;
+            })
+            .Sum()
+            .Dump();
+    }
+
+    [Test]
+    public void day10_2()
+    {
+        var scores = new Dictionary<char, long>()
+        {
+            { ')', 1 },
+            { ']', 2 },
+            { '}', 3 },
+            { '>', 4 }
+        };
+
+        var matches = new Dictionary<char, char>()
+        {
+            { '(', ')' },
+            { '[', ']' },
+            { '{' , '}'},
+            { '<' , '>'}
+        };
+
+        File
+           .ReadAllText(
+                        "./inputs/day10.txt")
+           .Trim()
+           .Split("\n")
+           .Select(x => x.ToList())
+           .Where(line => !this.IsCorrupted(line))
+           .Select(line =>
+           {
+               var stack = new Stack<char>();
+               foreach (var letter in line)
+               {
+                   if (matches.ContainsKey(letter))
+                   {
+                       stack.Push(letter);
+                   }
+                   else
+                   {
+                       stack.Pop();
+                   }
+               }
+
+               return stack.Aggregate((long)0, (score, letter) => score * 5 + scores[matches[letter]]);
+           })
+           .OrderBy(x => x)
+           .Median()
+           .Dump();
+    }
+
+    // copy from part 1 for part 2
+    private bool IsCorrupted(IEnumerable<char> line)
+    {
+
+        var matches = new Dictionary<char, char>()
+        {
+            { ')', '(' },
+            { ']', '[' },
+            { '}' , '{'},
+            { '>' , '<'}
+        };
+
+        var stack = new Stack<char>();
+        foreach (var letter in line)
+        {
+            if (matches.Values.Contains(letter))
+            {
+                stack.Push(letter);
+            }
+            else
+            {
+                if (stack.Peek() == matches[letter])
+                {
+                    stack.Pop();
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     public record CoordPair(int startX, int startY, int endX, int endY);
 
     public class BingoCard

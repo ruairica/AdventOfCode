@@ -25,6 +25,7 @@
                 Console.Write($"]{Environment.NewLine}");
             }
         }
+
         public static double Median<T>(this IEnumerable<T> items) where T : struct, IComparable<T>
         {
             if (items == null)

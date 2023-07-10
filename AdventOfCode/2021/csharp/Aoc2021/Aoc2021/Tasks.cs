@@ -182,7 +182,103 @@ public class Tasks
                 }
             }
         }
+    }
 
+    [Test]
+    public void day4_1_grid()
+    {
+        var text = File.ReadAllText("./inputs/day4.txt").Trim();
+
+        var splits = text.Replace("\r\n", "\n").Split("\n\n");
+        var bingoCalls = splits[0].Trim();
+        var bingoCardSplits = splits[1..]
+            .Select(x => x.Replace("  ", " ").Trim());
+
+        var cards = bingoCardSplits
+            .Select(x => x.Split('\n')
+                .Select(x => x.Trim().Split(' ')
+                    .Select(int.Parse)
+                    .ToList())
+                .ToList())
+            .ToList()
+            .Select(x => new GridWithOtherVal<bool>(x, false)).ToList();
+
+        foreach (var call in bingoCalls.Split(',').Select(int.Parse))
+        {
+            foreach (var card in cards)
+            {
+                var coord = card.FirstOrDefault(x => x.val == call);
+                if (coord != null)
+                {
+                    card.SetOtherVal(coord, true);
+                }
+
+                var bingo = card.GetAllColumns()
+                    .Concat(card.GetAllRows())
+                    .Any(x => x.All(c => c.otherVal));
+
+                if (bingo)
+                {
+                    (call * card
+                        .WhereWithCoord((gi, coord) => !gi.otherVal)
+                        .Select(x => x.gridItem.val)
+                        .Sum())
+                        .Dump();
+                }
+            }
+        }
+    }
+
+
+    [Test]
+    public void day4_2_grid()
+    {
+        var text = File.ReadAllText("./inputs/day4.txt").Trim();
+
+        var splits = text.Replace("\r\n", "\n").Split("\n\n");
+        var bingoCalls = splits[0].Trim();
+        var bingoCardSplits = splits[1..]
+            .Select(x => x.Replace("  ", " ").Trim());
+
+        var cards = bingoCardSplits
+            .Select(x => x.Split('\n')
+                .Select(x => x.Trim().Split(' ')
+                    .Select(int.Parse)
+                    .ToList())
+                .ToList())
+            .ToList()
+            .Select(x => new GridWithOtherVal<bool>(x, false)).ToList();
+
+        foreach (var call in bingoCalls.Split(',').Select(int.Parse))
+        {
+            foreach (var card in cards)
+            {
+                if (card.Complete)
+                {
+                    continue;
+                }
+
+                var coord = card.FirstOrDefault(x => x.val == call);
+                if (coord != null)
+                {
+                    card.SetOtherVal(coord, true);
+                }
+
+                var bingo = card.GetAllColumns()
+                    .Concat(card.GetAllRows())
+                    .Any(x => x.All(c => c.otherVal));
+
+                if (bingo)
+                {
+                    card.Complete = true;
+                    (call * card
+                            .WhereWithCoord((gi, coord) => !gi.otherVal)
+                            .Select(x => x.gridItem.val)
+                            .Sum())
+                        .Dump();
+                }
+            }
+        }
     }
 
     [Test]
@@ -854,6 +950,137 @@ public class Tasks
                 $"Sync'd at step {step + 1}".Dump(); // offset because my steps start at 0
                 break;
             }
+        }
+    }
+
+    [Test]
+    public void day11_1_grid()
+    {
+        var g = File
+            .ReadAllText(
+                "./inputs/day11.txt")
+            .Trim()
+            .Split("\n")
+            .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())
+            .ToList();
+
+        var grid = new Grid(g);
+        var totalFlashes = 0;
+        for (int step = 1; step <= 100; step++)
+        {
+            var q = new Queue<Coord>();
+            var visited = new HashSet<Coord>();
+            // increase all by one, if it's >9 reset to 0
+            grid.Print();
+            grid = grid.SelectAllValues(x => x += 1)
+                .SelectAllValues(x => x > 9 ? 0 : x);
+
+            grid.ForEachWithCoord((val, coord) =>
+            {
+                if (val == 0)
+                {
+                    q.Enqueue(coord);
+                }
+            });
+
+
+            while (q.Any())
+            {
+                var currentCoord = q.Dequeue();
+
+                if (visited.Contains(currentCoord))
+                {
+                    continue;
+                }
+
+                visited.Add(currentCoord);
+                totalFlashes += 1;
+
+                grid.GetValidAdjacentIncludingDiag(currentCoord)
+                    .ForEach(adjCoord =>
+                    {
+
+                        if (grid[adjCoord] != 0)
+                        {
+                            grid[adjCoord] += 1;
+                        }
+
+                        if (grid[adjCoord] > 9)
+                        {
+                            grid[adjCoord] = 0;
+                            q.Enqueue(adjCoord);
+                        }
+                    });
+            }
+
+            totalFlashes.Dump();
+        }
+    }
+
+    [Test]
+    public void day11_2_grid()
+    {
+        var g = File
+            .ReadAllText(
+                "./inputs/day11.txt")
+            .Trim()
+            .Split("\n")
+            .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())
+            .ToList();
+
+        var grid = new Grid(g);
+        for (int step = 1; step <= 10000; step++)
+        {
+            var q = new Queue<Coord>();
+            var visited = new HashSet<Coord>();
+            // increase all by one, if it's >9 reset to 0
+            grid.Print();
+            grid = grid.SelectAllValues(x => x += 1)
+                .SelectAllValues(x => x > 9 ? 0 : x);
+
+            grid.ForEachWithCoord((val, coord) =>
+            {
+                if (val == 0)
+                {
+                    q.Enqueue(coord);
+                }
+            });
+
+
+            while (q.Any())
+            {
+                var currentCoord = q.Dequeue();
+
+                if (visited.Contains(currentCoord))
+                {
+                    continue;
+                }
+
+                visited.Add(currentCoord);
+
+                grid.GetValidAdjacentIncludingDiag(currentCoord)
+                    .ForEach(adjCoord =>
+                    {
+
+                        if (grid[adjCoord] != 0)
+                        {
+                            grid[adjCoord] += 1;
+                        }
+
+                        if (grid[adjCoord] > 9)
+                        {
+                            grid[adjCoord] = 0;
+                            q.Enqueue(adjCoord);
+                        }
+                    });
+            }
+
+            if (grid.AllValues(x => x == 0))
+            {
+                $"Sync'd at {step}".Dump();
+                break;
+            }
+
         }
     }
 

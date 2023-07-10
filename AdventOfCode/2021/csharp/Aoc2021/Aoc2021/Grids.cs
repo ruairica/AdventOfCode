@@ -27,6 +27,8 @@ public class Grid
     //    public void ForEachWithCoord(Action<int, Coord> action)
     //    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord)
     //    public List<Coord> GetValidAdjacentNoDiag(Coord coord)
+    //    return Grid SetValues(this, predicate)
+    //    
 
 
     public int this[Coord coord]
@@ -124,16 +126,7 @@ public class GridWithOtherVal<T>
 
     public void SetOtherVal(Coord coord, T otherVal)
     {
-        for (int x = 0; x < this.Width; x++)
-        {
-            for (int y = 0; y < this.Height; y++)
-            {
-                if (coord == new Coord(x, y))
-                {
-                    this.grid[x][y] = new GridItem<T>(this[coord].val, otherVal);
-                }
-            }
-        }
+        this[coord] = new GridItem<T>(this[coord].val, otherVal);
     }
 
     public void ForEachWithCoord(Action<GridItem<T>, Coord> action)

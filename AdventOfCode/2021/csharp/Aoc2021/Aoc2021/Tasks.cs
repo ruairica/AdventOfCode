@@ -210,6 +210,7 @@ public class Tasks
                 var coord = card.FirstOrDefault(x => x.val == call);
                 if (coord != null)
                 {
+                    card[coord] = new GridItem<bool>(card[coord].val, true);
                     card.SetOtherVal(coord, true);
                 }
 

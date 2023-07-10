@@ -21,6 +21,13 @@ public class Grid
 
     // TODO
     // grid with just numbers could be an abstraction over GridWithOtherItem
+    // unify both grid classes so they have all the same methods/extensions
+    // should probably have a combination of each, ones that return a new grid and one
+    // Print
+    //    public void ForEachWithCoord(Action<int, Coord> action)
+    //    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord)
+    //    public List<Coord> GetValidAdjacentNoDiag(Coord coord)
+
 
     public int this[Coord coord]
     {
@@ -84,8 +91,6 @@ public record GridItem<T>(int val, T otherVal);
 
 public record GridItemCoord<T>(GridItem<T> gridItem, Coord Coord);
 
-
-// TODO RENAME
 public class GridWithOtherVal<T>
 {
     public GridItem<T> this[Coord coord]
@@ -215,22 +220,6 @@ public static class GridWithOtherValExtensions
         }
     }
 
-    /* TODO
-    public static Grid GetAllValues(this GridWithOtherVal<T> grid, Func<GRidItem<T>, int> func)
-    {
-        var resultGrid = CopyGrid(grid);
-
-        for (var x = 0; x < grid.Width; x++)
-        {
-            for (int y = 0; y < grid.grid[x].Count; y++)
-            {
-                resultGrid.grid[x][y] = func(grid.grid[x][y]);
-            }
-        }
-
-        return resultGrid;
-    }*/
-
     public static bool AllValues<T>(this GridWithOtherVal<T> grid, Func<GridItem<T>, bool> func)
     {
         return grid.grid.SelectMany(x => x).All(func);
@@ -239,7 +228,7 @@ public static class GridWithOtherValExtensions
 
 public static class GridExtensions
 {
-    public static Grid GetAllValues(this Grid grid, Func<int, int> func)
+    public static Grid SetValues(this Grid grid, Func<int, int> func)
     {
         var resultGrid = CopyGrid(grid);
 
@@ -295,9 +284,6 @@ public static class GridExtensions
             {
                 if (g.grid[x][y] == 0)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.BackgroundColor = ConsoleColor.Blue;
-
                     Console.Write($"{g.grid[x][y]}, ");
                     Console.ResetColor();
                 }

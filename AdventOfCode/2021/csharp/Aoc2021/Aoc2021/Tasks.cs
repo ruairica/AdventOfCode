@@ -972,8 +972,8 @@ public class Tasks
             var visited = new HashSet<Coord>();
             // increase all by one, if it's >9 reset to 0
             grid.Print();
-            grid = grid.SelectAllValues(x => x += 1)
-                .SelectAllValues(x => x > 9 ? 0 : x);
+            grid = grid.SetValues(x => x += 1)
+                .SetValues(x => x > 9 ? 0 : x);
 
             grid.ForEachWithCoord((val, coord) =>
             {
@@ -1035,8 +1035,8 @@ public class Tasks
             var visited = new HashSet<Coord>();
             // increase all by one, if it's >9 reset to 0
             grid.Print();
-            grid = grid.SelectAllValues(x => x += 1)
-                .SelectAllValues(x => x > 9 ? 0 : x);
+            grid = grid.SetValues(x => x += 1)
+                .SetValues(x => x > 9 ? 0 : x);
 
             grid.ForEachWithCoord((val, coord) =>
             {

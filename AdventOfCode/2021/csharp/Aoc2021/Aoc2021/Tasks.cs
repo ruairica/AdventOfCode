@@ -2,8 +2,6 @@
 using NUnit.Framework;
 
 namespace Aoc2021;
-
-
 // Note: can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
 [TestFixture]
 public class Tasks
@@ -708,6 +706,157 @@ public class Tasks
            .Median()
            .Dump();
     }
+
+    [Test]
+    public void day11_1()
+    {
+        var grid = File
+            .ReadAllText(
+                "./inputs/day11.txt")
+            .Trim()
+            .Split("\n")
+            .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())
+            .ToList();
+
+        var totalFlashes = 0;
+
+        for (var step = 0; step < 100; step++)
+        {
+            var q = new Queue<(int, int)>();
+            var visited = new HashSet<(int, int)>();
+            // increase all by one, if it's >9 reset to 0
+
+            // add now 0 coords to queue
+            for (var x = 0; x < grid.Count; x++)
+            {
+                for (var y = 0; y < grid[0].Count; y++)
+                {
+                    grid[x][y] += 1;
+                    if (grid[x][y] > 9)
+                    {
+                        grid[x][y] = 0;
+                        q.Enqueue(new(x, y));
+
+                    }
+                }
+            }
+
+            while (q.Any())
+            {
+                var (cx, cy) = q.Dequeue();
+
+                if (visited.Contains(new(cx, cy)))
+                {
+                    continue;
+                }
+
+                visited.Add(new(cx, cy));
+                totalFlashes += 1;
+                var directions = new List<(int, int)>
+                {
+                    new(0, 1), new(0, -1), new(1, 0), new(-1, 0),  new(1, 1), new(1, -1), new(-1, 1), new(-1, -1)
+                };
+
+                directions
+                    .Where(e => e.Item1 + cx >= 0 && e.Item1 + cx < grid.Count && e.Item2 + cy >= 0 && e.Item2 + cy < grid[0].Count)
+                    .ToList()
+                    .ForEach(dir =>
+                    {
+                        if (grid[cx + dir.Item1][cy + dir.Item2] != 0)
+                        {
+                            grid[cx + dir.Item1][cy + dir.Item2] += 1;
+                        }
+
+                        if (grid[cx + dir.Item1][cy + dir.Item2] > 9)
+                        {
+                            grid[cx + dir.Item1][cy + dir.Item2] = 0;
+                            q.Enqueue(new(cx + dir.Item1, cy + dir.Item2));
+                        }
+                    });
+            }
+
+            $"after {step + 1} steps:".Dump();
+            grid.PrintGrid();
+            totalFlashes.Dump();
+        }
+
+        totalFlashes.Dump();
+    }
+
+    [Test]
+    public void day11_2()
+    {
+        var grid = File
+            .ReadAllText(
+                "./inputs/day11.txt")
+            .Trim()
+            .Replace("\r\n", "\n") // for working with example
+            .Split("\n")
+            .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())
+            .ToList();
+
+        for (var step = 0; step < 10000; step++)
+        {
+            var q = new Queue<(int, int)>();
+            var visited = new HashSet<(int, int)>();
+            // increase all by one, if it's >9 reset to 0
+
+            // add now 0 coords to queue
+            for (var x = 0; x < grid.Count; x++)
+            {
+                for (var y = 0; y < grid[0].Count; y++)
+                {
+                    grid[x][y] += 1;
+                    if (grid[x][y] > 9)
+                    {
+                        grid[x][y] = 0;
+                        q.Enqueue(new(x, y));
+
+                    }
+                }
+            }
+
+            while (q.Any())
+            {
+                var (cx, cy) = q.Dequeue();
+
+                if (visited.Contains(new(cx, cy)))
+                {
+                    continue;
+                }
+
+                visited.Add(new(cx, cy));
+                var directions = new List<(int, int)>
+                {
+                    new(0, 1), new(0, -1), new(1, 0), new(-1, 0),  new(1, 1), new(1, -1), new(-1, 1), new(-1, -1)
+                };
+
+                directions
+                    .Where(e => e.Item1 + cx >= 0 && e.Item1 + cx < grid.Count && e.Item2 + cy >= 0 && e.Item2 + cy < grid[0].Count)
+                    .ToList()
+                    .ForEach(dir =>
+                    {
+                        if (grid[cx + dir.Item1][cy + dir.Item2] != 0)
+                        {
+                            grid[cx + dir.Item1][cy + dir.Item2] += 1;
+                        }
+
+                        if (grid[cx + dir.Item1][cy + dir.Item2] > 9)
+                        {
+                            grid[cx + dir.Item1][cy + dir.Item2] = 0;
+                            q.Enqueue(new(cx + dir.Item1, cy + dir.Item2));
+                        }
+                    });
+            }
+
+            if (grid.SelectMany(x => x).All(x => x == 0))
+            {
+                $"Sync'd at step {step + 1}".Dump(); // offset because my steps start at 0
+                break;
+            }
+        }
+    }
+
 
     // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)

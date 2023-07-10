@@ -2,6 +2,29 @@
 {
     public static class Helpers
     {
+        public static void PrintGrid(this List<List<int>> grid)
+        {
+            for (int x = 0; x < grid.Count; x++)
+            {
+                Console.Write("[");
+                for (int y = 0; y < grid[x].Count; y++)
+                {
+                    if (grid[x][y] == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.BackgroundColor = ConsoleColor.Blue;
+
+                        Console.Write($"{grid[x][y]}, ");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.Write($"{grid[x][y]}, ");
+                    }
+                }
+                Console.Write($"]{Environment.NewLine}");
+            }
+        }
         public static double Median<T>(this IEnumerable<T> items) where T : struct, IComparable<T>
         {
             if (items == null)

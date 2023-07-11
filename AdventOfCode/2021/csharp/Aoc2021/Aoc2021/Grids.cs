@@ -35,7 +35,7 @@ public class Grid
     public int this[Coord coord]
     {
         get => this.grid[coord.x][coord.y];
-        set { this.grid[coord.x][coord.y] = value; }
+        set => this.grid[coord.x][coord.y] = value;
     }
 
     public int Width { get; set; }

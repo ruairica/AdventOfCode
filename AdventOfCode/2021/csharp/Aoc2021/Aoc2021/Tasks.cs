@@ -611,6 +611,7 @@ public class Tasks
 
         var grid = new Grid(g);
         var total = 0;
+
         grid.ForEachWithCoord((val, coord) =>
         {
             if (grid.GetValidAdjacentNoDiag(coord).All(a => grid[a] > val))
@@ -1312,6 +1313,114 @@ public class Tasks
         totalPaths.Count.Dump();
     }
 
+    [Test]
+    public void day13_1()
+    {
+        var (pointLines, folds) = File
+            .ReadAllText(
+                "./inputs/day13.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n\n");
+
+        var points = pointLines
+            .Split("\n")
+            .Select(pl =>
+            {
+                var (x, y) = pl.Trim().Split(",");
+                return new ValueTuple<int, int>(int.Parse(x), int.Parse(y));
+            })
+            .ToDictionary(k => k, v => 1);
+
+        var (dir, lineStrNum) = folds.Split('\n').First().Split(' ').Last().Split('=');
+
+        // checked for part 1 that my first fold is an X and only coded for it
+        if (dir == "x")
+        {
+            // x is a horizonal point, so  will fold left
+
+            var lineNum = int.Parse(lineStrNum);
+
+            foreach (var (ox, oy) in points.Where(kvp => kvp.Key.Item1 > lineNum).ToList().Select(x => x.Key))
+            {
+                var diff = Math.Abs(ox - lineNum);
+
+                var nx = ox - (2 * diff);
+
+                if (points.ContainsKey(new(nx, oy)))
+                {
+                    points[new(nx, oy)] += 1;
+                }
+                else
+                {
+                    points[new(nx, oy)] = 1;
+                }
+
+                points.Remove(new(ox, oy));
+            }
+        }
+
+        points.Keys.Count.Dump();
+    }
+
+
+    [Test]
+    public void day13_2()
+    {
+        var (pointLines, folds) = File
+            .ReadAllText(
+                "./inputs/day13.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n\n");
+
+        var points = pointLines
+            .Split("\n")
+            .Select(pl =>
+            {
+                var (x, y) = pl.Trim().Split(",");
+                return new ValueTuple<int, int>(int.Parse(x), int.Parse(y));
+            })
+            .ToDictionary(k => k, v => 1);
+
+
+
+        foreach (var (dir, lineStrNum) in folds.Split('\n').Select(l => l.Split(' ').Last().Split('=')))
+        {
+            var lineNum = int.Parse(lineStrNum);
+            var horizontal = dir == "x";
+            foreach (var (ox, oy) in points.Where(kvp => horizontal ? kvp.Key.Item1 > lineNum : kvp.Key.Item2 > lineNum).ToList().Select(x => x.Key))
+            {
+                var diff = horizontal ? Math.Abs(ox - lineNum) : Math.Abs(oy - lineNum);
+
+                var nx = ox - (2 * diff);
+                var ny = oy - (2 * diff);
+
+                ValueTuple<int, int> newCoord = horizontal ? new(nx, oy) : new(ox, ny);
+                if (points.ContainsKey(newCoord))
+                {
+                    points[newCoord] += 1;
+                }
+                else
+                {
+                    points[newCoord] = 1;
+                }
+
+                points.Remove(new(ox, oy));
+            }
+
+        }
+
+        for (int i = 0; i < 20; i++)
+        {
+            Console.WriteLine("");
+            for (int j = 0; j < 150; j++)
+            {
+                var letter = points.ContainsKey(new(j, i)) ? "X" : " ";
+                Console.Write(letter);
+            }
+        }
+    }
 
     // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)

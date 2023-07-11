@@ -79,7 +79,7 @@ public class GridWithOtherVal<T>
         Console.Write("[");
         for (int x = 0; x < this.Width; x++)
         {
-            Console.Write($"[{Environment.NewLine}");
+            Console.Write($"{Environment.NewLine}[");
             Console.Write(string.Join(", ", this.grid[x].Select(e => $"({e.val}, {e.otherVal})")));
             Console.Write($"]");
         }

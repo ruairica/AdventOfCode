@@ -91,7 +91,7 @@ public class Grid
         Console.Write("[");
         for (int x = 0; x < this.Width; x++)
         {
-            Console.Write($"[{Environment.NewLine}");
+            Console.Write($"{Environment.NewLine}[");
             Console.Write(string.Join(", ", this.grid[x]));
             Console.Write($"]");
         }

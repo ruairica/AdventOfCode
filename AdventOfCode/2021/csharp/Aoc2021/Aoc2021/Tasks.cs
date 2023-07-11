@@ -452,7 +452,7 @@ public class Tasks
     [Test]
     public void day7_1()
     {
-        var positions = File.ReadAllText(inputPath + "/day7.txt")
+        var positions = File.ReadAllText("./inputs/day7.txt")
                          .Trim()
                          .Split(",")
                          .Select(int.Parse)
@@ -471,7 +471,7 @@ public class Tasks
     [Test]
     public void day7_2()
     {
-        var positions = File.ReadAllText(inputPath + "/day7.txt")
+        var positions = File.ReadAllText("./inputs/day7.txt")
                          .Trim()
                          .Split(",")
                          .Select(int.Parse)
@@ -490,7 +490,7 @@ public class Tasks
     [Test]
     public void day7_2_TwoLiner()
     {
-        var allPositions = File.ReadAllText(inputPath + "/day7.txt")
+        var allPositions = File.ReadAllText("./inputs/day7.txt")
                          .Trim()
                          .Split(",")
                          .Select(int.Parse)
@@ -500,6 +500,26 @@ public class Tasks
             .Min()
             .Dump();
     }
+
+    [Test]
+    public void day7_2_TwoLiner2()
+    {
+
+        var positions = File.ReadAllText("./inputs/day7.txt")
+            .Trim()
+            .Split(",")
+            .Select(int.Parse)
+            .ToList();
+
+
+        Enumerable.Range(0, positions.Max())
+            .Select(pos => positions
+                .Sum(p => Enumerable.Range(0, Math.Abs(p - pos) + 1)
+                    .Sum(x => 1 * x)))
+            .Aggregate(long.MaxValue, (winner, current) => Math.Min(winner, current))
+            .Dump();
+    }
+
 
     [Test]
     public void day8_1()
@@ -552,8 +572,9 @@ public class Tasks
     [Test]
     public void day9_1()
     {
-        var grid = File.ReadAllText(inputPath + "/day9.txt")
+        var grid = File.ReadAllText("./inputs/day9.txt")
          .Trim()
+         .Replace("\r\n", "\n")
          .Split("\n")
          .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
          .ToList();
@@ -563,7 +584,6 @@ public class Tasks
         {
             for (var y = 0; y < grid[0].Count; y++)
             {
-
                 var val = grid[x][y];
                 if (new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
                 .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
@@ -578,10 +598,35 @@ public class Tasks
     }
 
     [Test]
+    public void day9_1_grid()
+    {
+        var g = File.ReadAllText("./inputs/day9.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
+            .ToList();
+
+        var grid = new Grid(g);
+        var total = 0;
+        grid.ForEachWithCoord((val, coord) =>
+        {
+            if (grid.GetValidAdjacentNoDiag(coord).All(a => grid[a] > val))
+            {
+                total += (1 + val);
+            }
+        });
+
+        total.Dump();
+    }
+
+
+    [Test]
     public void day9_1_Linqier()
     {
         var grid = File.ReadAllText("./inputs/day9.txt")
          .Trim()
+         .Replace("\r\n", "\n")
          .Split("\n")
          .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
          .ToList();
@@ -600,6 +645,7 @@ public class Tasks
     {
         var grid = File.ReadAllText("./inputs/day9.txt")
          .Trim()
+         .Replace("\r\n", "\n")
          .Split("\n")
          .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
          .ToList();
@@ -640,6 +686,54 @@ public class Tasks
                 {
                     tail.Enqueue(new(cx + e.Item1, cy + e.Item2));
                 });
+            }
+            basinTotals.Add(visited.Count);
+        }
+
+        basinTotals
+            .OrderByDescending(x => x)
+            .Take(3)
+            .Aggregate(1, (total, cur) => total * cur)
+            .Dump();
+    }
+
+    [Test]
+    public void day9_2_grid()
+    {
+        var g = File.ReadAllText("./inputs/day9.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
+            .ToList();
+
+        var grid = new Grid(g);
+
+        var basinCoords = grid.WhereWithCoord((v, coord) => grid.GetValidAdjacentNoDiag(coord).All(a => grid[a] > v))
+            .Select(x => new Coord(x.Coord.x, x.Coord.y))
+            .ToList();
+
+        var basinTotals = new List<int>();
+        foreach (var bc in basinCoords)
+        {
+            // BFS and just don't add 9s
+            var visited = new HashSet<Coord>();
+            var tail = new Queue<Coord>();
+            tail.Enqueue(bc);
+
+            while (tail.Count > 0)
+            {
+                var currentCoord = tail.Dequeue();
+                if (visited.Contains(currentCoord))
+                {
+                    continue;
+                }
+                visited.Add(currentCoord);
+
+                grid.GetValidAdjacentNoDiag(currentCoord)
+                    .Where(adj => grid[adj] != 9)
+                    .ToList()
+                    .ForEach(tail.Enqueue);
             }
             basinTotals.Add(visited.Count);
         }

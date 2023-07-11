@@ -8,16 +8,15 @@ public class Grid
         set => grid[coord.x][coord.y] = value;
     }
 
+    public bool Complete { get; set; }
+
+    public int Number { get; set; }
+
     public int Width { get; set; }
 
     public int Height { get; set; }
 
     public List<List<int>> grid;
-
-    public static readonly List<Coord> dirsWithDiags = new()
-        { new(0, 1), new(0, -1), new(1, 0), new(-1, 0), new(1, 1), new(1, -1), new(-1, 1), new(-1, -1) };
-
-    public static readonly List<Coord> dirsNoDiags = new() { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
 
 
     public Grid(List<List<int>> grid)

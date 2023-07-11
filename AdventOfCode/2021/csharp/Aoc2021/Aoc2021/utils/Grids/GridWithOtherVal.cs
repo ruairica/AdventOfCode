@@ -12,6 +12,8 @@ public class GridWithOtherVal<T>
 
     public bool Complete { get; set; }
 
+    public int Number { get; set; }
+
     public int Width { get; set; }
 
     public int Height { get; set; }

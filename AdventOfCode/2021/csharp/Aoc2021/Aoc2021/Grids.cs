@@ -25,6 +25,7 @@ public class Grid
     // should probably have a combination of each, ones that return a new grid and one
     // Print
     //    public void ForEachWithCoord(Action<int, Coord> action)
+    //     WHERE with coord
     //    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord)
     //    public List<Coord> GetValidAdjacentNoDiag(Coord coord)
     //    return Grid SetValues(this, predicate)
@@ -278,7 +279,6 @@ public static class GridExtensions
                 if (g.grid[x][y] == 0)
                 {
                     Console.Write($"{g.grid[x][y]}, ");
-                    Console.ResetColor();
                 }
                 else
                 {

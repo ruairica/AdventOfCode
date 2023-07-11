@@ -1248,7 +1248,7 @@ public class Tasks
     [Test]
     public void day12_2()
     {
-        var links = new Dictionary<string, List<(string cave, bool big)>>();
+        var links = new Dictionary<string, List<string>>();
         var smallCaves = new HashSet<string>();
         File
             .ReadAllText(
@@ -1261,8 +1261,8 @@ public class Tasks
             {
                 var (cave1, cave2) = line.Trim().Split("-");
                 // add caves to eachother
-                links[cave1] = links.GetValueOrDefault(cave1, new List<(string cave, bool big)>()).Concat(new List<(string cave, bool big)> { new(cave2, cave2 == cave2.ToUpper()) }).ToList();
-                links[cave2] = links.GetValueOrDefault(cave2, new List<(string cave, bool big)>()).Concat(new List<(string cave, bool big)> { new(cave1, cave1 == cave1.ToUpper()) }).ToList();
+                links[cave1] = links.GetValueOrDefault(cave1, new List<string>()).Concat(new List<string> { cave2 }).ToList();
+                links[cave2] = links.GetValueOrDefault(cave2, new List<string>()).Concat(new List<string> { cave1 }).ToList();
 
                 if (cave1 == cave1.ToLower())
                 {
@@ -1303,7 +1303,7 @@ public class Tasks
 
 
             // add all links
-            var linkCaves = links[currentCave.cave].Select(x => x.cave).ToList();
+            var linkCaves = links[currentCave.cave].Select(x => x).ToList();
 
 
             linkCaves.ForEach(x => stack.Push(

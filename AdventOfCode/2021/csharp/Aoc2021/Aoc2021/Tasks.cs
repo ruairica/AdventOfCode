@@ -1182,22 +1182,21 @@ public class Tasks
     [Test]
     public void day12_1()
     {
-        var links = new Dictionary<string, List<(string cave, bool big)>>();
+        var links = new Dictionary<string, List<string>>();
         var smallCaves = new HashSet<string>();
         File
             .ReadAllText(
                 "./inputs/day12.txt")
             .Trim()
             .Replace("\r\n", "\n")
-
             .Split("\n")
             .ToList()
             .ForEach(line =>
             {
                 var (cave1, cave2) = line.Trim().Split("-");
                 // add caves to eachother
-                links[cave1] = links.GetValueOrDefault(cave1, new List<(string cave, bool big)>()).Concat(new List<(string cave, bool big)> { new(cave2, cave2 == cave2.ToUpper()) }).ToList();
-                links[cave2] = links.GetValueOrDefault(cave2, new List<(string cave, bool big)>()).Concat(new List<(string cave, bool big)> { new(cave1, cave1 == cave1.ToUpper()) }).ToList();
+                links[cave1] = links.GetValueOrDefault(cave1, new List<string>()).Concat(new List<string> { cave2 }).ToList();
+                links[cave2] = links.GetValueOrDefault(cave2, new List<string>()).Concat(new List<string> { cave1 }).ToList();
 
                 if (cave1 == cave1.ToLower())
                 {
@@ -1229,8 +1228,6 @@ public class Tasks
                 continue;
             }
 
-            // need a way to reset small caves if path lead to a dead end
-
             // can only visit each small cave once so continue if visited
             if (smallCaves.Contains(currentCave.cave) && currentCave.pathSoFar.Contains(currentCave.cave))
             {
@@ -1238,7 +1235,7 @@ public class Tasks
             }
 
             // add all links
-            var linkCaves = links[currentCave.cave].Select(x => x.cave).ToList();
+            var linkCaves = links[currentCave.cave].Select(x => x).ToList();
 
 
             linkCaves.ForEach(x => stack.Push(new(x, currentCave.pathSoFar.Concat(new List<string> { currentCave.cave }).ToList())));
@@ -1249,7 +1246,7 @@ public class Tasks
     }
 
     [Test]
-    public void day12_2() //TODO
+    public void day12_2()
     {
         var links = new Dictionary<string, List<(string cave, bool big)>>();
         var smallCaves = new HashSet<string>();
@@ -1258,7 +1255,6 @@ public class Tasks
                 "./inputs/day12.txt")
             .Trim()
             .Replace("\r\n", "\n")
-
             .Split("\n")
             .ToList()
             .ForEach(line =>
@@ -1279,8 +1275,6 @@ public class Tasks
                 }
             });
 
-        links.Dump();
-
         var stack = new Stack<(string cave, List<string> pathSoFar, bool hasUsedDuplicate)>();
         var startCave = "start";
         var endCave = "end";
@@ -1288,14 +1282,12 @@ public class Tasks
         var totalPaths = new HashSet<string>();
         while (stack.Any())
         {
-            stack.Count.Dump();
             var currentCave = stack.Pop();
 
             // end of path reached
             if (currentCave.cave == endCave)
             {
                 totalPaths.Add(string.Join(", ", currentCave.pathSoFar));
-                totalPaths.Count.Dump();
                 continue;
             }
 
@@ -1314,15 +1306,11 @@ public class Tasks
             var linkCaves = links[currentCave.cave].Select(x => x.cave).ToList();
 
 
-            linkCaves.ForEach(x =>
-                stack.Push(
-                    new(x, currentCave.pathSoFar.Concat(new List<string> { currentCave.cave }).ToList(), shouldHaveDup)));
-
+            linkCaves.ForEach(x => stack.Push(
+                new(x, new List<string>(currentCave.pathSoFar) { currentCave.cave }, shouldHaveDup)));
         }
 
-        "ANS:".Dump();
         totalPaths.Count.Dump();
-        //94017638 is wrong
     }
 
 

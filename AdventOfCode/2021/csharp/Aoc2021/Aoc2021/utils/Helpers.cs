@@ -1,31 +1,7 @@
-﻿namespace Aoc2021
+﻿namespace Aoc2021.utils
 {
     public static class Helpers
     {
-        public static void PrintGrid(this List<List<int>> grid)
-        {
-            for (int x = 0; x < grid.Count; x++)
-            {
-                Console.Write("[");
-                for (int y = 0; y < grid[x].Count; y++)
-                {
-                    if (grid[x][y] == 0)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.BackgroundColor = ConsoleColor.Blue;
-
-                        Console.Write($"{grid[x][y]}, ");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.Write($"{grid[x][y]}, ");
-                    }
-                }
-                Console.Write($"]{Environment.NewLine}");
-            }
-        }
-
         public static double Median<T>(this IEnumerable<T> items) where T : struct, IComparable<T>
         {
             if (items == null)
@@ -47,20 +23,11 @@
 
         public static IEnumerable<(T, int)> Enumerate<T>(this IEnumerable<T> list)
         {
-            var i = 0;
-            foreach (var item in list)
-            {
-                yield return new(item, i++);
-            }
+            return list.Select((x, i) => new ValueTuple<T, int>(x, i));
         }
         public static int ConvertToDecimal(List<int> binary)
         {
-            var result = 0;
-            for (int m = 0; m < binary.Count; m++)
-            {
-                result += binary[m] * (int)Math.Pow(2, binary.Count - 1 - m);
-            }
-            return result;
+            return binary.Select((t, m) => t * (int)Math.Pow(2, binary.Count - 1 - m)).Sum();
         }
 
         public static void Deconstruct<T>(this IList<T> list, out T first)

@@ -1,4 +1,6 @@
-﻿using Dumpify;
+﻿using Aoc2021.utils;
+using Aoc2021.utils.Grids;
+using Dumpify;
 using NUnit.Framework;
 
 namespace Aoc2021;
@@ -967,7 +969,6 @@ public class Tasks
             }
 
             $"after {step + 1} steps:".Dump();
-            grid.PrintGrid();
             totalFlashes.Dump();
         }
 
@@ -1066,8 +1067,7 @@ public class Tasks
             var q = new Queue<Coord>();
             var visited = new HashSet<Coord>();
             // increase all by one, if it's >9 reset to 0
-            grid.Print();
-            grid = grid.SetValues(x => x += 1)
+            grid = grid.SetValues(x => x + 1)
                 .SetValues(x => x > 9 ? 0 : x);
 
             grid.ForEachWithCoord((val, coord) =>
@@ -1129,7 +1129,6 @@ public class Tasks
             var q = new Queue<Coord>();
             var visited = new HashSet<Coord>();
             // increase all by one, if it's >9 reset to 0
-            grid.Print();
             grid = grid.SetValues(x => x += 1)
                 .SetValues(x => x > 9 ? 0 : x);
 

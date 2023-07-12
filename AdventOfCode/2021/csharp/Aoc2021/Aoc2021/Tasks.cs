@@ -4,6 +4,9 @@ using Dumpify;
 using NUnit.Framework;
 
 namespace Aoc2021;
+
+using System.Text;
+
 // Note: can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
 [TestFixture]
 public class Tasks
@@ -1408,7 +1411,6 @@ public class Tasks
 
                 points.Remove(new(ox, oy));
             }
-
         }
 
         for (int i = 0; i < 20; i++)
@@ -1420,6 +1422,154 @@ public class Tasks
                 Console.Write(letter);
             }
         }
+    }
+
+    [Test]
+    public void day14_1()
+    {
+        var (original, r) = File
+            .ReadAllText(
+                "./inputs/day14.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n\n");
+
+        var rules = r.Split("\n")
+            .Select(line =>
+            {
+                var (i, o) = line.Trim().Split(" -> ");
+                return (i, o);
+            })
+            .ToDictionary(k => k.i, v => v.o);
+        var result = original.Trim();
+        result.Dump();
+
+        /*Template:     NNCB
+After step 1: NCNBCHB
+After step 2: NBCCNBBBCBHCB
+After step 3: NBBBCNCCNBBNBNBBCHBHHBCHB*/
+        for (var step = 1; step <= 10; step++)
+        {
+            step.Dump();
+            var newResult = "";
+            for (int l = 1; l < result.Length; l++)
+            {
+                var middle = rules[$"{result[l - 1]}{result[l]}"];
+                var news = $"{result[l - 1]}{middle}";
+                newResult += news;
+            }
+
+            result = newResult + result.Last().ToString();
+        }
+
+        var freqs = result.GroupBy(x => x).Select(x => x.LongCount()).ToList();
+        var ans = freqs.Max() - freqs.Min();
+        ans.Dump();
+    }
+
+    [Test]
+    public void day14_2() // TODO
+    {
+        var (original, r) = File
+            .ReadAllText(
+                "./inputs/day14.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n\n");
+
+        var rules = r.Split("\n")
+            .Select(line =>
+            {
+                var (i, o) = line.Trim().Split(" -> ");
+                return (i, o);
+            })
+            .ToDictionary(k => k.i, v => v.o);
+        var result = new StringBuilder(original.Trim());
+
+        var last = original.Trim().Last().ToString();
+        for (var step = 1; step <= 40; step++)
+        {
+            step.Dump();
+            var newResult = new StringBuilder();
+            for (int l = 1; l < result.Length; l++)
+            {
+                var middle = rules[$"{result[l - 1]}{result[l]}"];
+                var news = $"{result[l - 1]}{middle}";
+                newResult.Append(news);
+            }
+            result = newResult.Append(result[^1]);
+        }
+
+        var freqs = result.ToString().GroupBy(x => x).Select(x => x.LongCount()).ToList();
+        var ans = freqs.Max() - freqs.Min();
+        ans.Dump();
+    }
+
+    [Test]
+    public void day14_TwoDifferent() //TODO
+    {
+        var (original, r) = File
+            .ReadAllText(
+                "./inputs/day14ex.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n\n");
+
+        var rules = r.Split("\n")
+            .Select(line =>
+            {
+                var (i, o) = line.Trim().Split(" -> ");
+                return (i, o);
+            })
+            .ToDictionary(k => k.i, v => v.o);
+        var os = new StringBuilder(original.Trim());
+
+        var last = original.Trim().Last().ToString();
+
+        var results = new Dictionary<string, long>();
+        for (int l = 1; l < os.Length; l++)
+        {
+            var key = $"{os[l - 1]}{os[l]}";
+            results[key] = results.GetValueOrDefault(key, 0) + 1;
+        }
+
+
+        for (var step = 1; step <= 9; step++)
+        {
+            var newResults = new Dictionary<string, long>();
+
+            foreach (var kvp in results)
+            {
+                var (first, second) = kvp.Key.Select(x => x).ToList();
+                var mid = rules[kvp.Key];
+                var new1 = $"{first}{mid}";
+                var new2 = $"{mid}{second}";
+
+                newResults[new1] = newResults.GetValueOrDefault(new1, 0) + kvp.Value;
+                newResults[new2] = newResults.GetValueOrDefault(new2, 0) + kvp.Value;
+            }
+
+            results = new Dictionary<string, long>(newResults);
+            step.Dump();
+            results.Dump();
+        }
+
+        var finals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(x => x)
+            .ToDictionary(x => x.ToString(), x => (long)0);
+        foreach (var kvp in results)
+        {
+            var (c1, c2) = (kvp.Key[0].ToString(), kvp.Key[1].ToString());
+            finals[c1] += kvp.Value;
+            finals[c2] += kvp.Value;
+        }
+
+        finals = finals.Where(x => x.Value > 0)
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        finals.Dump();
+
+        var ans = finals.MaxBy(x => x.Value).Value - finals.MinBy(x => x.Value).Value;
+        ans.Dump();
     }
 
     // copy from part 1 for part 2

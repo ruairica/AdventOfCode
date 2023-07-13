@@ -1652,6 +1652,72 @@ public class Tasks
         (finalFreqs.Last() - finalFreqs.First()).Dump();
     }
 
+    [Test]
+    public void day14_2_refactor() // TODO
+    {
+        var (original, r) = File
+            .ReadAllText(
+                "./inputs/day14.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n\n")
+            .Select(x => x.Trim())
+            .ToList();
+
+        var rules = r.Split("\n")
+            .Select(line =>
+            {
+                var (i, o) = line.Trim().Split(" -> ");
+                return (i, o);
+            })
+            .ToDictionary(k => k.i, v => v.o);
+
+        var results = new Dictionary<string, long>();
+        for (int l = 1; l < original.Length; l++)
+        {
+            var key = $"{original[l - 1]}{original[l]}";
+            results[key] = results.GetValueOrDefault(key, 0) + 1;
+        }
+
+        for (var step = 1; step <= 40; step++)
+        {
+            foreach (var (key, val) in new Dictionary<string, long>(results))
+            {
+                var (first, second) = key.Select(x => x).ToList();
+                var mid = rules[key];
+                var new1 = $"{first}{mid}";
+                var new2 = $"{mid}{second}";
+
+                results[new1] = results.GetValueOrDefault(new1, 0) + val;
+                results[new2] = results.GetValueOrDefault(new2, 0) + val;
+                results[key] -= val;
+            }
+        }
+
+        var finals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            .Select(x => x)
+            .ToDictionary(x => x.ToString(), x => (long)0);
+
+        foreach (var kvp in results)
+        {
+            var (c1, c2) = (kvp.Key[0].ToString(), kvp.Key[1].ToString());
+            finals[c1] += kvp.Value;
+            finals[c2] += kvp.Value;
+        }
+
+        // first and last characters never change
+        finals[original[0].ToString()]++;
+        finals[original[^1].ToString()]++;
+
+        var finalFreqs = finals
+            .Where(x => x.Value > 0)
+            .Select(x => x.Value / 2)
+            .OrderBy(x => x)
+            .ToList();
+
+        (finalFreqs.Last() - finalFreqs.First()).Dump();
+    }
+
     // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)
     {

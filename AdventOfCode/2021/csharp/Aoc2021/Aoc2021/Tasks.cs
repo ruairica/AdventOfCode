@@ -14,6 +14,126 @@ public class Tasks
     private const string inputPath = @"C:\repos\AdventOfCode\AdventOfCode\2021\csharp\Aoc2021\Aoc2021\inputs\";
 
     [Test]
+    public void day1_1()
+    {
+        var lines = File.ReadAllText("./inputs/day1.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .Select(int.Parse)
+            .ToList();
+
+        var result = 0;
+        for (int i = 1; i < lines.Count; i++)
+        {
+            if (lines[i] > lines[i - 1])
+            {
+                result += 1;
+            }
+        }
+
+        result.Dump();
+
+    }
+
+    [Test]
+    public void day1_2()
+    {
+        var lines = File.ReadAllText("./inputs/day1.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .Select(int.Parse)
+            .ToList();
+
+        var result = 0;
+        for (int i = 3; i < lines.Count; i++)
+        {
+            if (lines[i] + lines[i - 1] + lines[i - 2] > lines[i - 1] + lines[i - 2] + lines[i - 3])
+            {
+                result += 1;
+            }
+        }
+
+        result.Dump();
+    }
+
+    [Test]
+    public void day2_1()
+    {
+        var lines = File.ReadAllText("./inputs/day2.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .ToList();
+
+        long horizontal = 0;
+        long depth = 0;
+
+        foreach (var line in lines)
+        {
+            var (dir, s) = line.Split(" ");
+
+            var size = int.Parse(s);
+
+            switch (dir)
+            {
+                case "forward":
+                    horizontal += size;
+                    break;
+                case "up":
+                    depth -= size;
+                    break;
+                case "down":
+                    depth += size;
+                    break;
+
+            }
+        }
+
+        (horizontal * depth).Dump();
+    }
+
+
+    [Test]
+    public void day2_2()
+    {
+        var lines = File.ReadAllText("./inputs/day2.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .ToList();
+
+        long horizontal = 0;
+        long depth = 0;
+        long aim = 0;
+
+        foreach (var line in lines)
+        {
+            var (dir, s) = line.Split(" ");
+
+            var size = int.Parse(s);
+
+            switch (dir)
+            {
+                case "forward":
+                    horizontal += size;
+                    depth += (size * aim);
+                    break;
+                case "up":
+                    aim -= size;
+                    break;
+                case "down":
+                    aim += size;
+                    break;
+            }
+        }
+
+        (horizontal * depth).Dump();
+    }
+
+
+    [Test]
     public void day3_1()
     {
         var i = File.ReadAllText(inputPath + "/day3.txt")

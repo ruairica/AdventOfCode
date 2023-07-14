@@ -1718,6 +1718,32 @@ public class Tasks
         (finalFreqs.Last() - finalFreqs.First()).Dump();
     }
 
+    [Test]
+    public void day15_1()
+    {
+        var grid = File.ReadAllText("./inputs/day15.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
+            .ToList();
+
+        Node start = new Node(0, 0);
+        Node target = new Node(grid.Count - 1, grid[0].Count - 1);
+
+        int cost = AStarAlgorithm.AStar(grid, start, target);
+
+        if (cost != -1)
+        {
+            Console.WriteLine("Distance from start to target: {0}", cost);
+        }
+        else
+        {
+            Console.WriteLine("No path found!");
+        }
+
+    }
+
     // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)
     {

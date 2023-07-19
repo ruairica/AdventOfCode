@@ -1,31 +1,30 @@
-﻿public class Node
+﻿public class AStarNode
 {
     public int Row { get; set; }
     public int Column { get; set; }
-    public int F { get; set; } // Estimated total cost
+    public int F => G + H; // Estimated total cost
     public int G { get; set; } // Cost from start node
     public int H { get; set; } // Heuristic estimate to target node
-    public Node Parent { get; set; }
+    public AStarNode Parent { get; set; }
 
-    public Node(int row, int column)
+    public AStarNode(int row, int column)
     {
         Row = row;
         Column = column;
-        F = 0;
         G = 0;
         H = 0;
         Parent = null;
     }
 }
-
+/*
 public class AStarAlgorithm
 {
-    static int ManhattanDistance(Node current, Node target)
+    static int ManhattanDistance(AStarNode current, AStarNode target)
     {
         return Math.Abs(current.Row - target.Row) + Math.Abs(current.Column - target.Column);
     }
 
-    static List<Node> GetNeighbors(Node current, List<List<int>> grid, List<List<bool>> closed)
+    static List<AStarNode> GetNeighbors(AStarNode current, List<List<int>> grid, List<List<bool>> closed)
     {
         int[] dr = { -1, 0, 1, 0 };
         int[] dc = { 0, 1, 0, -1 };
@@ -33,7 +32,7 @@ public class AStarAlgorithm
         int rows = grid.Count;
         int columns = grid[0].Count;
 
-        List<Node> neighbors = new List<Node>();
+        List<AStarNode> neighbors = new List<AStarNode>();
 
         for (int i = 0; i < 4; i++)
         {
@@ -42,19 +41,19 @@ public class AStarAlgorithm
 
             if (newRow >= 0 && newRow < rows && newColumn >= 0 && newColumn < columns && !closed[newRow][newColumn])
             {
-                neighbors.Add(new Node(newRow, newColumn));
+                neighbors.Add(new AStarNode(newRow, newColumn));
             }
         }
 
         return neighbors;
     }
 
-    public static int AStar(List<List<int>> grid, Node start, Node target)
+    public static int AStar(List<List<int>> grid, AStarNode start, AStarNode target)
     {
         int rows = grid.Count;
         int columns = grid[0].Count;
 
-        List<Node> openList = new List<Node>();
+        List<AStarNode> openList = new List<AStarNode>();
         List<List<bool>> closedList = new List<List<bool>>();
 
         for (int i = 0; i < rows; i++)
@@ -74,7 +73,7 @@ public class AStarAlgorithm
 
         while (openList.Count > 0)
         {
-            Node current = openList[0];
+            AStarNode current = openList[0];
             int currentIndex = 0;
 
             for (int i = 1; i < openList.Count; i++)
@@ -93,18 +92,19 @@ public class AStarAlgorithm
             {
                 // Reached the target, return the total cost (sum of grid values)
                 int totalCost = 0;
-                Node node = current;
-                while (node != null)
+                AStarNode aStarNode = current;
+                while (aStarNode != null)
                 {
-                    totalCost += grid[node.Row][node.Column];
-                    node = node.Parent;
+                    totalCost += grid[aStarNode.Row][aStarNode.Column];
+                    aStarNode = aStarNode.Parent;
                 }
-                return totalCost - grid[0][0]; // first cost isn't counted
+
+                return current.G;
             }
 
-            List<Node> neighbors = GetNeighbors(current, grid, closedList);
+            List<AStarNode> neighbors = GetNeighbors(current, grid, closedList);
 
-            foreach (Node neighbor in neighbors)
+            foreach (AStarNode neighbor in neighbors)
             {
                 int gScore = current.G + grid[neighbor.Row][neighbor.Column];
                 bool isBetterPath = false;
@@ -138,3 +138,4 @@ public class AStarAlgorithm
         return -1;
     }
 }
+*/

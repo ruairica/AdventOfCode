@@ -1728,10 +1728,10 @@ public class Tasks
             .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
             .ToList();
 
-        Node start = new Node(0, 0);
-        Node target = new Node(grid.Count - 1, grid[0].Count - 1);
+        AStarNode start = new AStarNode(0, 0);
+        AStarNode target = new AStarNode(grid.Count - 1, grid[0].Count - 1);
 
-        int cost = AStarAlgorithm.AStar(grid, start, target);
+        int cost = new AStarAlgorithm_2().AStar(new Grid(grid), start, target);
 
         if (cost != -1)
         {
@@ -1741,7 +1741,6 @@ public class Tasks
         {
             Console.WriteLine("No path found!");
         }
-
     }
 
     // copy from part 1 for part 2

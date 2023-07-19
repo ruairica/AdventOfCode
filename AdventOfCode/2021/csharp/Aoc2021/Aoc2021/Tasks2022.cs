@@ -141,7 +141,7 @@ public class Tasks2022
 
             var i = first.ToCharArray().Intersect(second.ToCharArray()).Single();
 
-            if (Char.IsLower(i))
+            if (char.IsLower(i))
             {
                 result += (int)i - 96;
             }
@@ -170,7 +170,7 @@ public class Tasks2022
             var chunk = c.Select(x => x.ToCharArray()).ToList();
             var i = chunk[0].Intersect(chunk[1]).Intersect(chunk[2]).Single();
 
-            if (Char.IsLower(i))
+            if (char.IsLower(i))
             {
                 result += (int)i - 96;
             }

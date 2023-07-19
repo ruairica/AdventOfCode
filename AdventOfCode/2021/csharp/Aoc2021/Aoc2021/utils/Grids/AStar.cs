@@ -16,7 +16,7 @@
         Parent = null;
     }
 }
-/*
+
 public class AStarAlgorithm
 {
     static int ManhattanDistance(AStarNode current, AStarNode target)
@@ -67,7 +67,6 @@ public class AStarAlgorithm
 
         start.G = 0;
         start.H = ManhattanDistance(start, target);
-        start.F = start.G + start.H;
         start.Parent = null;
         openList.Add(start);
 
@@ -113,7 +112,6 @@ public class AStarAlgorithm
                 {
                     neighbor.G = gScore;
                     neighbor.H = ManhattanDistance(neighbor, target);
-                    neighbor.F = neighbor.G + neighbor.H;
                     neighbor.Parent = current;
                     openList.Add(neighbor);
                     isBetterPath = true;
@@ -121,7 +119,6 @@ public class AStarAlgorithm
                 else if (gScore < neighbor.G)
                 {
                     neighbor.G = gScore;
-                    neighbor.F = neighbor.G + neighbor.H;
                     neighbor.Parent = current;
                     isBetterPath = true;
                 }
@@ -138,4 +135,3 @@ public class AStarAlgorithm
         return -1;
     }
 }
-*/

@@ -1731,17 +1731,62 @@ public class Tasks
         AStarNode start = new AStarNode(0, 0);
         AStarNode target = new AStarNode(grid.Count - 1, grid[0].Count - 1);
 
-        int cost = new AStarAlgorithm_2().AStar(new Grid(grid), start, target);
+        var cost = new AStarAlgorithm_2().AStar(new Grid(grid), start, target);
+        cost.Dump();
+    }
 
-        if (cost != -1)
+    [Test]
+    public void day15_2()
+    {
+        var grid = File.ReadAllText("./inputs/day15ex.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
+            .ToList();
+
+        var rows = new Grid(grid).GetAllRows();
+
+        new Grid(grid).Print();
+        for (int x = 1; x <= 5; x++)
         {
-            Console.WriteLine("Distance from start to target: {0}", cost);
+            var collection = rows.Select(l => l.Select(e => e + x > 9 ? 1 : e + x).ToList()).ToList();
+            grid.AddRange(collection);
         }
-        else
+
+        /*
+        for (int x = 1; x <= 5; x++)
         {
-            Console.WriteLine("No path found!");
+            grid = grid.Select((l, index) =>
+                {
+                    return l.Concat(rows[index % rows.Count]
+                            .Select(e => (e + x + (index / rows.Count)) > 9 ? 1 : e + x + (index / rows.Count)))
+                        .ToList();
+                })
+                .ToList();
+        }
+        */
+        "hihihihihihihihihihihihi".Dump();
+        new Grid(grid).Print();
+
+
+        AStarNode start = new AStarNode(0, 0);
+        AStarNode target = new AStarNode(grid.Count - 1, grid[0].Count - 1);
+
+        var grid1 = new Grid(grid);
+        grid1.Print();
+        var cost = new AStarAlgorithm_2().AStar(grid1, start, target);
+        cost.Dump();
+    }
+
+    private void DuplicateRight(List<List<int>> g)
+    {
+        foreach (var row in g)
+        {
+            row.AddRange(row);
         }
     }
+
 
     // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)

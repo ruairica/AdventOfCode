@@ -38,7 +38,8 @@ public class AStarAlgorithm_2
 
     public int AStar(Grid grid, AStarNode start, AStarNode target)
     {
-        List<AStarNode> openList = new List<AStarNode>();
+        // List<AStarNode> openList = new List<AStarNode>();
+        var openList = new List<AStarNode>();
         // TODO
         // can I turn this into a proper prio Q, need to be able to acces elements tho
         // Node should have computed F, DONE
@@ -51,6 +52,7 @@ public class AStarAlgorithm_2
         while (openList.Count > 0)
         {
             AStarNode current = openList[0];
+
             int currentIndex = 0;
             // prio queue could possibly remove this
             for (int i = 1; i < openList.Count; i++)
@@ -86,8 +88,9 @@ public class AStarAlgorithm_2
                     neighbor.Parent = current;
                     openList.Add(neighbor);
                 }
-                else if (gScore < neighbor.G)
+                else if (gScore < neighbor.G) // should be something here to adjust it's position in the q.. not sure that's possible
                 {
+                    // I think this is wrong, doesn't seem to ever get hit
                     neighbor.G = gScore;
                     neighbor.Parent = current;
                 }

@@ -9,7 +9,7 @@ using System.Linq;
 
 // Note: can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
 [TestFixture]
-public class Tasks
+public class Tasks2021
 {
     private const string inputPath = @"C:\repos\AdventOfCode\AdventOfCode\2021\csharp\Aoc2021\Aoc2021\inputs\";
 

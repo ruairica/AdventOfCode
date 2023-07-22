@@ -1728,10 +1728,7 @@ public class Tasks2021
             .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
             .ToList();
 
-        AStarNode start = new AStarNode(0, 0);
-        AStarNode target = new AStarNode(grid.Count - 1, grid[0].Count - 1);
-
-        var cost = new AStarAlgorithm_2().AStar(new Grid(grid), start, target);
+        var cost = AStarAlgorithm.AStar(new Grid(grid), new Coord(0, 0), new Coord(grid.Count - 1, grid[0].Count - 1));
         cost.Dump();
     }
 
@@ -1747,7 +1744,6 @@ public class Tasks2021
 
         var rows = grid.Select(x => x.Select(x => x).ToList()).ToList();
 
-        "------".Dump();
         new Grid(grid).Print();
 
         // rows
@@ -1769,23 +1765,9 @@ public class Tasks2021
         }
 
         var g = new Grid(grid);
-
-
-        AStarNode start = new AStarNode(0, 0);
-        AStarNode target = new AStarNode(grid.Count - 1, grid[0].Count - 1);
-
-        var cost = new AStarAlgorithm_2().AStar(g, start, target);
+        var cost = AStarAlgorithm.AStar(g, new Coord(0, 0), new Coord(grid.Count - 1, grid[0].Count - 1));
         cost.Dump();
     }
-
-    private void DuplicateRight(List<List<int>> g)
-    {
-        foreach (var row in g)
-        {
-            row.AddRange(row);
-        }
-    }
-
 
     // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)

@@ -1,137 +1,85 @@
-﻿public class AStarNode
+﻿using Aoc2021.utils.Grids;
+
+public static class AStarAlgorithm
 {
-    public int Row { get; set; }
-    public int Column { get; set; }
-    public int F => G + H; // Estimated total cost
-    public int G { get; set; } // Cost from start node
-    public int H { get; set; } // Heuristic estimate to target node
-    public AStarNode Parent { get; set; }
-
-    public AStarNode(int row, int column)
+    static int ManhattanDistance(Coord current, Coord target)
     {
-        Row = row;
-        Column = column;
-        G = 0;
-        H = 0;
-        Parent = null;
-    }
-}
-
-public class AStarAlgorithm
-{
-    static int ManhattanDistance(AStarNode current, AStarNode target)
-    {
-        return Math.Abs(current.Row - target.Row) + Math.Abs(current.Column - target.Column);
+        return Math.Abs(current.x - target.x) + Math.Abs(current.y - target.y);
     }
 
-    static List<AStarNode> GetNeighbors(AStarNode current, List<List<int>> grid, List<List<bool>> closed)
+    public static int AStar(Grid grid, Coord start, Coord target)
     {
-        int[] dr = { -1, 0, 1, 0 };
-        int[] dc = { 0, 1, 0, -1 };
-
-        int rows = grid.Count;
-        int columns = grid[0].Count;
-
-        List<AStarNode> neighbors = new List<AStarNode>();
-
-        for (int i = 0; i < 4; i++)
+        HashSet<Coord> closed = new();
+        var openQ = new List<AStarNode>
         {
-            int newRow = current.Row + dr[i];
-            int newColumn = current.Column + dc[i];
+            new AStarNode(start.x, start.y, 0, ManhattanDistance(start, target), null)
+        };
 
-            if (newRow >= 0 && newRow < rows && newColumn >= 0 && newColumn < columns && !closed[newRow][newColumn])
-            {
-                neighbors.Add(new AStarNode(newRow, newColumn));
-            }
-        }
-
-        return neighbors;
-    }
-
-    public static int AStar(List<List<int>> grid, AStarNode start, AStarNode target)
-    {
-        int rows = grid.Count;
-        int columns = grid[0].Count;
-
-        List<AStarNode> openList = new List<AStarNode>();
-        List<List<bool>> closedList = new List<List<bool>>();
-
-        for (int i = 0; i < rows; i++)
+        while (openQ.Count > 0)
         {
-            closedList.Add(new List<bool>());
-            for (int j = 0; j < columns; j++)
+            var current = openQ[0];
+
+            var currentIndex = 0;
+            // find next node by priority
+            // prio queue could remove this but c# prio q doesn't support changing priority mid Q.
+            for (var i = 1; i < openQ.Count; i++)
             {
-                closedList[i].Add(false);
-            }
-        }
-
-        start.G = 0;
-        start.H = ManhattanDistance(start, target);
-        start.Parent = null;
-        openList.Add(start);
-
-        while (openList.Count > 0)
-        {
-            AStarNode current = openList[0];
-            int currentIndex = 0;
-
-            for (int i = 1; i < openList.Count; i++)
-            {
-                if (openList[i].F < current.F || (openList[i].F == current.F && openList[i].H < current.H))
+                if (openQ[i].F < current.F || (openQ[i].F == current.F && openQ[i].H < current.H))
                 {
-                    current = openList[i];
+                    current = openQ[i];
                     currentIndex = i;
                 }
             }
 
-            openList.RemoveAt(currentIndex);
-            closedList[current.Row][current.Column] = true;
+            openQ.RemoveAt(currentIndex);
 
-            if (current.Row == target.Row && current.Column == target.Column)
+            closed.Add(new Coord(current.Row, current.Column));
+
+            if (current.Row == target.x && current.Column == target.y)
             {
-                // Reached the target, return the total cost (sum of grid values)
-                int totalCost = 0;
-                AStarNode aStarNode = current;
-                while (aStarNode != null)
-                {
-                    totalCost += grid[aStarNode.Row][aStarNode.Column];
-                    aStarNode = aStarNode.Parent;
-                }
-
                 return current.G;
             }
 
-            List<AStarNode> neighbors = GetNeighbors(current, grid, closedList);
+            var neighbourCoords = grid.GetValidAdjacentNoDiag(new Coord(current.Row, current.Column))
+                .Where(c => !closed.Contains(c));
 
-            foreach (AStarNode neighbor in neighbors)
+            foreach (var nc in neighbourCoords)
             {
-                int gScore = current.G + grid[neighbor.Row][neighbor.Column];
-                bool isBetterPath = false;
+                var gScore = current.G + grid.grid[nc.x][nc.y];
+                var neighbour = openQ.FirstOrDefault(x => x.Row == nc.x && x.Column == nc.y);
 
-                if (!openList.Contains(neighbor))
+                if (neighbour is null)
                 {
-                    neighbor.G = gScore;
-                    neighbor.H = ManhattanDistance(neighbor, target);
-                    neighbor.Parent = current;
-                    openList.Add(neighbor);
-                    isBetterPath = true;
+                    openQ.Add(new AStarNode(nc.x, nc.y, gScore, ManhattanDistance(nc, target), current));
                 }
-                else if (gScore < neighbor.G)
+                else if (gScore < neighbour.G)
                 {
-                    neighbor.G = gScore;
-                    neighbor.Parent = current;
-                    isBetterPath = true;
-                }
-
-                if (isBetterPath)
-                {
-                    neighbor.Row = neighbor.Row;
-                    neighbor.Column = neighbor.Column;
+                    neighbour.G = gScore;
+                    neighbour.Parent = current;
                 }
             }
         }
 
         // No path found
         return -1;
+    }
+}
+
+public class AStarNode
+{
+    public int Row { get; set; }
+    public int Column { get; set; }
+    public int F => G + H; // Estimated total cost
+    public int G { get; set; } // Cost from start node
+    public int H { get; set; } // Heuristic estimate to target node
+    public AStarNode? Parent { get; set; }
+
+    public AStarNode(int row, int column, int g = 0, int h = 0, AStarNode? parent = null)
+    {
+        Row = row;
+        Column = column;
+        G = g;
+        H = h;
+        Parent = parent;
     }
 }

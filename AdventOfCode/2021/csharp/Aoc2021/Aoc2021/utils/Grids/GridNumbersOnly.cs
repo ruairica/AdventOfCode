@@ -89,7 +89,7 @@ public class Grid
     public void Print()
     {
         Console.Write("[");
-        for (int x = 0; x < this.Width; x++)
+        for (int x = 0; x < this.Height; x++)
         {
             Console.Write($"{Environment.NewLine}[");
             Console.Write(string.Join(", ", this.grid[x]));

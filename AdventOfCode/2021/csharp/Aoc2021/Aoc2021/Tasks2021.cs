@@ -1738,44 +1738,43 @@ public class Tasks2021
     [Test]
     public void day15_2()
     {
-        var grid = File.ReadAllText("./inputs/day15ex.txt")
+        var grid = File.ReadAllText("./inputs/day15.txt")
             .Trim()
             .Replace("\r\n", "\n")
             .Split("\n")
             .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
             .ToList();
 
-        var rows = new Grid(grid).GetAllRows();
+        var rows = grid.Select(x => x.Select(x => x).ToList()).ToList();
 
+        "------".Dump();
         new Grid(grid).Print();
-        for (int x = 1; x <= 5; x++)
+
+        // rows
+        for (int i = 1; i <= 4; i++)
         {
-            var collection = rows.Select(l => l.Select(e => e + x > 9 ? 1 : e + x).ToList()).ToList();
-            grid.AddRange(collection);
+            for (int j = 0; j < grid.Count; j++)
+            {
+                var newValsInRow = rows[j].Select(x => (x + i) > 9 ? x + i - 9 : x + i);
+                grid[j] = grid[j].Concat(newValsInRow).ToList();
+            }
         }
 
-        /*
-        for (int x = 1; x <= 5; x++)
+        rows = grid.Select(x => x.Select(x => x).ToList()).ToList();
+        // cols
+        for (int i = 1; i <= 4; i++)
         {
-            grid = grid.Select((l, index) =>
-                {
-                    return l.Concat(rows[index % rows.Count]
-                            .Select(e => (e + x + (index / rows.Count)) > 9 ? 1 : e + x + (index / rows.Count)))
-                        .ToList();
-                })
-                .ToList();
+            var newRows = rows.Select(c => c.Select(e => e + i > 9 ? e + i - 9 : e + i).ToList()).ToList();
+            grid.AddRange(newRows);
         }
-        */
-        "hihihihihihihihihihihihi".Dump();
-        new Grid(grid).Print();
+
+        var g = new Grid(grid);
 
 
         AStarNode start = new AStarNode(0, 0);
         AStarNode target = new AStarNode(grid.Count - 1, grid[0].Count - 1);
 
-        var grid1 = new Grid(grid);
-        grid1.Print();
-        var cost = new AStarAlgorithm_2().AStar(grid1, start, target);
+        var cost = new AStarAlgorithm_2().AStar(g, start, target);
         cost.Dump();
     }
 

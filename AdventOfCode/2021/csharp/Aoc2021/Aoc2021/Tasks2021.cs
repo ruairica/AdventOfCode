@@ -6,6 +6,7 @@ using NUnit.Framework;
 namespace Aoc2021;
 
 using System.Linq;
+using Spectre.Console;
 
 // Note: can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
 [TestFixture]
@@ -1769,10 +1770,46 @@ public class Tasks2021
         cost.Dump();
     }
 
+    [Test]
+    public void day16_1()
+    {
+        var hexBinary = new Dictionary<string, string>
+        {
+            {"0", "0000"},
+            {"1", "0001"},
+            {"2", "0010"},
+            {"3", "0011"},
+            {"4", "0100"},
+            {"5", "0101"},
+            {"6", "0110"},
+            {"7", "0111"},
+            {"8", "1000"},
+            {"9", "1001"},
+            {"A", "1010"},
+            {"B", "1011"},
+            {"C", "1100"},
+            {"D", "1101"},
+            {"E", "1110"},
+            {"F", "1111"}
+        };
+
+        var inputString = File.ReadAllText("./inputs/day16.txt")
+            .Trim();
+
+        var binary = inputString.SelectMany(x => hexBinary[x.ToString()]).ToString();
+
+        for (var i = 0; i < binary.Length; i++)
+        {
+
+        }
+
+
+    }
+
+
     // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)
     {
-
         var matches = new Dictionary<char, char>()
         {
             { ')', '(' },

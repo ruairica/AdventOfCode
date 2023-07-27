@@ -64,7 +64,6 @@ public static class AStarAlgorithm
         return -1;
     }
 }
-
 public class AStarNode
 {
     public int Row { get; set; }

@@ -20,10 +20,8 @@ public class GridWithOtherVal<T>
 
     public List<List<GridItem<T>>> grid;
 
-
     public GridWithOtherVal(List<List<int>> grid, T defaultOtherVal)
     {
-        // Could I refactor GridItem to be generic
         this.grid = grid.Select(x => x.Select(x => new GridItem<T>(x, defaultOtherVal)).ToList()).ToList();
         Width = grid[0].Count;
         Height = grid.Count;
@@ -60,6 +58,7 @@ public class GridWithOtherVal<T>
 
         return null;
     }
+
     public IEnumerable<GridItemCoord<T>> WhereWithCoord(Func<GridItem<T>, Coord, bool> func)
     {
         for (var x = 0; x < this.Width; x++)
@@ -100,11 +99,14 @@ public class GridWithOtherVal<T>
     public List<List<GridItem<T>>> GetAllColumns()
     {
         return Enumerable.Range(0, Width)
-            .Select(column => Enumerable.Range(0, Height).Select(row => grid[row][column]).ToList())
+            .Select(column =>
+                Enumerable.Range(0, Height)
+                    .Select(row => grid[row][column])
+                    .ToList())
             .ToList();
     }
 
-    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord) => Extensions.GetValidAdjacentIncludingDiag(coord, this.Width, this.Height);
+    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord) => coord.GetValidAdjacentIncludingDiag(this.Width, this.Height);
 
-    public List<Coord> GetValidAdjacentNoDiag(Coord coord) => Extensions.GetValidAdjacentNoDiag(coord, this.Width, this.Height);
+    public List<Coord> GetValidAdjacentNoDiag(Coord coord) => coord.GetValidAdjacentNoDiag(this.Width, this.Height);
 }

@@ -1,12 +1,12 @@
 ﻿namespace Aoc2021.utils.Grids;
-public static class Extensions
-{
 
+public static class GridExtensions
+{
     public static readonly List<Coord> dirsWithDiags = new() { new(0, 1), new(0, -1), new(1, 0), new(-1, 0), new(1, 1), new(1, -1), new(-1, 1), new(-1, -1) };
 
     public static readonly List<Coord> dirsNoDiags = new() { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
 
-    public static List<Coord> GetValidAdjacentIncludingDiag(Coord coord, int Width, int Height)
+    public static List<Coord> GetValidAdjacentIncludingDiag(this Coord coord, int Width, int Height)
     {
         return dirsWithDiags
             .Where(e => e.x + coord.x >= 0 &&
@@ -17,7 +17,7 @@ public static class Extensions
             .ToList();
     }
 
-    public static List<Coord> GetValidAdjacentNoDiag(Coord coord, int Width, int Height)
+    public static List<Coord> GetValidAdjacentNoDiag(this Coord coord, int Width, int Height)
     {
         return dirsNoDiags
             .Where(e => e.x + coord.x >= 0 &&

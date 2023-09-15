@@ -23,8 +23,9 @@
 
         public static IEnumerable<(T, int)> Enumerate<T>(this IEnumerable<T> list)
         {
-            return list.Select((x, i) => new ValueTuple<T, int>(x, i));
+            return list.Select((x, i) => (x, i));
         }
+
         public static int ConvertToDecimal(List<int> binary)
         {
             return binary.Select((t, m) => t * (int)Math.Pow(2, binary.Count - 1 - m)).Sum();

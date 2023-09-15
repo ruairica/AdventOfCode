@@ -18,7 +18,6 @@ public class Grid
 
     public List<List<int>> grid;
 
-
     public Grid(List<List<int>> grid)
     {
         this.grid = grid;
@@ -98,9 +97,9 @@ public class Grid
         Console.Write($"{Environment.NewLine}]{Environment.NewLine}");
     }
 
-    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord) => Extensions.GetValidAdjacentIncludingDiag(coord, this.Width, this.Height);
+    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord) => coord.GetValidAdjacentIncludingDiag(this.Width, this.Height);
 
-    public List<Coord> GetValidAdjacentNoDiag(Coord coord) => Extensions.GetValidAdjacentNoDiag(coord, this.Width, this.Height);
+    public List<Coord> GetValidAdjacentNoDiag(Coord coord) => coord.GetValidAdjacentNoDiag(this.Width, this.Height);
 
     public Grid SetValues(Func<int, int> func)
     {

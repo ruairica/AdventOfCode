@@ -267,7 +267,7 @@ public class Tasks2021
         var bingoCards = bingoCardSplits
             .Select(x => x.Split('\n')
                 .Select(x => x.Trim().Split(' ')
-                    .Select(x => new ValueTuple<int, bool>(int.Parse(x), false))
+                    .Select(x => (int.Parse(x), false))
                     .ToList())
                 .ToList())
             .ToList()
@@ -437,7 +437,7 @@ public class Tasks2021
 
                 for (var y = start; y <= end; y++)
                 {
-                    var point = new ValueTuple<int, int>(line.startX, y);
+                    var point = (line.startX, y);
                     pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
                 }
             }
@@ -450,7 +450,7 @@ public class Tasks2021
 
                 for (var x = start; x <= end; x++)
                 {
-                    var point = new ValueTuple<int, int>(x, line.startY);
+                    var point = (x, line.startY);
                     pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
                 }
             }
@@ -458,7 +458,7 @@ public class Tasks2021
             // edge case 0 lenght line
             if (line.startY == line.endY && line.startX == line.endX)
             {
-                var point = new ValueTuple<int, int>(line.startX, line.startY);
+                var point = (line.startX, line.startY);
                 pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
             }
 
@@ -475,7 +475,7 @@ public class Tasks2021
 
                 foreach (var (x, y) in diagPoints)
                 {
-                    var point = new ValueTuple<int, int>(x, y);
+                    var point = (x, y);
                     pointCounter[point] = pointCounter.GetValueOrDefault(point, 0) + 1;
                 }
             }
@@ -782,8 +782,8 @@ public class Tasks2021
                 .Select(y => new List<(int, int)> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) }
                     .Where(e => e.Item1 + x >= 0 && e.Item1 + x < grid.Count && e.Item2 + y >= 0 && e.Item2 + y < grid[0].Count)
                     .All(e => grid[x][y] < grid[x + e.Item1][y + e.Item2])
-                        ? new ValueTuple<int, int>(x, y)
-                        : new ValueTuple<int, int>(-100, -100)))
+                        ? (x, y)
+                        : (-100, -100)))
             .Where(x => x.Item1 != -100 && x.Item2 != -100)
             .ToList();
 
@@ -1451,7 +1451,7 @@ public class Tasks2021
             .Select(pl =>
             {
                 var (x, y) = pl.Trim().Split(",");
-                return new ValueTuple<int, int>(int.Parse(x), int.Parse(y));
+                return (int.Parse(x), int.Parse(y));
             })
             .ToDictionary(k => k, v => 1);
 
@@ -1502,7 +1502,7 @@ public class Tasks2021
             .Select(pl =>
             {
                 var (x, y) = pl.Trim().Split(",");
-                return new ValueTuple<int, int>(int.Parse(x), int.Parse(y));
+                return (int.Parse(x), int.Parse(y));
             })
             .ToDictionary(k => k, v => 1);
 
@@ -1519,7 +1519,7 @@ public class Tasks2021
                 var nx = ox - (2 * diff);
                 var ny = oy - (2 * diff);
 
-                ValueTuple<int, int> newCoord = horizontal ? new(nx, oy) : new(ox, ny);
+                var newCoord = horizontal ? (nx, oy) : (ox, ny);
                 if (points.ContainsKey(newCoord))
                 {
                     points[newCoord] += 1;
@@ -1874,7 +1874,7 @@ public class Tasks2021
                     var (number, _) = items[column];
                     if (number == bingoCall)
                     {
-                        this.Numbers[row][column] = new ValueTuple<int, bool>(number, true);
+                        this.Numbers[row][column] = (number, true);
                         return true;
                     }
                 }

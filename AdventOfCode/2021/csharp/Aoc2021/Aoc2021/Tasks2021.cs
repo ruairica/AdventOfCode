@@ -1472,14 +1472,14 @@ public class Tasks2021
 
                 if (points.ContainsKey(new(nx, oy)))
                 {
-                    points[new(nx, oy)] += 1;
+                    points[(nx, oy)] += 1;
                 }
                 else
                 {
-                    points[new(nx, oy)] = 1;
+                    points[(nx, oy)] = 1;
                 }
 
-                points.Remove(new(ox, oy));
+                points.Remove((ox, oy));
             }
         }
 

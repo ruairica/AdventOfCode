@@ -6,7 +6,6 @@ using NUnit.Framework;
 namespace Aoc2021;
 
 using System.Linq;
-using Spectre.Console;
 
 // Note: can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
 [TestFixture]
@@ -1803,12 +1802,22 @@ public class Tasks2021
 
         }
 
-
     }
 
-    look at running tests with -l "console;verbosity=detailed"' to see if it streams the output
-
-
+    [Test]
+    public void day17_1()
+    {
+        foreach (var num in Enumerable.Range(0, 100))
+        {
+            Console.WriteLine(num);
+        }
+        Thread.Sleep(5000);
+        foreach (var num in Enumerable.Range(0, 100))
+        {
+            Console.WriteLine(num);
+        }
+        //    look at running tests with -l "console;verbosity=detailed"' to see if it streams the output
+    }
 
     // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)

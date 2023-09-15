@@ -182,4 +182,46 @@ public class Tasks2022
 
         result.Dump();
     }
+
+    [Test]
+    // https://adventofcode.com/2022/day/4
+    public void day4_1_2022()
+    {
+        File.ReadAllText("./inputs/2022/day4.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .Select(x =>
+                {
+                    var (e1, e2) = x.Split(",");
+                    var (l1, u1) = e1.Split("-");
+                    var (l2, u2) = e2.Split("-");
+                    return (int.Parse(l1), int.Parse(u1), int.Parse(l2), int.Parse(u2));
+                }).Count(x =>
+                {
+                    var (l1, u1, l2, u2) = x;
+                    return l1 >= l2 && u1 <= u2 || l2 >= l1 && u2 <= u1;
+                }).Dump();
+    }
+
+    [Test]
+    // https://adventofcode.com/2022/day/4
+    public void day4_2_2022()
+    {
+        File.ReadAllText("./inputs/2022/day4.txt")
+            .Trim()
+            .Replace("\r\n", "\n")
+            .Split("\n")
+            .Select(x =>
+            {
+                var (e1, e2) = x.Split(",");
+                var (l1, u1) = e1.Split("-");
+                var (l2, u2) = e2.Split("-");
+                return (int.Parse(l1), int.Parse(u1), int.Parse(l2), int.Parse(u2));
+            }).Count(x =>
+            {
+                var (l1, u1, l2, u2) = x;
+                return u1 >= l2 && l1 <= l2 || l1 <= u2 && u1 >= u2 || u2 >= l1 && l2 <= l1 || l2 <= u1 && u2 >= u1;
+            }).Dump();
+    }
 }

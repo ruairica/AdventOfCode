@@ -1,4 +1,4 @@
-﻿namespace Aoc2021.utils
+﻿namespace Aoc.Utils
 {
     public static class Helpers
     {

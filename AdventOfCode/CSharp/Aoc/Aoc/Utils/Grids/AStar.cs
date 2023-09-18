@@ -1,4 +1,4 @@
-﻿using Aoc2021.utils.Grids;
+﻿namespace Aoc.Utils.Grids;
 
 public static class AStarAlgorithm
 {

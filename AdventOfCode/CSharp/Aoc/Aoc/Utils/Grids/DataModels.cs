@@ -1,4 +1,4 @@
-﻿namespace Aoc2021.utils.Grids;
+﻿namespace Aoc.Utils.Grids;
 
 
 public record ValCoord(int Val, Coord Coord);

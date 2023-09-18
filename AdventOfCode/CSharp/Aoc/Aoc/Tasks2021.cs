@@ -1,18 +1,15 @@
-﻿using Aoc2021.utils;
-using Aoc2021.utils.Grids;
-using Dumpify;
-using NUnit.Framework;
-
-namespace Aoc2021;
+﻿namespace Aoc;
 
 using System.Linq;
+using Aoc.Utils;
+using Aoc.Utils.Grids;
+using Dumpify;
+using NUnit.Framework;
 
 // Note: can do dotnet watch test --filter day8_1 to run specific test in terminal with hot reloading
 [TestFixture]
 public class Tasks2021
 {
-    private const string inputPath = @"C:\repos\AdventOfCode\AdventOfCode\2021\csharp\Aoc2021\Aoc2021\inputs\";
-
     [Test]
     public void day1_1()
     {
@@ -136,7 +133,7 @@ public class Tasks2021
     [Test]
     public void day3_1()
     {
-        var i = File.ReadAllText(inputPath + "/day3.txt")
+        var i = File.ReadAllText("./inputs/day3.txt")
         .Trim()
         .Split("\n")
         .ToList();
@@ -190,7 +187,7 @@ public class Tasks2021
     [Test]
     public void day3_2()
     {
-        var numbers = File.ReadAllText(inputPath + "/day3.txt")
+        var numbers = File.ReadAllText("./inputs/day3.txt")
             .Trim()
             .Split("\n")
             .ToList();
@@ -257,7 +254,7 @@ public class Tasks2021
     [Test]
     public void day4_1_2()
     {
-        var text = File.ReadAllText(inputPath + "/day4.txt").Trim();
+        var text = File.ReadAllText("./inputs/day4.txt").Trim();
 
         var splits = text.Replace("\r\n", "\n").Split("\n\n");
         var bingoCalls = splits[0].Trim();
@@ -410,7 +407,7 @@ public class Tasks2021
     [Test]
     public async Task day5_1_2()
     {
-        var textLines = File.ReadAllText(inputPath + "/day5.txt")
+        var textLines = File.ReadAllText("./inputs/day5.txt")
              .Trim()
              .Split("\n")
              .ToList();
@@ -488,7 +485,7 @@ public class Tasks2021
     [Test]
     public void day6_1()
     {
-        var timers = File.ReadAllText(inputPath + "/day6.txt")
+        var timers = File.ReadAllText("./inputs/day6.txt")
                          .Trim()
                          .Split(",")
                          .Select(int.Parse)
@@ -519,7 +516,7 @@ public class Tasks2021
     [Test]
     public void day6_2()
     {
-        var initialTimers = File.ReadAllText(inputPath + "/day6.txt")
+        var initialTimers = File.ReadAllText("./inputs/day6.txt")
                          .Trim()
                          .Split(",")
                          .Select(int.Parse)
@@ -552,7 +549,7 @@ public class Tasks2021
         var resetDay = 6;
         var newFishResetDay = 9;
         var days = 256;
-        var fish = File.ReadAllLines(inputPath + "/day6.txt")
+        var fish = File.ReadAllLines("./inputs/day6.txt")
             .SelectMany(input =>
                 input.Split(',')
                 .Select(int.Parse))
@@ -649,7 +646,7 @@ public class Tasks2021
     [Test]
     public void day8_1()
     {
-        File.ReadAllText(inputPath + "/day8.txt")
+        File.ReadAllText("./inputs/day8.txt")
                          .Trim()
                          .Split("\n")
                          .Select(x => x.Split('|')[1].Trim().Split(' '))
@@ -661,7 +658,7 @@ public class Tasks2021
     [Test]
     public void day8_2()
     {
-        File.ReadAllText(inputPath + "/day8.txt")
+        File.ReadAllText("/day8.txt")
                  .Trim()
                  .Split("\n")
                  .Select(line =>

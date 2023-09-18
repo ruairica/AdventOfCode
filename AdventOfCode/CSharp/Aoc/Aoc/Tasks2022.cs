@@ -1,9 +1,8 @@
-﻿using NUnit.Framework;
+﻿namespace Aoc;
 
-namespace Aoc2021;
-
-using Aoc2021.utils;
+using Aoc.Utils;
 using Dumpify;
+using NUnit.Framework;
 
 [TestFixture]
 public class Tasks2022
@@ -205,7 +204,6 @@ public class Tasks2022
     }
 
     [Test]
-    // https://adventofcode.com/2022/day/4
     public void day4_2_2022()
     {
         File.ReadAllText("./inputs/2022/day4.txt")
@@ -223,5 +221,28 @@ public class Tasks2022
                 var (l1, u1, l2, u2) = x;
                 return u1 >= l2 && l1 <= l2 || l1 <= u2 && u1 >= u2 || u2 >= l1 && l2 <= l1 || l2 <= u1 && u2 >= u1;
             }).Dump();
+    }
+
+    [Test]
+    public void day5_1_2022()
+    {
+        var (start, steps) = File.ReadAllText("./inputs/2022/day5.txt")
+            .Replace("\r\n", "\n")
+            .Split("\n\n");
+
+        var lines = start.Split("\n");
+
+        var stacks = Enumerable.Range(0, 10).Select(_ => new Stack<string>()).ToList();
+
+        foreach (var line in lines)
+        {
+            for (int i = 1; i < lines[0].Length; i += 4)
+            {
+                if (char.IsAsciiLetterOrDigit(line[i]))
+                {
+                    stacks[i].Push(line[i].ToString());
+                }
+            }
+        }
     }
 }

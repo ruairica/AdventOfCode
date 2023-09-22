@@ -1,5 +1,6 @@
 ﻿namespace Aoc;
 
+using System.Text.RegularExpressions;
 using Aoc.Utils;
 using Dumpify;
 using NUnit.Framework;
@@ -232,17 +233,69 @@ public class Tasks2022
 
         var lines = start.Split("\n");
 
-        var stacks = Enumerable.Range(0, 10).Select(_ => new Stack<string>()).ToList();
+        var stacks = Enumerable.Range(1, 9).Select(_ => new Stack<string>()).ToList();
 
-        foreach (var line in lines)
+        foreach (var line in lines[..^1].Reverse())
         {
             for (int i = 1; i < lines[0].Length; i += 4)
             {
                 if (char.IsAsciiLetterOrDigit(line[i]))
                 {
-                    stacks[i].Push(line[i].ToString());
+                    stacks[i / 4].Push(line[i].ToString());
                 }
             }
         }
+
+        foreach (var step in steps.Split("\n"))
+        {
+            var matches = Regex.Match(step, @"move (\d+) from (\d+) to (\d+)");
+            var n = int.Parse(matches.Groups[1].Value);
+            var from = int.Parse(matches.Groups[2].Value);
+            var to = int.Parse(matches.Groups[3].Value);
+
+            foreach (var _ in Enumerable.Range(1, n))
+            {
+                stacks[to - 1].Push(stacks[from - 1].Pop());
+            }
+        }
+
+        string.Join("", stacks.Select(x => x.Peek())).Dump();
+    }
+
+    [Test]
+    public void day5_2_2022()
+    {
+        var (start, steps) = File.ReadAllText("./inputs/2022/day5.txt")
+            .Replace("\r\n", "\n")
+            .Split("\n\n");
+
+        var lines = start.Split("\n");
+
+        var stacks = Enumerable.Range(1, 9).Select(_ => new Stack<string>()).ToList();
+
+        foreach (var line in lines[..^1].Reverse())
+        {
+            for (int i = 1; i < lines[0].Length; i += 4)
+            {
+                if (char.IsAsciiLetterOrDigit(line[i]))
+                {
+                    stacks[i / 4].Push(line[i].ToString());
+                }
+            }
+        }
+
+        foreach (var step in steps.Split("\n"))
+        {
+            var matches = Regex.Match(step, @"move (\d+) from (\d+) to (\d+)");
+            var n = int.Parse(matches.Groups[1].Value);
+            var from = int.Parse(matches.Groups[2].Value);
+            var to = int.Parse(matches.Groups[3].Value);
+
+            var items = Enumerable.Range(1, n).Select(_ => stacks[from - 1].Pop());
+            items = items.Reverse();
+            items.ToList().ForEach(x => stacks[to - 1].Push(x));
+        }
+
+        string.Join("", stacks.Select(x => x.Peek())).Dump();
     }
 }

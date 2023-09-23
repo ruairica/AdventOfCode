@@ -298,4 +298,44 @@ public class Tasks2022
 
         string.Join("", stacks.Select(x => x.Peek())).Dump();
     }
+
+    [Test]
+    public void day6_1_2022()
+    {
+        var chars = File.ReadAllText("./inputs/2022/day6.txt")
+            .Replace("\r\n", "\n")
+            .Trim();
+
+        var result = 0;
+        for (int i = 4; i < chars.Length; i++)
+        {
+            if (chars[(i - 4)..i].Distinct().Count() == 4)
+            {
+                result = i;
+                break;
+            }
+        }
+
+        result.Dump();
+    }
+
+    [Test]
+    public void day6_2_2022()
+    {
+        var chars = File.ReadAllText("./inputs/2022/day6.txt")
+            .Replace("\r\n", "\n")
+            .Trim();
+
+        var result = 0;
+        for (int i = 14; i < chars.Length; i++)
+        {
+            if (chars[(i - 14)..i].Distinct().Count() == 14)
+            {
+                result = i;
+                break;
+            }
+        }
+
+        result.Dump();
+    }
 }

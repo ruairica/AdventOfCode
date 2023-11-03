@@ -134,6 +134,7 @@ public class Tasks2021
     public void day3_1()
     {
         var i = File.ReadAllText("./inputs/day3.txt")
+         .Replace("\r\n", "\n")
         .Trim()
         .Split("\n")
         .ToList();
@@ -188,6 +189,7 @@ public class Tasks2021
     public void day3_2()
     {
         var numbers = File.ReadAllText("./inputs/day3.txt")
+            .Replace("\r\n", "\n")
             .Trim()
             .Split("\n")
             .ToList();
@@ -658,7 +660,7 @@ public class Tasks2021
     [Test]
     public void day8_2()
     {
-        File.ReadAllText("/day8.txt")
+        File.ReadAllText("./inputs/day8.txt")
                  .Trim()
                  .Split("\n")
                  .Select(line =>
@@ -872,6 +874,7 @@ public class Tasks2021
     public void day10_1()
     {
         var lines = File.ReadAllText("./inputs/day10.txt")
+            .Replace("\r\n", "\n")
             .Trim()
             .Split("\n")
             .Select(x => x.ToList())
@@ -942,6 +945,7 @@ public class Tasks2021
         };
 
         File.ReadAllText("./inputs/day10.txt")
+            .Replace("\r\n", "\n")
             .Trim()
             .Split("\n")
             .Select(x => x.ToList())
@@ -995,6 +999,7 @@ public class Tasks2021
         File
            .ReadAllText(
                         "./inputs/day10.txt")
+           .Replace("\r\n", "\n")
            .Trim()
            .Split("\n")
            .Select(x => x.ToList())
@@ -1027,6 +1032,7 @@ public class Tasks2021
         var grid = File
             .ReadAllText(
                 "./inputs/day11.txt")
+            .Replace("\r\n", "\n")
             .Trim()
             .Split("\n")
             .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())
@@ -1176,6 +1182,7 @@ public class Tasks2021
         var g = File
             .ReadAllText(
                 "./inputs/day11.txt")
+            .Replace("\r\n", "\n")
             .Trim()
             .Split("\n")
             .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())
@@ -1239,6 +1246,7 @@ public class Tasks2021
         var g = File
             .ReadAllText(
                 "./inputs/day11.txt")
+            .Replace("\r\n", "\n")
             .Trim()
             .Split("\n")
             .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())

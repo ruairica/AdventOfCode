@@ -21,6 +21,18 @@
             return Convert.ToDouble(sortedList[middleIndex]);
         }
 
+        public static T Pop<T>(this List<T> list)
+        {
+            var last = list[^1];
+            list.RemoveAt(list.Count - 1);
+            return last;
+        }
+
+        public static void AddOrUpdate<T>(this Dictionary<T, int> dict, T key, int val)
+        {
+            dict[key] = dict.GetValueOrDefault(key, 0) + val;
+        }
+
         public static IEnumerable<(T, int)> Enumerate<T>(this IEnumerable<T> list)
         {
             return list.Select((x, i) => (x, i));

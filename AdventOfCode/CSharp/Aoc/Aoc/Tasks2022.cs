@@ -1,5 +1,7 @@
 ﻿namespace Aoc;
 
+using System.ComponentModel.Design;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Aoc.Utils;
 using Dumpify;
@@ -337,5 +339,111 @@ public class Tasks2022
         }
 
         result.Dump();
+    }
+
+    [Test]
+    public void day7_1_2022()
+    {
+        var lines = File.ReadAllText("./inputs/2022/day7.txt")
+            .Replace("\r\n", "\n")
+            .Trim()
+            .Split("\n");
+
+        Dictionary<string, int> sizes = new();
+        List<string> currentPath = new();
+        foreach (var line in lines)
+        {
+            // change directory
+            if (line.StartsWith("$ cd"))
+            {
+                var (_, _, dir) = line.Split(" ");
+                if (dir == "..")
+                {
+                    currentPath.Pop();
+                }
+                else
+                {
+                    currentPath.Add(dir);
+                }
+            }
+
+            else if(int.TryParse(line.Split(" ")[0], out var size))
+            {
+                // add size to all in path?
+                var copy = currentPath.Select(x => x).ToList();
+                while(copy.Count > 0)
+                {
+                    sizes.AddOrUpdate(CreateKey(copy), size);
+                    copy.Pop();
+                }
+            }
+        }
+
+        var max = 100000;
+        sizes.Where(x => x.Value <= max).Sum(x => x.Value).Dump();
+
+
+        string CreateKey(List<string> path)
+        {
+            return string.Join(",", path);
+        }
+    }
+
+    [Test]
+    public void day7_2_2022()
+    {
+        var lines = File.ReadAllText("./inputs/2022/day7.txt")
+            .Replace("\r\n", "\n")
+            .Trim()
+            .Split("\n");
+
+        Dictionary<string, int> sizes = new();
+        List<string> currentPath = new();
+        foreach (var line in lines)
+        {
+            // change directory
+            if (line.StartsWith("$ cd"))
+            {
+                var (_, _, dir) = line.Split(" ");
+                if (dir == "..")
+                {
+                    currentPath.Pop();
+                }
+                else
+                {
+                    currentPath.Add(dir);
+                }
+            }
+
+            else if (int.TryParse(line.Split(" ")[0], out var size))
+            {
+                // add size to all in path?
+                var copy = currentPath.Select(x => x).ToList();
+                while (copy.Count > 0)
+                {
+                    sizes.AddOrUpdate(CreateKey(copy), size);
+                    copy.Pop();
+                }
+            }
+        }
+
+        var totalAvailable = 70000000;
+        var spaceNeeded = 30000000;
+
+        var spaceUsedCurrently = sizes["/"];
+
+        var currentUnusedSpace = totalAvailable - spaceUsedCurrently;
+        var needsFreed = spaceNeeded - currentUnusedSpace;
+
+        sizes
+            .Select(x => x.Value)
+            .OrderBy(x => x)
+            .First(x => x >= needsFreed)
+            .Dump();
+
+        string CreateKey(List<string> path)
+        {
+            return string.Join(",", path);
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Aoc.Utils;
 
-public static class LifeExtensions
+public static class ListExtensions
 {
     public static T Pop<T>(this List<T> list)
     {

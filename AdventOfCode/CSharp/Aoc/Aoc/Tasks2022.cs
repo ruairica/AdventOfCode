@@ -492,4 +492,158 @@ public class Tasks2022
 
         maxScore.Dump();
     }
+
+    [Test]
+    public void day9_1_2022()
+    {
+        var visted = new List<Coord>();
+
+        var headPos = new Coord(0, 0);
+        var tailPos = new Coord(0, 0);
+        var lines = FP.ReadLines("./inputs/2022/day9.txt");
+
+
+        /*If the head is ever two steps directly up, down, left, or right from the tail, the tail must also move one step in that direction so it remains close enough:
+         Otherwise, if the head and tail aren't touching and aren't in the same row or column, the tail always moves one step diagonally to keep up
+
+*/
+        visted.Add(tailPos);
+        foreach (var line in lines)
+        {
+            var (dir, dists) = line.Split(' ');
+            var dist = int.Parse(dists);
+
+            for (int i = 0; i < dist; i++)
+            {
+                switch (dir)
+                {
+                    case "U":
+                        {
+                            headPos = headPos with { x = headPos.x - 1 };
+
+                            if (TailIsInLineWithHeadMove(headPos, tailPos))
+                            {
+                                tailPos = tailPos with { x = tailPos.x - 1 };
+                            }
+                            else if (NeedsDiagMove())
+                            {
+                                tailPos = new Coord(tailPos.x - 1, headPos.y > tailPos.y ? tailPos.y + 1 : tailPos.y - 1);
+                            }
+
+                            break;
+                        }
+                    case "D":
+                        {
+                            headPos = headPos with { x = headPos.x + 1 };
+
+                            if (TailIsInLineWithHeadMove(headPos, tailPos))
+                            {
+                                tailPos = tailPos with { x = tailPos.x + 1 };
+                            }
+                            else if (NeedsDiagMove())
+                            {
+                                tailPos = new Coord(tailPos.x + 1, headPos.y > tailPos.y ? tailPos.y + 1 : tailPos.y - 1);
+                            }
+
+                            break;
+                        }
+                    case "R":
+                        {
+                            headPos = headPos with { y = headPos.y + 1 };
+
+                            if (TailIsInLineWithHeadMove(headPos, tailPos))
+                            {
+                                tailPos = tailPos with { y = tailPos.y + 1 };
+                            }
+                            else if (NeedsDiagMove())
+                            {
+                                tailPos = new Coord(headPos.x > tailPos.x ? tailPos.x + 1 : tailPos.x - 1, tailPos.y + 1);
+
+                            }
+
+                            break;
+                        }
+                    case "L":
+                        {
+                            headPos = headPos with { y = headPos.y - 1 };
+
+                            if (TailIsInLineWithHeadMove(headPos, tailPos))
+                            {
+                                tailPos = tailPos with { y = tailPos.y - 1 };
+                            }
+                            else if (NeedsDiagMove())
+                            {
+                                tailPos = new Coord(headPos.x > tailPos.x ? tailPos.x + 1 : tailPos.x - 1, tailPos.y - 1);
+                            }
+
+                            break;
+                        }
+                }
+
+                visted.Add(tailPos);
+            }
+        }
+
+
+        visted.Distinct().Count().Dump();
+        bool TailIsInLineWithHeadMove(Coord headPos, Coord tailPos)
+        {
+            return Math.Abs(headPos.x - tailPos.x) == 2 && headPos.y == tailPos.y || Math.Abs(headPos.y - tailPos.y) == 2 && headPos.x == tailPos.x;
+        }
+
+        bool NeedsDiagMove()
+        {
+            return Math.Abs(headPos.x - tailPos.x) == 2 && headPos.y != tailPos.y || Math.Abs(headPos.y - tailPos.y) == 2 && headPos.x != tailPos.x;
+        }
+    }
+
+    [Test]
+    public void day9_2_2022()
+    {
+        var visted = new List<Coord>();
+
+        var headPos = new Coord(0, 0);
+        var tailPos = new Coord(0, 0);
+        var tail = Enumerable.Repeat(1, 9).Select(_ => new Coord(0, 0)).ToList();
+        var lines = FP.ReadLines("./inputs/2022/day9.txt");
+
+        visted.Add(tailPos);
+        foreach (var line in lines)
+        {
+            var (dir, dists) = line.Split(' ');
+            var dist = int.Parse(dists);
+
+            for (int i = 0; i < dist; i++)
+            {
+                headPos = dir switch
+                {
+                    "U" => headPos with { x = headPos.x - 1 },
+                    "D" => headPos with { x = headPos.x + 1 },
+                    "R" => headPos with { y = headPos.y + 1 },
+                    "L" => headPos with { y = headPos.y - 1 },
+                    _ => throw new InvalidOperationException(),
+                };
+
+                if (Math.Abs(headPos.x - tailPos.x) == 2 && headPos.y == tailPos.y) // vert
+                {
+                    tailPos = tailPos with { x = tailPos.x + (headPos.x > tailPos.x ? 1 : -1) };
+                }
+                else if (Math.Abs(headPos.y - tailPos.y) == 2 && headPos.x == tailPos.x) // horizontal
+                {
+                    tailPos = tailPos with { y = tailPos.y + (headPos.y > tailPos.y ? 1 : -1) };
+                }
+                else if (Math.Abs(headPos.x - tailPos.x) == 2 && headPos.y != tailPos.y || Math.Abs(headPos.y - tailPos.y) == 2 && headPos.x != tailPos.x) //diag 
+                {
+                    tailPos = new Coord(tailPos.x + (headPos.x > tailPos.x ? 1 : -1), headPos.y > tailPos.y ? tailPos.y + 1 : tailPos.y - 1);
+                }
+
+
+                visted.Add(tailPos);
+
+            }
+        }
+
+
+        visted.Distinct().Count().Dump();
+    }
 }

@@ -546,7 +546,6 @@ public class Tasks2022
     {
         var visted = new HashSet<Coord>();
 
-
         var tail = Enumerable.Repeat(1, 10).Select(_ => new Coord(0, 0)).ToList();
         var lines = FP.ReadLines("./inputs/2022/day9.txt");
 

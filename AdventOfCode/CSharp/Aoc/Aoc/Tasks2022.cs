@@ -497,18 +497,18 @@ public class Tasks2022
             var currentScore = 1;
             var allValuesUpFromCoord = grid.GetAllValuesUpFromCoord(coord);
             var up = allValuesUpFromCoord.Enumerate().FirstOrDefault(x => x.val >= val);
-            currentScore *= (up == default ? coord.y : up.index);
+            currentScore *= (up == default ? coord.x : up.index + 1);
 
 
             var left = grid.GetAllValuesLeftOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
-            currentScore *= (left == default ? coord.x : left.index);
+            currentScore *= (left == default ? coord.y : left.index + 1);
 
 
-            var right = grid.GetAllValuesLeftOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
-            currentScore *= (right == default ? grid.Width - 1 - coord.x : right.index);
+            var right = grid.GetAllValuesRightOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
+            currentScore *= (right == default ? grid.Width - 1 - coord.y : right.index + 1);
 
             var down = grid.GetAllValuesDownFromCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
-            currentScore *= (down == default ? grid.Height - 1 - coord.y : down.index);
+            currentScore *= (down == default ? grid.Height - 1 - coord.x : down.index + 1);
 
             maxScore = Math.Max(maxScore, currentScore);
         });

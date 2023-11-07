@@ -4,14 +4,14 @@ public static class FP
 {
     public static string ReadFile(string path) =>
         File.ReadAllText(path)
-            .Replace("\r\n", "\n") // this is to account for different OS
+            .Replace("\r\n", "\n") // standardize line breaks
             .Trim();
 
     public static string[] ReadLines(string path) =>
         ReadFile(path).Split("\n");
 
     public static List<List<int>> ReadAsGrid(string path) =>
-      ReadLines(path)
-          .Select(x => x.Select(y => int.Parse(y.ToString())).ToList())
-          .ToList();
+        ReadLines(path)
+              .Select(x => x.Select(y => int.Parse(y.ToString())).ToList())
+              .ToList();
 }

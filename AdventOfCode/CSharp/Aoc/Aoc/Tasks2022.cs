@@ -11,29 +11,23 @@ public class Tasks2022
     [Test]
     public void day1_1_2022()
     {
-        var elves = File.ReadAllText("./inputs/2022/day1.txt")
-            .Trim()
-            .Replace("\r\n", "\n")
+        FP.ReadFile("./inputs/2022/day1.txt")
             .Split("\n\n")
             .Select(x => x.Split("\n").Select(int.Parse).Sum())
-            .OrderByDescending(x => x)
-            .ToList();
-
-        elves.First().Dump();
+            .MaxBy(x => x)
+            .Dump();
     }
 
     [Test]
     public void day1_2_2022()
     {
-        var elves = File.ReadAllText("./inputs/2022/day1.txt")
-            .Trim()
-            .Replace("\r\n", "\n")
+        FP.ReadFile("./inputs/2022/day1.txt")
             .Split("\n\n")
             .Select(x => x.Split("\n").Select(int.Parse).Sum())
             .OrderByDescending(x => x)
-            .ToList();
-
-        elves.Take(3).Sum().Dump();
+            .Take(3)
+            .Sum()
+            .Dump();
     }
 
     [Test]
@@ -42,11 +36,8 @@ public class Tasks2022
         // A for Rock, B for Paper, and C for Scissors
         //X for Rock, Y for Paper, and Z for Scissors
         // shape you selected(1 for Rock, 2 for Paper, and 3 for Scissors) plus the score for the outcome of the round(0 if you lost, 3 if the round was a draw, and 6 if you won).
-        var lines = File.ReadAllText("./inputs/2022/day2.txt")
-            .Trim()
-            .Replace("\r\n", "\n")
-            .Split("\n")
-            .ToList();
+        var lines = FP.ReadLines("./inputs/2022/day2.txt");
+
         var lossScore = 0;
         var drawScore = 3;
         var winScore = 6;
@@ -86,11 +77,7 @@ public class Tasks2022
         // A for Rock, B for Paper, and C for Scissors
         //X for Rock, Y for Paper, and Z for Scissors
         // shape you selected(1 for Rock, 2 for Paper, and 3 for Scissors) plus the score for the outcome of the round(0 if you lost, 3 if the round was a draw, and 6 if you won).
-        var lines = File.ReadAllText("./inputs/2022/day2.txt")
-            .Trim()
-            .Replace("\r\n", "\n")
-            .Split("\n")
-            .ToList();
+        var lines = FP.ReadLines("./inputs/2022/day2.txt");
         var lossScore = 0;
         var drawScore = 3;
         var winScore = 6;
@@ -184,13 +171,9 @@ public class Tasks2022
     }
 
     [Test]
-    // https://adventofcode.com/2022/day/4
     public void day4_1_2022()
     {
-        File.ReadAllText("./inputs/2022/day4.txt")
-            .Trim()
-            .Replace("\r\n", "\n")
-            .Split("\n")
+        FP.ReadLines("./inputs/2022/day4.txt")
             .Select(x =>
                 {
                     var (e1, e2) = x.Split(",");
@@ -207,10 +190,7 @@ public class Tasks2022
     [Test]
     public void day4_2_2022()
     {
-        File.ReadAllText("./inputs/2022/day4.txt")
-            .Trim()
-            .Replace("\r\n", "\n")
-            .Split("\n")
+        FP.ReadLines("./inputs/2022/day4.txt")
             .Select(x =>
             {
                 var (e1, e2) = x.Split(",");
@@ -265,8 +245,7 @@ public class Tasks2022
     [Test]
     public void day5_2_2022()
     {
-        var (start, steps) = File.ReadAllText("./inputs/2022/day5.txt")
-            .Replace("\r\n", "\n")
+        var (start, steps) = FP.ReadFile("./inputs/2022/day5.txt")
             .Split("\n\n");
 
         var lines = start.Split("\n");
@@ -302,10 +281,7 @@ public class Tasks2022
     [Test]
     public void day6_1_2022()
     {
-        var chars = File.ReadAllText("./inputs/2022/day6.txt")
-            .Replace("\r\n", "\n")
-            .Trim();
-
+        var chars = FP.ReadFile("./inputs/2022/day6.txt");
         var result = 0;
         for (int i = 4; i < chars.Length; i++)
         {
@@ -359,7 +335,6 @@ public class Tasks2022
                     currentPath.Add(dir);
                 }
             }
-
             else if (int.TryParse(line.Split(" ")[0], out var size))
             {
                 // add size to all in path?
@@ -374,7 +349,6 @@ public class Tasks2022
 
         var max = 100000;
         sizes.Where(x => x.Value <= max).Sum(x => x.Value).Dump();
-
 
         string CreateKey(List<string> path)
         {
@@ -496,7 +470,7 @@ public class Tasks2022
     [Test]
     public void day9_1_2022()
     {
-        var visted = new HashSet<Coord>();
+        var visited = new HashSet<Coord>();
 
         var headPos = new Coord(0, 0);
         var tailPos = new Coord(0, 0);
@@ -504,7 +478,7 @@ public class Tasks2022
 
         /*If the head is ever two steps directly up, down, left, or right from the tail, the tail must also move one step in that direction so it remains close enough:
          Otherwise, if the head and tail aren't touching and aren't in the same row or column, the tail always moves one step diagonally to keep up*/
-        visted.Add(tailPos);
+        visited.Add(tailPos);
         foreach (var line in lines)
         {
             var (dir, dists) = line.Split(' ');
@@ -534,22 +508,22 @@ public class Tasks2022
                     tailPos = new Coord(tailPos.x + (headPos.x > tailPos.x ? 1 : -1), headPos.y > tailPos.y ? tailPos.y + 1 : tailPos.y - 1);
                 }
 
-                visted.Add(tailPos);
+                visited.Add(tailPos);
             }
         }
 
-        visted.Count.Dump();
+        visited.Count.Dump();
     }
 
     [Test]
     public void day9_2_2022()
     {
-        var visted = new HashSet<Coord>();
+        var visited = new HashSet<Coord>();
 
         var tail = Enumerable.Repeat(1, 10).Select(_ => new Coord(0, 0)).ToList();
         var lines = FP.ReadLines("./inputs/2022/day9.txt");
 
-        visted.Add(tail[^1]);
+        visited.Add(tail[^1]);
         foreach (var line in lines)
         {
             var (dir, dists) = line.Split(' ');
@@ -588,12 +562,12 @@ public class Tasks2022
                     }
                 }
 
-                visted.Add(newTail[^1]);
+                visited.Add(newTail[^1]);
                 tail = newTail;
             }
         }
 
 
-        visted.Count.Dump();
+        visited.Count.Dump();
     }
 }

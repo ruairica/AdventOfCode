@@ -322,9 +322,7 @@ public class Tasks2022
     [Test]
     public void day6_2_2022()
     {
-        var chars = File.ReadAllText("./inputs/2022/day6.txt")
-            .Replace("\r\n", "\n")
-            .Trim();
+        var chars = FP.ReadFile("./inputs/2022/day6.txt");
 
         var result = 0;
         for (int i = 14; i < chars.Length; i++)
@@ -342,10 +340,7 @@ public class Tasks2022
     [Test]
     public void day7_1_2022()
     {
-        var lines = File.ReadAllText("./inputs/2022/day7.txt")
-            .Replace("\r\n", "\n")
-            .Trim()
-            .Split("\n");
+        var lines = FP.ReadLines("./inputs/2022/day7.txt");
 
         Dictionary<string, int> sizes = new();
         List<string> currentPath = new();
@@ -390,10 +385,7 @@ public class Tasks2022
     [Test]
     public void day7_2_2022()
     {
-        var lines = File.ReadAllText("./inputs/2022/day7.txt")
-            .Replace("\r\n", "\n")
-            .Trim()
-            .Split("\n");
+        var lines = FP.ReadLines("./inputs/2022/day7.txt");
 
         Dictionary<string, int> sizes = new();
         List<string> currentPath = new();
@@ -415,7 +407,7 @@ public class Tasks2022
 
             else if (int.TryParse(line.Split(" ")[0], out var size))
             {
-                // add size to all in path?
+                // add size to all in path
                 var copy = currentPath.Select(x => x).ToList();
                 while (copy.Count > 0)
                 {
@@ -448,17 +440,12 @@ public class Tasks2022
     [Test]
     public void day8_1_2022()
     {
-        var lines = File.ReadAllText("./inputs/2022/day8.txt")
-            .Replace("\r\n", "\n")
-            .Trim()
-            .Split("\n")
-            .Select(x => x.Select(y => int.Parse(y.ToString())).ToList())
-            .ToList();
+        var g = FP.ReadAsGrid("./inputs/2022/day8.txt");
 
         // all edges
-        var visibleTrees = lines.Count * 4 - 4;
+        var visibleTrees = g.Count * 4 - 4;
 
-        var grid = new Grid(lines);
+        var grid = new Grid(g);
 
         grid.ForEachWithCoord((val, coord) =>
         {
@@ -480,29 +467,19 @@ public class Tasks2022
     [Test]
     public void day8_2_2022()
     {
-        var lines = File.ReadAllText("./inputs/2022/day8.txt")
-            .Replace("\r\n", "\n")
-            .Trim()
-            .Split("\n")
-            .Select(x => x.Select(y => int.Parse(y.ToString())).ToList())
-            .ToList();
+        var g = FP.ReadAsGrid("./inputs/2022/day8.txt");
 
-        // all edges
         var maxScore = 0;
-
-        var grid = new Grid(lines);
+        var grid = new Grid(g);
 
         grid.ForEachWithCoord((val, coord) =>
         {
             var currentScore = 1;
-            var allValuesUpFromCoord = grid.GetAllValuesUpFromCoord(coord);
-            var up = allValuesUpFromCoord.Enumerate().FirstOrDefault(x => x.val >= val);
+            var up = grid.GetAllValuesUpFromCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
             currentScore *= (up == default ? coord.x : up.index + 1);
-
 
             var left = grid.GetAllValuesLeftOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
             currentScore *= (left == default ? coord.y : left.index + 1);
-
 
             var right = grid.GetAllValuesRightOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
             currentScore *= (right == default ? grid.Width - 1 - coord.y : right.index + 1);

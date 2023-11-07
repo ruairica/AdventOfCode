@@ -1,5 +1,7 @@
 ﻿namespace Aoc.Utils.Grids;
 
+using Dumpify;
+
 public class Grid
 {
     public int this[Coord coord]
@@ -83,6 +85,41 @@ public class Grid
         return Enumerable.Range(0, Width)
             .Select(column => Enumerable.Range(0, Height).Select(row => grid[row][column]).ToList())
             .ToList();
+    }
+
+    public List<int> GetAllValuesRightOfCoord(Coord coord)
+    {
+        return Enumerable.Range(coord.x + 1, this.grid[coord.x].Count - coord.x - 1)
+            .Select(x => this.grid[x][coord.y])
+            .ToList();
+    }
+
+    public List<int> GetAllValuesLeftOfCoord(Coord coord)
+    {
+        var row = Enumerable.Range(0, coord.x)
+            .Select(x => this.grid[x][coord.y])
+            .ToList();
+
+        row.Reverse();
+        return row;
+    }
+
+    public List<int> GetAllValuesDownFromCoord(Coord coord)
+    {
+        return Enumerable.Range(coord.y + 1, this.grid.Count - coord.y - 1)
+            .Select(y => this.grid[coord.x][y])
+            .ToList();
+    }
+
+    public List<int> GetAllValuesUpFromCoord(Coord coord)
+    {
+        var col = Enumerable.Range(0, coord.y)
+            .Select(y => this.grid[coord.x][y])
+            .ToList();
+
+        col.Reverse();
+        col.Dump();
+        return col;
     }
 
     public void Print()

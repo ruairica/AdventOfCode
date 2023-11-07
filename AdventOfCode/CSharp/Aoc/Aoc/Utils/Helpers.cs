@@ -33,7 +33,7 @@
             dict[key] = dict.GetValueOrDefault(key, 0) + val;
         }
 
-        public static IEnumerable<(T, int)> Enumerate<T>(this IEnumerable<T> list)
+        public static IEnumerable<(T val, int index)> Enumerate<T>(this IEnumerable<T> list)
         {
             return list.Select((x, i) => (x, i));
         }

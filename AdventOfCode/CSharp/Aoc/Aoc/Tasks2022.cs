@@ -1,9 +1,7 @@
 ﻿namespace Aoc;
-
-using System.ComponentModel.Design;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Aoc.Utils;
+using Aoc.Utils.Grids;
 using Dumpify;
 using NUnit.Framework;
 
@@ -367,11 +365,11 @@ public class Tasks2022
                 }
             }
 
-            else if(int.TryParse(line.Split(" ")[0], out var size))
+            else if (int.TryParse(line.Split(" ")[0], out var size))
             {
                 // add size to all in path?
                 var copy = currentPath.Select(x => x).ToList();
-                while(copy.Count > 0)
+                while (copy.Count > 0)
                 {
                     sizes.AddOrUpdate(CreateKey(copy), size);
                     copy.Pop();
@@ -445,5 +443,76 @@ public class Tasks2022
         {
             return string.Join(",", path);
         }
+    }
+
+    [Test]
+    public void day8_1_2022()
+    {
+        var lines = File.ReadAllText("./inputs/2022/day8.txt")
+            .Replace("\r\n", "\n")
+            .Trim()
+            .Split("\n")
+            .Select(x => x.Select(y => int.Parse(y.ToString())).ToList())
+            .ToList();
+
+        // all edges
+        var visibleTrees = lines.Count * 4 - 4;
+
+        var grid = new Grid(lines);
+
+        grid.ForEachWithCoord((val, coord) =>
+        {
+            if (
+                !(coord.x == 0 || coord.y == 0 || coord.x == grid.Width - 1 || coord.y == grid.Height - 1) &&
+                (grid.GetAllValuesDownFromCoord(coord).All(x => x < val) ||
+                grid.GetAllValuesUpFromCoord(coord).All(x => x < val) ||
+                grid.GetAllValuesLeftOfCoord(coord).All(x => x < val) ||
+                grid.GetAllValuesRightOfCoord(coord).All(x => x < val)))
+            {
+                visibleTrees += 1;
+            }
+        });
+
+        visibleTrees.Dump();
+    }
+
+
+    [Test]
+    public void day8_2_2022()
+    {
+        var lines = File.ReadAllText("./inputs/2022/day8.txt")
+            .Replace("\r\n", "\n")
+            .Trim()
+            .Split("\n")
+            .Select(x => x.Select(y => int.Parse(y.ToString())).ToList())
+            .ToList();
+
+        // all edges
+        var maxScore = 0;
+
+        var grid = new Grid(lines);
+
+        grid.ForEachWithCoord((val, coord) =>
+        {
+            var currentScore = 1;
+            var allValuesUpFromCoord = grid.GetAllValuesUpFromCoord(coord);
+            var up = allValuesUpFromCoord.Enumerate().FirstOrDefault(x => x.val >= val);
+            currentScore *= (up == default ? coord.y : up.index);
+
+
+            var left = grid.GetAllValuesLeftOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
+            currentScore *= (left == default ? coord.x : left.index);
+
+
+            var right = grid.GetAllValuesLeftOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
+            currentScore *= (right == default ? grid.Width - 1 - coord.x : right.index);
+
+            var down = grid.GetAllValuesDownFromCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
+            currentScore *= (down == default ? grid.Height - 1 - coord.y : down.index);
+
+            maxScore = Math.Max(maxScore, currentScore);
+        });
+
+        maxScore.Dump();
     }
 }

@@ -600,14 +600,13 @@ public class Tasks2022
     [Test]
     public void day9_2_2022()
     {
-        var visted = new List<Coord>();
+        var visted = new HashSet<Coord>();
 
-        var headPos = new Coord(0, 0);
-        var tailPos = new Coord(0, 0);
-        var tail = Enumerable.Repeat(1, 9).Select(_ => new Coord(0, 0)).ToList();
+
+        var tail = Enumerable.Repeat(1, 10).Select(_ => new Coord(0, 0)).ToList();
         var lines = FP.ReadLines("./inputs/2022/day9.txt");
 
-        visted.Add(tailPos);
+        visted.Add(tail[^1]);
         foreach (var line in lines)
         {
             var (dir, dists) = line.Split(' ');
@@ -615,35 +614,43 @@ public class Tasks2022
 
             for (int i = 0; i < dist; i++)
             {
-                headPos = dir switch
+                var newHead = dir switch
                 {
-                    "U" => headPos with { x = headPos.x - 1 },
-                    "D" => headPos with { x = headPos.x + 1 },
-                    "R" => headPos with { y = headPos.y + 1 },
-                    "L" => headPos with { y = headPos.y - 1 },
+                    "U" => tail[0] with { x = tail[0].x - 1 },
+                    "D" => tail[0] with { x = tail[0].x + 1 },
+                    "R" => tail[0] with { y = tail[0].y + 1 },
+                    "L" => tail[0] with { y = tail[0].y - 1 },
                     _ => throw new InvalidOperationException(),
                 };
+                var newTail = new List<Coord>() { newHead };
 
-                if (Math.Abs(headPos.x - tailPos.x) == 2 && headPos.y == tailPos.y) // vert
+                // go through the whole tail and apply changes, skip the head as it's already added
+                foreach (var coord in tail.Skip(1))
                 {
-                    tailPos = tailPos with { x = tailPos.x + (headPos.x > tailPos.x ? 1 : -1) };
-                }
-                else if (Math.Abs(headPos.y - tailPos.y) == 2 && headPos.x == tailPos.x) // horizontal
-                {
-                    tailPos = tailPos with { y = tailPos.y + (headPos.y > tailPos.y ? 1 : -1) };
-                }
-                else if (Math.Abs(headPos.x - tailPos.x) == 2 && headPos.y != tailPos.y || Math.Abs(headPos.y - tailPos.y) == 2 && headPos.x != tailPos.x) //diag 
-                {
-                    tailPos = new Coord(tailPos.x + (headPos.x > tailPos.x ? 1 : -1), headPos.y > tailPos.y ? tailPos.y + 1 : tailPos.y - 1);
+                    if (Math.Abs(newTail[^1].x - coord.x) == 2 && newTail[^1].y == coord.y) // vert
+                    {
+                        newTail.Add(coord with { x = coord.x + (newTail[^1].x > coord.x ? 1 : -1) });
+                    }
+                    else if (Math.Abs(newTail[^1].y - coord.y) == 2 && newTail[^1].x == coord.x) // horizontal
+                    {
+                        newTail.Add(coord with { y = coord.y + (newTail[^1].y > coord.y ? 1 : -1) });
+                    }
+                    else if (Math.Abs(newTail[^1].x - coord.x) == 2 && newTail[^1].y != coord.y || Math.Abs(newTail[^1].y - coord.y) == 2 && newTail[^1].x != coord.x) //diag 
+                    {
+                        newTail.Add(new Coord(coord.x + (newTail[^1].x > coord.x ? 1 : -1), newTail[^1].y > coord.y ? coord.y + 1 : coord.y - 1));
+                    }
+                    else
+                    {
+                        newTail.Add(coord);
+                    }
                 }
 
-
-                visted.Add(tailPos);
-
+                visted.Add(newTail[^1]);
+                tail = newTail;
             }
         }
 
 
-        visted.Distinct().Count().Dump();
+        visted.Count.Dump();
     }
 }

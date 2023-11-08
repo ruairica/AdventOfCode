@@ -575,7 +575,6 @@ public class Tasks2022
     public void day10_1_2022()
     {
         var lines = FP.ReadLines("./inputs/2022/day10.txt");
-        lines.Dump();
 
         var X = 1;
         var startCycleCount = 0;
@@ -666,7 +665,6 @@ public class Tasks2022
                 if (spritePos == pixel || spritePos + 1 == pixel || spritePos - 1 == pixel)
                 {
                     Console.Write("#");
-
                 }
                 else
                 {
@@ -675,6 +673,5 @@ public class Tasks2022
             }
             Console.Write("\n");
         }
-
     }
 }

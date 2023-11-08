@@ -570,4 +570,111 @@ public class Tasks2022
 
         visited.Count.Dump();
     }
+
+    [Test]
+    public void day10_1_2022()
+    {
+        var lines = FP.ReadLines("./inputs/2022/day10.txt");
+        lines.Dump();
+
+        var X = 1;
+        var startCycleCount = 0;
+
+        List<int> importantCycles = new() { 20, 60, 100, 140, 180, 220 };
+        List<int> cycleValues = new();
+        foreach (var line in lines)
+        {
+            if (line.StartsWith("noop"))
+            {
+                startCycleCount += 1;
+
+                if (importantCycles.Contains(startCycleCount))
+                {
+                    cycleValues.Add(X);
+                }
+
+            }
+
+            if (line.StartsWith("addx"))
+            {
+                startCycleCount += 1;
+
+                if (importantCycles.Contains(startCycleCount))
+                {
+                    cycleValues.Add(X);
+                }
+
+                startCycleCount += 1;
+
+                if (importantCycles.Contains(startCycleCount))
+                {
+                    cycleValues.Add(X);
+                }
+                var (_, valString) = line.Split(" ");
+                var val = int.Parse(valString);
+                X += val;
+            }
+        }
+
+        importantCycles.Zip(cycleValues)
+            .Select(x => x.First * x.Second)
+            .Sum()
+            .Dump();
+    }
+
+    [Test]
+    public void day10_2_2022()
+    {
+        var lines = FP.ReadLines("./inputs/2022/day10.txt");
+
+        var X = 1;
+        var cycleCount = 1;
+
+        Dictionary<int, int> cycleValues = new();
+        foreach (var line in lines)
+        {
+            if (line.StartsWith("noop"))
+            {
+                cycleValues[cycleCount] = X;
+                cycleCount += 1;
+            }
+
+            if (line.StartsWith("addx"))
+            {
+                cycleValues[cycleCount] = X;
+                cycleCount += 1;
+
+                cycleValues[cycleCount] = X;
+                cycleCount += 1;
+                var (_, valString) = line.Split(" ");
+                var val = int.Parse(valString);
+                X += val;
+            }
+        }
+
+        /*
+         * If the sprite is positioned such that one of its three pixels is the pixel currently being drawn, the screen produces a lit pixel (#); otherwise, the screen leaves the pixel dark (.).
+         */
+        // left most value is 0 right most value is 39 on each row
+        foreach (var i in Enumerable.Range(1, 6))
+        {
+            foreach (var j in Enumerable.Range(1, 40))
+            {
+                var cycleNumber = (40 * (i - 1)) + j;
+                var pixel = j - 1;
+                var spritePos = cycleValues[cycleNumber];
+                if (spritePos == pixel || spritePos + 1 == pixel || spritePos - 1 == pixel)
+                {
+                    Console.Write("#");
+
+                }
+                else
+                {
+                    Console.Write(" ");
+                }
+            }
+            Console.Write("\n");
+        }
+
+    }
 }

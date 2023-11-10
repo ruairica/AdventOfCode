@@ -1,12 +1,12 @@
 ﻿namespace Aoc.Utils;
-
 public static class ListExtensions
 {
-    public static T Pop<T>(this List<T> list)
+    public static T Pop<T>(this List<T> list, int elementIndexer = -1)
     {
-        var last = list[^1];
-        list.RemoveAt(list.Count - 1);
-        return last;
+        var elementIndex = elementIndexer < 0 ? list.Count + elementIndexer : elementIndexer;
+        var element = list[elementIndex];
+        list.RemoveAt(elementIndex);
+        return element;
     }
 
     // allows a list to be deconstructed to a tuple like in Python.

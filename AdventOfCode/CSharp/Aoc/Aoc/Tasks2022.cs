@@ -338,7 +338,7 @@ public class Tasks2022
             else if (int.TryParse(line.Split(" ")[0], out var size))
             {
                 // add size to all in path?
-                var copy = currentPath.Select(x => x).ToList();
+                var copy = currentPath.ConvertAll(x => x);
                 while (copy.Count > 0)
                 {
                     sizes.AddOrUpdate(CreateKey(copy), size);

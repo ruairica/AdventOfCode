@@ -73,7 +73,7 @@ public class Grid
 
     public List<List<int>> GetAllRows()
     {
-        return grid.Select(x => x).ToList();
+        return grid.ConvertAll(x => x);
     }
 
 

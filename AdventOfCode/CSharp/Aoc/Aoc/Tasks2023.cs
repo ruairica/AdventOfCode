@@ -13,34 +13,38 @@ public class Tasks2023
     [Test]
     public void day1_1_2023()
     {
-        var result = 0;
-        var list = new List<int>();
         var lines = FP.ReadFile($"{basePath}/day1.txt").Split("\n");
 
-        lines.Dump();
+        var result = lines.Select(line => line.Where(char.IsDigit).ToList()).Select(digits => int.Parse($"{digits[0]}{digits[^1]}")).Sum();
 
-        foreach (var (val, index) in lines.Enumerate())
-        {
-            // var num = int.Parse(val);
-        }
-
-        "day1 part 1".Dump();
+        result.Dump();
     }
 
     [Test]
     public void day1_2_2023()
     {
-        var result = 0;
-        var list = new List<int>();
+        var numsStrings = new List<string>{ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+        
+        var dict = new Dictionary<string, int>();
+        numsStrings.Enumerate().ToList().ForEach(x=> dict.Add(x.val, x.index+1));
+
+        var collection = Enumerable.Range(1, 9).Select(x => x.ToString()).ToList();
+        collection.ForEach(x => dict.Add(x, int.Parse(x)));
+
+        numsStrings.AddRange(collection);
         var lines = FP.ReadFile($"{basePath}/day1.txt").Split("\n");
 
-        lines.Dump();
+        var result = lines
+            .Select(line => numsStrings
+                .SelectMany(x => line
+                    .AllIndexOf(x)
+                    .Select(y => (y, x))
+                    .Where(x => x.Item1 != -1)
+                    .ToList()))
+            .Select(digits => 
+                int.Parse($"{dict[digits.MinBy(x => x.Item1).Item2]}{dict[digits.MaxBy(x => x.Item1).Item2]}"))
+            .Sum();
 
-        foreach (var (val, index) in lines.Enumerate())
-        {
-            // var num = int.Parse(val);
-        }
-
-        "day1 par 2".Dump();
+        result.Dump();
     }
 }

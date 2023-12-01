@@ -28,5 +28,17 @@
         {
             return binary.Select((t, m) => t * (int)Math.Pow(2, binary.Count - 1 - m)).Sum();
         }
+
+        public static IList<int> AllIndexOf(this string text, string str)
+        {
+            IList<int> allIndexOf = new List<int>();
+            int index = text.IndexOf(str);
+            while (index != -1)
+            {
+                allIndexOf.Add(index);
+                index = text.IndexOf(str, index + 1);
+            }
+            return allIndexOf;
+        }
     }
 }

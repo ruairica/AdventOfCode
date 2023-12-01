@@ -47,4 +47,11 @@ public class Tasks2023
 
         result.Dump();
     }
+
+    [Test]
+    public void day2_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day2.txt").Split("\n");
+        lines.Dump();
+    }
 }

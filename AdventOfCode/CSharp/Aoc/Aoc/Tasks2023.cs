@@ -103,6 +103,7 @@ public class Tasks2023
         allGameIds.Except(invalidGameIds).Sum().Dump();
     }
 
+    [Test]
     public void day2_1_2023_Cleaner()
     {
         var lines = FP.ReadFile($"{basePath}/day2.txt").Split("\n");
@@ -119,7 +120,7 @@ public class Tasks2023
                     var reds = Regex.Matches(line, @"(\d+) red")
                         .Select(x => int.Parse(x.Value.Split(" ")[0]));
 
-                    return blues.All(x => x <= 14) || greens.All(x => x <= 13) ||
+                    return blues.All(x => x <= 14) && greens.All(x => x <= 13) &&
                            reds.All(x => x <= 12);
                 })
             .Select(

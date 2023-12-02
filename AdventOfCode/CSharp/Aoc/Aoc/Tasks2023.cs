@@ -146,6 +146,32 @@ public class Tasks2023
     }
 
     [Test]
+    public void day2_2_2023_Cleaner()
+    {
+        var lines = FP.ReadFile($"{basePath}/day2.txt").Split("\n");
+
+        lines.Select(
+            line =>
+            {
+                var blue = Regex.Matches(line, @"(\d+) blue")
+                    .Select(x => int.Parse(x.Value.Split(" ")[0]))
+                    .Max();
+
+                var red = Regex.Matches(line, @"(\d+) red")
+                    .Select(x => int.Parse(x.Value.Split(" ")[0]))
+                    .Max();
+
+                var green = Regex.Matches(line, @"(\d+) green")
+                    .Select(x => int.Parse(x.Value.Split(" ")[0]))
+                    .Max();
+
+                return blue * red * green;
+            })
+            .Sum()
+            .Dump();
+    }
+
+    [Test]
     public void day3_1_2023()
     {
         var lines = FP.ReadFile($"{basePath}/day2.txt").Split("\n");

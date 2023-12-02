@@ -78,6 +78,7 @@ public class Tasks2023
 
             var sets = line.Split(";");
 
+            // looping through sets is redundant here could have just got all the matches for the line and checked them all, see day2_1_2023_Cleaner
             foreach (var set in sets)
             {
                 var blue = Regex.Matches(set, @"(\d+) blue")
@@ -100,6 +101,33 @@ public class Tasks2023
         }
 
         allGameIds.Except(invalidGameIds).Sum().Dump();
+    }
+
+    public void day2_1_2023_Cleaner()
+    {
+        var lines = FP.ReadFile($"{basePath}/day2.txt").Split("\n");
+
+        lines.Where(
+                line =>
+                {
+                    var blues = Regex.Matches(line, @"(\d+) blue")
+                        .Select(x => int.Parse(x.Value.Split(" ")[0]));
+
+                    var greens = Regex.Matches(line, @"(\d+) green")
+                        .Select(x => int.Parse(x.Value.Split(" ")[0]));
+
+                    var reds = Regex.Matches(line, @"(\d+) red")
+                        .Select(x => int.Parse(x.Value.Split(" ")[0]));
+
+                    return blues.All(x => x <= 14) || greens.All(x => x <= 13) ||
+                           reds.All(x => x <= 12);
+                })
+            .Select(
+                line => Regex.Matches(line, @"Game (\d+)")
+                    .Select(x => int.Parse(x.Value.Split(" ")[1]))
+                    .FirstOrDefault())
+            .Sum()
+            .Dump();
     }
 
     [Test]
@@ -173,7 +201,7 @@ public class Tasks2023
     [Test]
     public void day3_1_2023()
     {
-        var lines = FP.ReadFile($"{basePath}/day2.txt").Split("\n");
+        var lines = FP.ReadFile($"{basePath}/day3.txt").Split("\n");
         lines.Dump();
     }
 }

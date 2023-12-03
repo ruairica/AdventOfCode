@@ -14,4 +14,9 @@ public static class FP
         ReadLines(path)
               .Select(x => x.Select(y => int.Parse(y.ToString())).ToList())
               .ToList();
+
+    public static List<List<char>> ReadAsCharGrid(string path) =>
+        ReadLines(path)
+            .Select(x => x.Select(y => y).ToList())
+            .ToList();
 }

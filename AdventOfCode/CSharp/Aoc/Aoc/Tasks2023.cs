@@ -1,7 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using Aoc.Utils;
+using Aoc.Utils.Grids;
 using Dumpify;
+using FluentAssertions;
 using NUnit.Framework;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Aoc;
 
@@ -202,7 +205,103 @@ public class Tasks2023
     [Test]
     public void day3_1_2023()
     {
-        var lines = FP.ReadFile($"{basePath}/day3.txt").Split("\n");
-        lines.Dump();
+        var grid = FP.ReadAsCharGrid($"{basePath}/day3.txt");
+        var result = 0;
+        var counted = new HashSet<(int, int)>();
+        var width = grid[0].Count;
+        var height = grid.Count;
+
+        for (int r = 0; r < width; r++)
+        {
+            for (var c = 0; c < height; c++)
+            {
+                if (char.IsDigit(grid[r][c]) && !counted.Contains((r, c)))
+                {
+                    List<(int r, int c)> coords = new() { new(r, c) };
+                    string number = grid[r][c].ToString();
+                    counted.Add((r, c));
+
+                    // walk forward until there is no more numbers
+                    var walker = c + 1;
+
+                    while (walker < width && char.IsDigit(grid[r][walker]))
+                    {
+                        coords.Add((r, walker));
+                        counted.Add((r, walker));
+                        number += grid[r][walker].ToString();
+                        walker++;
+                    }
+
+                    // check for any adjacent symbols
+                    if (coords.Select(x => new Coord(x.r, x.c))
+                        .Any(
+                            x => x.GetValidAdjacentIncludingDiag(width, height)
+                                .Select(e => grid[e.x][e.y])
+                                .Any(x => !char.IsDigit(x) && x != '.')))
+                    {
+                        result += int.Parse(number);
+                    }
+                }
+            }
+        }
+
+        result.Dump();
+    }
+
+    [Test]
+    public void day3_2_2023()
+    {
+        var grid = FP.ReadAsCharGrid($"{basePath}/day3.txt");
+        var counted = new HashSet<(int, int)>();
+        var width = grid[0].Count;
+        var height = grid.Count;
+
+        var gears = new Dictionary<(int, int), List<int>>();
+
+        for (int r = 0; r < width; r++)
+        {
+            for (var c = 0; c < height; c++)
+            {
+                if (char.IsDigit(grid[r][c]) && !counted.Contains((r, c)))
+                {
+                    List<(int r, int c)> coords = new() { new(r, c) };
+                    string number = grid[r][c].ToString();
+                    counted.Add((r, c));
+
+                    // walk forward until there is no more numbers
+                    var walker = c + 1;
+                    while (walker < width && char.IsDigit(grid[r][walker]))
+                    {
+                        coords.Add((r, walker));
+                        counted.Add((r, walker));
+                        number += grid[r][walker].ToString();
+                        walker++;
+                    }
+
+                    // check for any adjacent *
+                    var gearFound = coords.Select(x => new Coord(x.r, x.c))
+                        .SelectMany(
+                            c => c.GetValidAdjacentIncludingDiag(width, height)
+                                .Where(e => grid[e.x][e.y] == '*')
+                                .Select(e => (e.x, e.y)))
+                        .ToList();
+
+                    if (gearFound.Any())
+                    {
+                        var list = gears.GetValueOrDefault(
+                            gearFound.First(),
+                            new List<int>());
+
+                        list.Add(int.Parse(number));
+                        gears[gearFound.First()] = list;
+                    }
+                }
+            }
+        }
+
+        gears.Where(x => x.Value.Count == 2)
+            .Select(x => x.Value.Aggregate((a, b) => a * b))
+            .Sum()
+            .Dump();
     }
 }

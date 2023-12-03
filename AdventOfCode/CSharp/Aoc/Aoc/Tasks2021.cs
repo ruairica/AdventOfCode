@@ -731,7 +731,7 @@ public class Tasks2021
             .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
             .ToList();
 
-        var grid = new Grid(g);
+        var grid = new Grid<int>(g);
         var total = 0;
 
         grid.ForEachWithCoord((val, coord) =>
@@ -832,10 +832,10 @@ public class Tasks2021
             .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
             .ToList();
 
-        var grid = new Grid(g);
+        var grid = new Grid<int>(g);
 
         var basinCoords = grid.WhereWithCoord((v, coord) => grid.GetValidAdjacentNoDiag(coord).All(a => grid[a] > v))
-            .Select(x => new Coord(x.Coord.x, x.Coord.y))
+            .Select(x => new Coord(x.Coord.r, x.Coord.c))
             .ToList();
 
         var basinTotals = new List<int>();
@@ -1188,7 +1188,7 @@ public class Tasks2021
             .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())
             .ToList();
 
-        var grid = new Grid(g);
+        var grid = new Grid<int>(g);
         var totalFlashes = 0;
         for (int step = 1; step <= 100; step++)
         {
@@ -1252,7 +1252,7 @@ public class Tasks2021
             .Select(x => x.ToCharArray().Select(x => int.Parse(x.ToString())).ToList())
             .ToList();
 
-        var grid = new Grid(g);
+        var grid = new Grid<int>(g);
         for (int step = 1; step <= 10000; step++)
         {
             var q = new Queue<Coord>();
@@ -1733,7 +1733,7 @@ public class Tasks2021
             .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
             .ToList();
 
-        var cost = AStarAlgorithm.AStar(new Grid(grid), new Coord(0, 0), new Coord(grid.Count - 1, grid[0].Count - 1));
+        var cost = AStarAlgorithm.AStar(new Grid<int>(grid), new Coord(0, 0), new Coord(grid.Count - 1, grid[0].Count - 1));
         cost.Dump();
     }
 
@@ -1749,7 +1749,7 @@ public class Tasks2021
 
         var rows = grid.Select(x => x.Select(x => x).ToList()).ToList();
 
-        new Grid(grid).Print();
+        new Grid<int>(grid).Print();
 
         // rows
         for (int i = 1; i <= 4; i++)
@@ -1769,7 +1769,7 @@ public class Tasks2021
             grid.AddRange(newRows);
         }
 
-        var g = new Grid(grid);
+        var g = new Grid<int>(grid);
         var cost = AStarAlgorithm.AStar(g, new Coord(0, 0), new Coord(grid.Count - 1, grid[0].Count - 1));
         cost.Dump();
     }

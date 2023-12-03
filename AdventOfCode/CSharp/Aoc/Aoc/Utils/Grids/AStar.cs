@@ -4,15 +4,15 @@ public static class AStarAlgorithm
 {
     static int ManhattanDistance(Coord current, Coord target)
     {
-        return Math.Abs(current.x - target.x) + Math.Abs(current.y - target.y);
+        return Math.Abs(current.r - target.r) + Math.Abs(current.c - target.c);
     }
 
-    public static int AStar(Grid grid, Coord start, Coord target)
+    public static int AStar(Grid<int> grid, Coord start, Coord target)
     {
         HashSet<Coord> closed = new();
         var openQ = new List<AStarNode>
         {
-            new AStarNode(start.x, start.y, 0, ManhattanDistance(start, target), null)
+            new AStarNode(start.r, start.c, 0, ManhattanDistance(start, target), null)
         };
 
         while (openQ.Count > 0)
@@ -35,7 +35,7 @@ public static class AStarAlgorithm
 
             closed.Add(new Coord(current.Row, current.Column));
 
-            if (current.Row == target.x && current.Column == target.y)
+            if (current.Row == target.r && current.Column == target.c)
             {
                 return current.G;
             }
@@ -45,12 +45,12 @@ public static class AStarAlgorithm
 
             foreach (var nc in neighbourCoords)
             {
-                var gScore = current.G + grid.grid[nc.x][nc.y];
-                var neighbour = openQ.FirstOrDefault(x => x.Row == nc.x && x.Column == nc.y);
+                var gScore = current.G + grid.grid[nc.r][nc.c];
+                var neighbour = openQ.FirstOrDefault(x => x.Row == nc.r && x.Column == nc.c);
 
                 if (neighbour is null)
                 {
-                    openQ.Add(new AStarNode(nc.x, nc.y, gScore, ManhattanDistance(nc, target), current));
+                    openQ.Add(new AStarNode(nc.r, nc.c, gScore, ManhattanDistance(nc, target), current));
                 }
                 else if (gScore < neighbour.G)
                 {

@@ -236,7 +236,7 @@ public class Tasks2023
                     if (coords.Select(x => new Coord(x.r, x.c))
                         .Any(
                             x => x.GetValidAdjacentIncludingDiag(width, height)
-                                .Select(e => grid[e.x][e.y])
+                                .Select(e => grid[e.r][e.c])
                                 .Any(x => !char.IsDigit(x) && x != '.')))
                     {
                         result += int.Parse(number);
@@ -244,6 +244,50 @@ public class Tasks2023
                 }
             }
         }
+
+        result.Dump();
+    }
+
+    [Test]
+    public void day3_1_2023_Grid()
+    {
+        var g = FP.ReadAsCharGrid($"{basePath}/day3.txt");
+        var grid = new Grid<char>(g);
+
+        var result = 0;
+        var counted = new HashSet<Coord>();
+
+        grid.ForEachWithCoord(
+            (c, coord) =>
+            {
+                if (char.IsDigit(c) && !counted.Contains(coord))
+                {
+                    List<Coord> coords = new() { coord };
+                    string number = c.ToString();
+                    counted.Add(coord);
+
+                    // walk forward until there is no more numbers
+                    var walker = coord.c + 1;
+
+                    while (walker < grid.Width &&
+                           char.IsDigit(grid[new(coord.r, walker)]))
+                    {
+                        coords.Add(new(coord.r, walker));
+                        counted.Add(new(coord.r, walker));
+                        number += grid[new(coord.r, walker)].ToString();
+                        walker++;
+                    }
+
+                    // check for any adjacent symbols
+                    if (coords.Any(
+                            e => grid.GetValidAdjacentIncludingDiag(e)
+                                .Select(e => grid[e])
+                                .Any(x => !char.IsDigit(x) && x != '.')))
+                    {
+                        result += int.Parse(number);
+                    }
+                }
+            });
 
         result.Dump();
     }
@@ -270,6 +314,7 @@ public class Tasks2023
 
                     // walk forward until there is no more numbers
                     var walker = c + 1;
+
                     while (walker < width && char.IsDigit(grid[r][walker]))
                     {
                         coords.Add((r, walker));
@@ -282,8 +327,8 @@ public class Tasks2023
                     var gearFound = coords.Select(x => new Coord(x.r, x.c))
                         .SelectMany(
                             c => c.GetValidAdjacentIncludingDiag(width, height)
-                                .Where(e => grid[e.x][e.y] == '*')
-                                .Select(e => (e.x, e.y)))
+                                .Where(e => grid[e.r][e.c] == '*')
+                                .Select(e => (x: e.r, y: e.c)))
                         .ToList();
 
                     if (gearFound.Any())
@@ -303,5 +348,12 @@ public class Tasks2023
             .Select(x => x.Value.Aggregate((a, b) => a * b))
             .Sum()
             .Dump();
+    }
+
+    [Test]
+    public void day4_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day4.txt").Split("\n").ToList();
+        lines.ForEach(x => x.Dump());
     }
 }

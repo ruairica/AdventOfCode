@@ -1,9 +1,9 @@
 ﻿namespace Aoc.Utils.Grids;
 
 
-public record ValCoord(int Val, Coord Coord);
+public record ValCoord<T>(T Val, Coord Coord);
 
-public record Coord(int x, int y);
+public record Coord(int r, int c);
 
 public record GridItem<T>(int val, T otherVal);
 

@@ -4,8 +4,8 @@ public class GridWithOtherVal<T>
 {
     public GridItem<T> this[Coord coord]
     {
-        get => grid[coord.x][coord.y];
-        set { grid[coord.x][coord.y] = value; }
+        get => grid[coord.r][coord.c];
+        set { grid[coord.r][coord.c] = value; }
     }
 
     public Type OtherVal { get; set; }

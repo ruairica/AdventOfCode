@@ -419,12 +419,12 @@ public class Tasks2022
         // all edges
         var visibleTrees = g.Count * 4 - 4;
 
-        var grid = new Grid(g);
+        var grid = new Grid<int>(g);
 
         grid.ForEachWithCoord((val, coord) =>
         {
             if (
-                !(coord.x == 0 || coord.y == 0 || coord.x == grid.Width - 1 || coord.y == grid.Height - 1) &&
+                !(coord.r == 0 || coord.c == 0 || coord.r == grid.Width - 1 || coord.c == grid.Height - 1) &&
                 (grid.GetAllValuesDownFromCoord(coord).All(x => x < val) ||
                 grid.GetAllValuesUpFromCoord(coord).All(x => x < val) ||
                 grid.GetAllValuesLeftOfCoord(coord).All(x => x < val) ||
@@ -444,22 +444,22 @@ public class Tasks2022
         var g = FP.ReadAsGrid("./inputs/2022/day8.txt");
 
         var maxScore = 0;
-        var grid = new Grid(g);
+        var grid = new Grid<int>(g);
 
         grid.ForEachWithCoord((val, coord) =>
         {
             var currentScore = 1;
             var up = grid.GetAllValuesUpFromCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
-            currentScore *= (up == default ? coord.x : up.index + 1);
+            currentScore *= (up == default ? coord.r : up.index + 1);
 
             var left = grid.GetAllValuesLeftOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
-            currentScore *= (left == default ? coord.y : left.index + 1);
+            currentScore *= (left == default ? coord.c : left.index + 1);
 
             var right = grid.GetAllValuesRightOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
-            currentScore *= (right == default ? grid.Width - 1 - coord.y : right.index + 1);
+            currentScore *= (right == default ? grid.Width - 1 - coord.c : right.index + 1);
 
             var down = grid.GetAllValuesDownFromCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
-            currentScore *= (down == default ? grid.Height - 1 - coord.x : down.index + 1);
+            currentScore *= (down == default ? grid.Height - 1 - coord.r : down.index + 1);
 
             maxScore = Math.Max(maxScore, currentScore);
         });
@@ -488,24 +488,24 @@ public class Tasks2022
             {
                 headPos = dir switch
                 {
-                    "U" => headPos with { x = headPos.x - 1 },
-                    "D" => headPos with { x = headPos.x + 1 },
-                    "R" => headPos with { y = headPos.y + 1 },
-                    "L" => headPos with { y = headPos.y - 1 },
+                    "U" => headPos with { r = headPos.r - 1 },
+                    "D" => headPos with { r = headPos.r + 1 },
+                    "R" => headPos with { c = headPos.c + 1 },
+                    "L" => headPos with { c = headPos.c - 1 },
                     _ => throw new InvalidOperationException(),
                 };
 
-                if (Math.Abs(headPos.x - tailPos.x) == 2 && headPos.y == tailPos.y) // vert
+                if (Math.Abs(headPos.r - tailPos.r) == 2 && headPos.c == tailPos.c) // vert
                 {
-                    tailPos = tailPos with { x = tailPos.x + (headPos.x > tailPos.x ? 1 : -1) };
+                    tailPos = tailPos with { r = tailPos.r + (headPos.r > tailPos.r ? 1 : -1) };
                 }
-                else if (Math.Abs(headPos.y - tailPos.y) == 2 && headPos.x == tailPos.x) // horizontal
+                else if (Math.Abs(headPos.c - tailPos.c) == 2 && headPos.r == tailPos.r) // horizontal
                 {
-                    tailPos = tailPos with { y = tailPos.y + (headPos.y > tailPos.y ? 1 : -1) };
+                    tailPos = tailPos with { c = tailPos.c + (headPos.c > tailPos.c ? 1 : -1) };
                 }
-                else if (Math.Abs(headPos.x - tailPos.x) == 2 && headPos.y != tailPos.y || Math.Abs(headPos.y - tailPos.y) == 2 && headPos.x != tailPos.x) //diag 
+                else if (Math.Abs(headPos.r - tailPos.r) == 2 && headPos.c != tailPos.c || Math.Abs(headPos.c - tailPos.c) == 2 && headPos.r != tailPos.r) //diag 
                 {
-                    tailPos = new Coord(tailPos.x + (headPos.x > tailPos.x ? 1 : -1), headPos.y > tailPos.y ? tailPos.y + 1 : tailPos.y - 1);
+                    tailPos = new Coord(tailPos.r + (headPos.r > tailPos.r ? 1 : -1), headPos.c > tailPos.c ? tailPos.c + 1 : tailPos.c - 1);
                 }
 
                 visited.Add(tailPos);
@@ -533,10 +533,10 @@ public class Tasks2022
             {
                 var newHead = dir switch
                 {
-                    "U" => tail[0] with { x = tail[0].x - 1 },
-                    "D" => tail[0] with { x = tail[0].x + 1 },
-                    "R" => tail[0] with { y = tail[0].y + 1 },
-                    "L" => tail[0] with { y = tail[0].y - 1 },
+                    "U" => tail[0] with { r = tail[0].r - 1 },
+                    "D" => tail[0] with { r = tail[0].r + 1 },
+                    "R" => tail[0] with { c = tail[0].c + 1 },
+                    "L" => tail[0] with { c = tail[0].c - 1 },
                     _ => throw new InvalidOperationException(),
                 };
                 var newTail = new List<Coord>() { newHead };
@@ -544,17 +544,17 @@ public class Tasks2022
                 // go through the whole tail and apply changes, skip the head as it's already added
                 foreach (var coord in tail.Skip(1))
                 {
-                    if (Math.Abs(newTail[^1].x - coord.x) == 2 && newTail[^1].y == coord.y) // vert
+                    if (Math.Abs(newTail[^1].r - coord.r) == 2 && newTail[^1].c == coord.c) // vert
                     {
-                        newTail.Add(coord with { x = coord.x + (newTail[^1].x > coord.x ? 1 : -1) });
+                        newTail.Add(coord with { r = coord.r + (newTail[^1].r > coord.r ? 1 : -1) });
                     }
-                    else if (Math.Abs(newTail[^1].y - coord.y) == 2 && newTail[^1].x == coord.x) // horizontal
+                    else if (Math.Abs(newTail[^1].c - coord.c) == 2 && newTail[^1].r == coord.r) // horizontal
                     {
-                        newTail.Add(coord with { y = coord.y + (newTail[^1].y > coord.y ? 1 : -1) });
+                        newTail.Add(coord with { c = coord.c + (newTail[^1].c > coord.c ? 1 : -1) });
                     }
-                    else if (Math.Abs(newTail[^1].x - coord.x) == 2 && newTail[^1].y != coord.y || Math.Abs(newTail[^1].y - coord.y) == 2 && newTail[^1].x != coord.x) //diag 
+                    else if (Math.Abs(newTail[^1].r - coord.r) == 2 && newTail[^1].c != coord.c || Math.Abs(newTail[^1].c - coord.c) == 2 && newTail[^1].r != coord.r) //diag 
                     {
-                        newTail.Add(new Coord(coord.x + (newTail[^1].x > coord.x ? 1 : -1), newTail[^1].y > coord.y ? coord.y + 1 : coord.y - 1));
+                        newTail.Add(new Coord(coord.r + (newTail[^1].r > coord.r ? 1 : -1), newTail[^1].c > coord.c ? coord.c + 1 : coord.c - 1));
                     }
                     else
                     {

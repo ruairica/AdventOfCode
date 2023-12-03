@@ -1,10 +1,10 @@
 ﻿namespace Aoc.Utils.Grids;
-public class Grid
+public class Grid<T>
 {
-    public int this[Coord coord]
+    public T this[Coord coord]
     {
-        get => grid[coord.x][coord.y];
-        set => grid[coord.x][coord.y] = value;
+        get => grid[coord.r][coord.c];
+        set => grid[coord.r][coord.c] = value;
     }
 
     public bool Complete { get; set; }
@@ -15,16 +15,16 @@ public class Grid
 
     public int Height { get; set; }
 
-    public List<List<int>> grid;
+    public List<List<T>> grid;
 
-    public Grid(List<List<int>> grid)
+    public Grid(List<List<T>> grid)
     {
         this.grid = grid;
         Width = grid[0].Count;
         Height = grid.Count;
     }
 
-    public void ForEachWithCoord(Action<int, Coord> action)
+    public void ForEachWithCoord(Action<T, Coord> action)
     {
         for (var x = 0; x < Width; x++)
         {
@@ -35,7 +35,7 @@ public class Grid
         }
     }
 
-    public Coord? FirstOrDefault(Func<int, bool> func)
+    public Coord? FirstOrDefault(Func<T, bool> func)
     {
         for (int x = 0; x < this.Width; x++)
         {
@@ -51,7 +51,7 @@ public class Grid
         return null;
     }
 
-    public IEnumerable<ValCoord> WhereWithCoord(Func<int, Coord, bool> func)
+    public IEnumerable<ValCoord<T>> WhereWithCoord(Func<T, Coord, bool> func)
     {
         for (var x = 0; x < this.Width; x++)
         {
@@ -59,59 +59,59 @@ public class Grid
             {
                 if (func(grid[x][y], new(x, y)))
                 {
-                    yield return new ValCoord(grid[x][y], new(x, y));
+                    yield return new ValCoord<T>(grid[x][y], new(x, y));
                 }
             }
         }
     }
 
-    public bool AllValues(Func<int, bool> func)
+    public bool AllValues(Func<T, bool> func)
     {
         return grid.SelectMany(x => x).All(func);
     }
 
 
-    public List<List<int>> GetAllRows()
+    public List<List<T>> GetAllRows()
     {
         return grid.ConvertAll(x => x);
     }
 
 
-    public List<List<int>> GetAllColumns()
+    public List<List<T>> GetAllColumns()
     {
         return Enumerable.Range(0, Width)
             .Select(column => Enumerable.Range(0, Height).Select(row => grid[row][column]).ToList())
             .ToList();
     }
 
-    public List<int> GetAllValuesRightOfCoord(Coord coord)
+    public List<T> GetAllValuesRightOfCoord(Coord coord)
     {
-        return Enumerable.Range(coord.y + 1, this.Width - 1 - coord.y)
-            .Select(y => this.grid[coord.x][y])
+        return Enumerable.Range(coord.c + 1, this.Width - 1 - coord.c)
+            .Select(y => this.grid[coord.r][y])
             .ToList();
     }
 
-    public List<int> GetAllValuesLeftOfCoord(Coord coord)
+    public List<T> GetAllValuesLeftOfCoord(Coord coord)
     {
-        var row = Enumerable.Range(0, coord.y)
-            .Select(y => this.grid[coord.x][y])
+        var row = Enumerable.Range(0, coord.c)
+            .Select(y => this.grid[coord.r][y])
             .ToList();
 
         row.Reverse();
         return row;
     }
 
-    public List<int> GetAllValuesDownFromCoord(Coord coord)
+    public List<T> GetAllValuesDownFromCoord(Coord coord)
     {
-        return Enumerable.Range(coord.x + 1, this.Height - 1 - coord.x)
-            .Select(x => this.grid[x][coord.y])
+        return Enumerable.Range(coord.r + 1, this.Height - 1 - coord.r)
+            .Select(x => this.grid[x][coord.c])
             .ToList();
     }
 
-    public List<int> GetAllValuesUpFromCoord(Coord coord)
+    public List<T> GetAllValuesUpFromCoord(Coord coord)
     {
-        var col = Enumerable.Range(0, coord.x)
-            .Select(x => this.grid[x][coord.y])
+        var col = Enumerable.Range(0, coord.r)
+            .Select(x => this.grid[x][coord.c])
             .ToList();
 
         col.Reverse();
@@ -134,7 +134,7 @@ public class Grid
 
     public List<Coord> GetValidAdjacentNoDiag(Coord coord) => coord.GetValidAdjacentNoDiag(this.Width, this.Height);
 
-    public Grid SetValues(Func<int, int> func)
+    public Grid<T> SetValues(Func<T, T> func)
     {
         var resultGrid = CopyGrid(this);
 
@@ -149,9 +149,9 @@ public class Grid
         return resultGrid;
     }
 
-    private static Grid CopyGrid(Grid grid)
+    private static Grid<T> CopyGrid(Grid<T> grid)
     {
-        var resultGrid = new Grid(
+        var resultGrid = new Grid<T>(
             Enumerable.Range(0, grid.Height)
                 .Select(x =>
                     Enumerable.Range(0, grid.Width)

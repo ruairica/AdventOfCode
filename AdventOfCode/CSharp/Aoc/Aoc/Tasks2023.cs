@@ -269,12 +269,14 @@ public class Tasks2023
                     // walk forward until there is no more numbers
                     var walker = coord.c + 1;
 
+                    var currentCoord = new Coord(coord.r, walker);
+
                     while (walker < grid.Width &&
-                           char.IsDigit(grid[new(coord.r, walker)]))
+                           char.IsDigit(grid[currentCoord]))
                     {
-                        coords.Add(new(coord.r, walker));
-                        counted.Add(new(coord.r, walker));
-                        number += grid[new(coord.r, walker)].ToString();
+                        coords.Add(currentCoord);
+                        counted.Add(currentCoord);
+                        number += grid[currentCoord].ToString();
                         walker++;
                     }
 
@@ -328,7 +330,7 @@ public class Tasks2023
                         .SelectMany(
                             c => c.GetValidAdjacentIncludingDiag(width, height)
                                 .Where(e => grid[e.r][e.c] == '*')
-                                .Select(e => (x: e.r, y: e.c)))
+                                .Select(e => (e.r, e.c)))
                         .ToList();
 
                     if (gearFound.Any())
@@ -354,6 +356,74 @@ public class Tasks2023
     public void day4_1_2023()
     {
         var lines = FP.ReadFile($"{basePath}/day4.txt").Split("\n").ToList();
-        lines.ForEach(x => x.Dump());
+
+        var result = 0;
+        foreach (var line in lines)
+        {
+            var allNums = line.Split(":")[1];
+
+            var (winners, myNums) = allNums.Split("|");
+
+            var wNum = Regex.Matches(winners, @"(\d+)").Select(x => int.Parse(x.Value));
+            var aNum = Regex.Matches(myNums, @"(\d+)").Select(x => int.Parse(x.Value));
+
+            var count = wNum.Intersect(aNum).Count();
+            if (count == 0)
+            {
+                continue;
+            }
+
+            var total = 1;
+            for (var i = 0; i < count - 1; i++)
+            {
+                total *= 2;
+            }
+
+            result += total;
+        }
+
+        result.Dump();
+    }
+
+    [Test]
+    public void day4_2_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day4.txt").Split("\n").ToList();
+
+        var copies = new Dictionary<int, int>();
+        foreach (var (line, index) in lines.Enumerate())
+        {
+            var cardNumber = index + 1;
+            var allNums = line.Split(":")[1];
+
+            var (winners, myNums) = allNums.Split("|");
+
+            var wNum = Regex.Matches(winners, @"(\d+)").Select(x => int.Parse(x.Value));
+            var aNum = Regex.Matches(myNums, @"(\d+)").Select(x => int.Parse(x.Value));
+
+            var count = wNum.Intersect(aNum).Count();
+
+            // process copies for this line
+            var numOfCopies = copies.GetValueOrDefault(cardNumber, 0);
+            foreach (var num in Enumerable.Range(cardNumber + 1, count))
+            {
+                copies.AddOrUpdate(num, numOfCopies);
+            }
+            
+            // process original
+            foreach (var num in Enumerable.Range(cardNumber+1,  count))
+            {
+                copies.AddOrUpdate(num, 1);
+            }
+        }
+
+        (copies.Values.Sum() + lines.Count).Dump();
+    }
+
+    [Test]
+    public void day5_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day5.txt").Split("\n").ToList();
+        lines.ForEach(line => line.Dump());
     }
 }

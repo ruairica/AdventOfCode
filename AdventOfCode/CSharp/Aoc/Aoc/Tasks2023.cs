@@ -408,16 +408,9 @@ public class Tasks2023
 
             // process copies for this line
             var numOfCopies = copies.GetValueOrDefault(cardNumber, 0);
-
             foreach (var num in Enumerable.Range(cardNumber + 1, count))
             {
-                copies.AddOrUpdate(num, numOfCopies);
-            }
-
-            // process original
-            foreach (var num in Enumerable.Range(cardNumber + 1, count))
-            {
-                copies.AddOrUpdate(num, 1);
+                copies.AddOrUpdate(num, 1 + numOfCopies);
             }
         }
 

@@ -271,8 +271,7 @@ public class Tasks2023
 
                     var currentCoord = new Coord(coord.r, walker);
 
-                    while (walker < grid.Width &&
-                           char.IsDigit(grid[currentCoord]))
+                    while (walker < grid.Width && char.IsDigit(grid[currentCoord]))
                     {
                         coords.Add(currentCoord);
                         counted.Add(currentCoord);
@@ -358,6 +357,7 @@ public class Tasks2023
         var lines = FP.ReadFile($"{basePath}/day4.txt").Split("\n").ToList();
 
         var result = 0;
+
         foreach (var line in lines)
         {
             var allNums = line.Split(":")[1];
@@ -368,12 +368,14 @@ public class Tasks2023
             var aNum = Regex.Matches(myNums, @"(\d+)").Select(x => int.Parse(x.Value));
 
             var count = wNum.Intersect(aNum).Count();
+
             if (count == 0)
             {
                 continue;
             }
 
             var total = 1;
+
             for (var i = 0; i < count - 1; i++)
             {
                 total *= 2;
@@ -391,6 +393,7 @@ public class Tasks2023
         var lines = FP.ReadFile($"{basePath}/day4.txt").Split("\n").ToList();
 
         var copies = new Dictionary<int, int>();
+
         foreach (var (line, index) in lines.Enumerate())
         {
             var cardNumber = index + 1;
@@ -405,13 +408,14 @@ public class Tasks2023
 
             // process copies for this line
             var numOfCopies = copies.GetValueOrDefault(cardNumber, 0);
+
             foreach (var num in Enumerable.Range(cardNumber + 1, count))
             {
                 copies.AddOrUpdate(num, numOfCopies);
             }
-            
+
             // process original
-            foreach (var num in Enumerable.Range(cardNumber+1,  count))
+            foreach (var num in Enumerable.Range(cardNumber + 1, count))
             {
                 copies.AddOrUpdate(num, 1);
             }

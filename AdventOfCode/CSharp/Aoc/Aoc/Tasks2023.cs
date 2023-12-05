@@ -486,8 +486,6 @@ public class Tasks2023
         var newRanges = new List<(long, long)>();
         foreach (var block in text.Split("\n\n").Skip(1))
         {
-            var usedRanges = new HashSet<(long, long)>();   
-
             foreach (var line in block.Split("\n").Skip(1))
             {
                 var (destinationR, sourceR, range) = Regex
@@ -495,59 +493,57 @@ public class Tasks2023
                     .Select(x => long.Parse(x.Value))
                     .ToList();
 
-                var nr = new List<(long, long)>();
-                var leftover = new List<(long, long)>();
-                var used = new List<(long, long)>();
+                var nr = new List<(long, long)>(); 
+                var leftover = new List<(long, long)>(); // ranges that were left over from partial overlap
+                var used = new List<(long, long)>(); // record which of the original ranges were used
 
                 var (start, end) = (sourceR, sourceR + range - 1);
                 foreach (var (rangeS, rangeE) in currentRanges)
                 {
-                    if (rangeS >= start && rangeE <= end)
+                    if (rangeS >= start && rangeE <= end) // fully contained
                     {
                         used.Add((rangeS, rangeE));
                         nr.Add((destinationR + rangeS - start,
-                            destinationR + rangeS - start + (rangeE - rangeS)));
+                            destinationR - start + rangeE));
                     }
-                    else if ((rangeS >= start && rangeS <= end) && rangeE > end)
+                    else if ((rangeS >= start && rangeS <= end) && rangeE > end) // partial overlap
                     {
                         used.Add((rangeS, rangeE));
                         leftover.Add((end + 1, rangeE));
-                        nr.Add((destinationR + (rangeS - start), destinationR + (rangeS - start) + (end - rangeS)));
+                        nr.Add((destinationR + rangeS - start, destinationR - start + end));
                     }
-                    else if (rangeS < start && (rangeE <= end && rangeE >= start))
+                    else if (rangeS < start && (rangeE <= end && rangeE >= start)) // partial overlap
                     {
                         used.Add((rangeS, rangeE));
                         leftover.Add((rangeS, start - 1));
                         nr.Add((destinationR, destinationR + (rangeE - start)));
                     }
-                    else if (rangeS < start && rangeE > end)
+                    else if (rangeS < start && rangeE > end) // fully overlapping
                     {
                         used.Add((rangeS, rangeE));
-
                         leftover.Add((rangeS, start - 1));
                         leftover.Add((end + 1, rangeE));
                         nr.Add((destinationR, destinationR + range - 1));
                     }
-                    else if (rangeE < start || rangeS > end)
+                    else if (rangeE < start || rangeS > end) // no overlap
                     {
                         leftover.Add((rangeS, rangeE));
                     }
                 }
 
 
-                used.ForEach(x => usedRanges.Add(x));
-                newRanges.AddRange(nr);
+                newRanges.AddRange(nr); // newly mapped ranges fdrom the line
+
+                // unused ranges and leftover ranges from partial overlaps move on to the next line
                 currentRanges = currentRanges.Except(used).ToList();
                 currentRanges.AddRange(leftover);
-                currentRanges = currentRanges.Distinct().ToList();
             }
 
             currentRanges =
                 newRanges.Select(x => x)
-                    .ToList()
                     .Concat(currentRanges)
-                    .Except(usedRanges)
                     .ToList();
+
             newRanges = new List<(long, long)>();
         }
 

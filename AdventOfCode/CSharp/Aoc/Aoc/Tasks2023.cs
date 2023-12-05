@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.IO.MemoryMappedFiles;
+using System.Text.RegularExpressions;
 using Aoc.Utils;
 using Aoc.Utils.Grids;
 using Dumpify;
@@ -408,6 +410,7 @@ public class Tasks2023
 
             // process copies for this line
             var numOfCopies = copies.GetValueOrDefault(cardNumber, 0);
+
             foreach (var num in Enumerable.Range(cardNumber + 1, count))
             {
                 copies.AddOrUpdate(num, 1 + numOfCopies);
@@ -420,7 +423,238 @@ public class Tasks2023
     [Test]
     public void day5_1_2023()
     {
-        var lines = FP.ReadFile($"{basePath}/day5.txt").Split("\n").ToList();
-        lines.ForEach(line => line.Dump());
+        var text = FP.ReadFile($"{basePath}/day5.txt");
+
+        var c = Regex.Matches(text.Split("\n")[0], @"(\d+)")
+            .Select(x => long.Parse(x.Value))
+            .ToList();
+
+        var maps = c.Select(x => new List<long> { x }).ToList();
+
+        maps.Dump();
+
+        foreach (var (block, blockIndex) in text.Split("\n\n").Skip(1).Enumerate())
+        {
+            foreach (var line in block.Split("\n").Skip(1))
+            {
+                var (destinationR, sourceR, range) = Regex
+                    .Matches(line.Split("\n")[0], @"(\d+)")
+                    .Select(x => long.Parse(x.Value))
+                    .ToList();
+
+                foreach (var (map, i) in maps.Enumerate()
+                             .Where(x => x.val.Count == blockIndex + 1))
+                {
+                    var current = map.Last();
+
+                    if (current >= sourceR && current <= sourceR + range - 1)
+                    {
+                        var mappedValue = current - sourceR + destinationR;
+                        map.Add(mappedValue);
+                    }
+                }
+            }
+
+            var unmapped = maps.Where(x => x.Count < blockIndex + 2).ToList();
+            unmapped.ForEach(x => x.Add(x.Last()));
+
+            if (maps.Select(x => x.Count).Distinct().Count() != 1)
+            {
+                "PROBLEM".Dump();
+            }
+        }
+
+        maps.Select(x => x.Last()).Min().Dump();
+    }
+
+    [Test]
+    public void day5_2_2023()
+    {
+        var text = FP.ReadFile($"{basePath}/day5.txt");
+
+        var c = Regex.Matches(text.Split("\n")[0], @"(\d+)")
+            .Select(x => long.Parse(x.Value))
+            .ToList();
+
+        var ranges = new List<(long, long)>();
+
+        for (int x = 0; x < c.Count; x += 2)
+        {
+            ranges.Add((c[x], c[x] + c[x + 1] - 1));
+        }
+
+        //ranges.Dump();
+
+        var originalRanges = ranges.Select(x => x).ToList();
+        var currentRanges = originalRanges.Select(x => x).ToList();
+        var newRanges = new List<(long, long)>();
+
+        foreach (var (block, blockIndex) in text.Split("\n\n").Skip(1).Enumerate())
+        {
+            var usedRanges = new HashSet<(long, long)>();   
+
+            foreach (var (line, lindex) in block.Split("\n").Skip(1).Enumerate())
+            {
+                //$"block : {blockIndex}, line {lindex}".Dump();
+
+                var (destinationR, sourceR, range) = Regex
+                    .Matches(line.Split("\n")[0], @"(\d+)")
+                    .Select(x => long.Parse(x.Value))
+                    .ToList();
+
+
+                var (start, end) = (sourceR, sourceR + range - 1);
+
+                /*
+                foreach (var (rangeS, rangeE) in currentRanges)
+                {
+                    if (rangeE < start || rangeS > end)
+                    {
+                        $"maps to itself {rangeS}, {rangeE}  -  {start}, {end}".Dump();
+                        unusedRanges.Add((rangeS, rangeE));
+                    }
+                }*/
+
+                var (nr, leftover, used, stopSearching) = CheckRanges(
+                    destinationR,
+                    sourceR,
+                    range,
+                    currentRanges);
+
+                used.ForEach(x => usedRanges.Add(x));
+
+                newRanges.AddRange(nr);
+
+                currentRanges = currentRanges.Except(used).ToList();
+                currentRanges.AddRange(leftover);
+                currentRanges = currentRanges.Distinct().ToList();
+
+
+                /*currentRanges = leftover.Distinct().Concat(unusedRanges.Distinct()).ToList();
+
+                if (lindex == block.Split("\n").Skip(1).Count())
+                {
+                    "nothing left to check".Dump();
+                    newRanges.AddRange(currentRanges);
+                }*/
+
+                //"endofline".Dump();
+                //currentRanges.Dump();
+            }
+
+            //"nr".Dump();
+            currentRanges =
+                newRanges.Select(x => x)
+                    .ToList()
+                    .Concat(currentRanges)
+                    .Concat(originalRanges)
+                    .Except(usedRanges)
+                    .ToList();
+            originalRanges = currentRanges.Select(x => x).ToList();
+            newRanges = new List<(long, long)>();
+
+
+            // $"END OF BLOCK {blockIndex}".Dump();
+            currentRanges.Dump();
+
+            /*
+            if (blockIndex == 2)
+            {
+                //break;
+            }*/
+        }
+
+        currentRanges.Select(x => x.Item1).Min().Dump();
+    }
+
+    public (List<(long, long)> newRanges, List<(long, long)> leftOvers, List<(long, long)>
+        unused, bool nothingLeftToCheck) CheckRanges(
+            long destinationR,
+            long sourceR,
+            long range,
+            List<(long, long)> ranges)
+    {
+        var newRanges = new List<(long, long)>();
+        var newLeftovers = new List<(long, long)>();
+        var used = new List<(long, long)>();
+
+        var (start, end) = (sourceR, sourceR + range - 1);
+
+        var found = false;
+
+        foreach (var (rangeS, rangeE) in ranges)
+        {
+            if (rangeS >= start && rangeE <= end)
+            {
+                found = true;
+                used.Add((rangeS, rangeE));
+
+                var e = (rangeE - rangeS);
+
+                var valueTuple = (destinationR + rangeS - start,
+                    destinationR + rangeS - start + e);
+
+                $"easy one, {e}, {destinationR} , {e + destinationR} newMapping {valueTuple}, destinationR: {destinationR}  - {rangeS},{rangeE}  -  {start},{end}"
+                    .Dump();
+
+                newRanges.Add(valueTuple);
+            }
+            else if ((rangeS >= start && rangeS <= end) && rangeE > end)
+            {
+                found = true;
+                used.Add((rangeS, rangeE));
+
+                var lefover = (end + 1, rangeE);
+
+                $"leftover 1: {lefover}, {rangeS}, {rangeE}  -  {start}, {end}".Dump();
+
+                var valueTuple = (destinationR + (rangeS - start), destinationR + (rangeS - start) + (end - rangeS));
+                $"newMapping {valueTuple},  destinationR: {destinationR}".Dump();
+
+                var newMapping = valueTuple;
+
+                newLeftovers.Add(lefover);
+                newRanges.Add(newMapping);
+            }
+            else if (rangeS < start && (rangeE <= end && rangeE >= start))
+            {
+                found = true;
+                used.Add((rangeS, rangeE));
+
+                var lefover = (rangeS, start - 1);
+
+                $"leftover 2: {lefover}, from {rangeS}, {rangeE}  -  {start}, {end}"
+                    .Dump();
+
+                var valueTuple = (destinationR, destinationR + (rangeE - start));
+                $"newMapping {valueTuple},  destinationR: {destinationR}".Dump();
+
+                var newMapping = valueTuple;
+                newLeftovers.Add(lefover);
+                newRanges.Add(newMapping);
+            }
+            else if (rangeS < start && rangeE > end)
+            {
+                found = true;
+                used.Add((rangeS, rangeE));
+
+                var lefover1 = (rangeS, start - 1);
+                var lefover2 = (end + 1, rangeE);
+                var newMapping = (destinationR, destinationR + range - 1);
+                newLeftovers.Add(lefover1);
+                newLeftovers.Add(lefover2);
+                newRanges.Add(newMapping);
+            }
+            else if (rangeE < start || rangeS > end)
+            {
+                newLeftovers.Add((rangeS, rangeE));
+            }
+        }
+
+        if (!found)
+        {
+        }
+
+        return (newRanges, newLeftovers, used, !found);
     }
 }

@@ -559,4 +559,14 @@ public class Tasks2023
 
         currentRanges.Select(x => x.Item1).Min().Dump();
     }
+
+    [Test]
+    public void day6_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day6.txt").Split("\n");
+        foreach (var line in lines)
+        {
+            line.Dump();
+        }
+    }
 }

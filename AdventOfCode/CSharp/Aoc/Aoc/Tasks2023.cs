@@ -472,77 +472,45 @@ public class Tasks2023
     {
         var text = FP.ReadFile($"{basePath}/day5.txt");
 
-        var c = Regex.Matches(text.Split("\n")[0], @"(\d+)")
+        var seeds = Regex.Matches(text.Split("\n")[0], @"(\d+)")
             .Select(x => long.Parse(x.Value))
             .ToList();
 
-        var ranges = new List<(long, long)>();
+        var originalRanges = new List<(long, long)>();
 
-        for (int x = 0; x < c.Count; x += 2)
+        for (int x = 0; x < seeds.Count; x += 2)
         {
-            ranges.Add((c[x], c[x] + c[x + 1] - 1));
+            originalRanges.Add((seeds[x], seeds[x] + seeds[x + 1] - 1));
         }
 
-        //ranges.Dump();
 
-        var originalRanges = ranges.Select(x => x).ToList();
         var currentRanges = originalRanges.Select(x => x).ToList();
         var newRanges = new List<(long, long)>();
 
-        foreach (var (block, blockIndex) in text.Split("\n\n").Skip(1).Enumerate())
+        foreach (var block in text.Split("\n\n").Skip(1))
         {
             var usedRanges = new HashSet<(long, long)>();   
 
-            foreach (var (line, lindex) in block.Split("\n").Skip(1).Enumerate())
+            foreach (var line in block.Split("\n").Skip(1))
             {
-                //$"block : {blockIndex}, line {lindex}".Dump();
-
                 var (destinationR, sourceR, range) = Regex
                     .Matches(line.Split("\n")[0], @"(\d+)")
                     .Select(x => long.Parse(x.Value))
                     .ToList();
 
-
-                var (start, end) = (sourceR, sourceR + range - 1);
-
-                /*
-                foreach (var (rangeS, rangeE) in currentRanges)
-                {
-                    if (rangeE < start || rangeS > end)
-                    {
-                        $"maps to itself {rangeS}, {rangeE}  -  {start}, {end}".Dump();
-                        unusedRanges.Add((rangeS, rangeE));
-                    }
-                }*/
-
-                var (nr, leftover, used, stopSearching) = CheckRanges(
+                var (nr, leftover, used) = CheckRanges(
                     destinationR,
                     sourceR,
                     range,
                     currentRanges);
 
                 used.ForEach(x => usedRanges.Add(x));
-
                 newRanges.AddRange(nr);
-
                 currentRanges = currentRanges.Except(used).ToList();
                 currentRanges.AddRange(leftover);
                 currentRanges = currentRanges.Distinct().ToList();
-
-
-                /*currentRanges = leftover.Distinct().Concat(unusedRanges.Distinct()).ToList();
-
-                if (lindex == block.Split("\n").Skip(1).Count())
-                {
-                    "nothing left to check".Dump();
-                    newRanges.AddRange(currentRanges);
-                }*/
-
-                //"endofline".Dump();
-                //currentRanges.Dump();
             }
 
-            //"nr".Dump();
             currentRanges =
                 newRanges.Select(x => x)
                     .ToList()
@@ -552,23 +520,13 @@ public class Tasks2023
                     .ToList();
             originalRanges = currentRanges.Select(x => x).ToList();
             newRanges = new List<(long, long)>();
-
-
-            // $"END OF BLOCK {blockIndex}".Dump();
-            currentRanges.Dump();
-
-            /*
-            if (blockIndex == 2)
-            {
-                //break;
-            }*/
         }
 
         currentRanges.Select(x => x.Item1).Min().Dump();
     }
 
-    public (List<(long, long)> newRanges, List<(long, long)> leftOvers, List<(long, long)>
-        unused, bool nothingLeftToCheck) CheckRanges(
+    private (List<(long, long)> newRanges, List<(long, long)> leftOvers, List<(long, long)>
+        unused) CheckRanges(
             long destinationR,
             long sourceR,
             long range,
@@ -580,70 +538,33 @@ public class Tasks2023
 
         var (start, end) = (sourceR, sourceR + range - 1);
 
-        var found = false;
-
         foreach (var (rangeS, rangeE) in ranges)
         {
             if (rangeS >= start && rangeE <= end)
             {
-                found = true;
                 used.Add((rangeS, rangeE));
-
-                var e = (rangeE - rangeS);
-
-                var valueTuple = (destinationR + rangeS - start,
-                    destinationR + rangeS - start + e);
-
-                $"easy one, {e}, {destinationR} , {e + destinationR} newMapping {valueTuple}, destinationR: {destinationR}  - {rangeS},{rangeE}  -  {start},{end}"
-                    .Dump();
-
-                newRanges.Add(valueTuple);
+                newRanges.Add((destinationR + rangeS - start,
+                    destinationR + rangeS - start + (rangeE - rangeS)));
             }
             else if ((rangeS >= start && rangeS <= end) && rangeE > end)
             {
-                found = true;
                 used.Add((rangeS, rangeE));
-
-                var lefover = (end + 1, rangeE);
-
-                $"leftover 1: {lefover}, {rangeS}, {rangeE}  -  {start}, {end}".Dump();
-
-                var valueTuple = (destinationR + (rangeS - start), destinationR + (rangeS - start) + (end - rangeS));
-                $"newMapping {valueTuple},  destinationR: {destinationR}".Dump();
-
-                var newMapping = valueTuple;
-
-                newLeftovers.Add(lefover);
-                newRanges.Add(newMapping);
+                newLeftovers.Add((end + 1, rangeE));
+                newRanges.Add((destinationR + (rangeS - start), destinationR + (rangeS - start) + (end - rangeS)));
             }
             else if (rangeS < start && (rangeE <= end && rangeE >= start))
             {
-                found = true;
                 used.Add((rangeS, rangeE));
-
-                var lefover = (rangeS, start - 1);
-
-                $"leftover 2: {lefover}, from {rangeS}, {rangeE}  -  {start}, {end}"
-                    .Dump();
-
-                var valueTuple = (destinationR, destinationR + (rangeE - start));
-                $"newMapping {valueTuple},  destinationR: {destinationR}".Dump();
-
-                var newMapping = valueTuple;
-                newLeftovers.Add(lefover);
-                newRanges.Add(newMapping);
+                newLeftovers.Add((rangeS, start - 1));
+                newRanges.Add((destinationR, destinationR + (rangeE - start)));
             }
             else if (rangeS < start && rangeE > end)
             {
-                found = true;
                 used.Add((rangeS, rangeE));
 
-                var lefover1 = (rangeS, start - 1);
-                var lefover2 = (end + 1, rangeE);
-                var newMapping = (destinationR, destinationR + range - 1);
-                newLeftovers.Add(lefover1);
-                newLeftovers.Add(lefover2);
-                newRanges.Add(newMapping);
+                newLeftovers.Add((rangeS, start - 1));
+                newLeftovers.Add((end + 1, rangeE));
+                newRanges.Add((destinationR, destinationR + range - 1));
             }
             else if (rangeE < start || rangeS > end)
             {
@@ -651,10 +572,6 @@ public class Tasks2023
             }
         }
 
-        if (!found)
-        {
-        }
-
-        return (newRanges, newLeftovers, used, !found);
+        return (newRanges, newLeftovers, used);
     }
 }

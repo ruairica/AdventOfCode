@@ -498,11 +498,46 @@ public class Tasks2023
                     .Select(x => long.Parse(x.Value))
                     .ToList();
 
-                var (nr, leftover, used) = CheckRanges(
-                    destinationR,
-                    sourceR,
-                    range,
-                    currentRanges);
+
+                var nr = new List<(long, long)>();
+                var leftover = new List<(long, long)>();
+                var used = new List<(long, long)>();
+
+                var (start, end) = (sourceR, sourceR + range - 1);
+                foreach (var (rangeS, rangeE) in currentRanges)
+                {
+                    if (rangeS >= start && rangeE <= end)
+                    {
+                        used.Add((rangeS, rangeE));
+                        nr.Add((destinationR + rangeS - start,
+                            destinationR + rangeS - start + (rangeE - rangeS)));
+                    }
+                    else if ((rangeS >= start && rangeS <= end) && rangeE > end)
+                    {
+                        used.Add((rangeS, rangeE));
+                        leftover.Add((end + 1, rangeE));
+                        nr.Add((destinationR + (rangeS - start), destinationR + (rangeS - start) + (end - rangeS)));
+                    }
+                    else if (rangeS < start && (rangeE <= end && rangeE >= start))
+                    {
+                        used.Add((rangeS, rangeE));
+                        leftover.Add((rangeS, start - 1));
+                        nr.Add((destinationR, destinationR + (rangeE - start)));
+                    }
+                    else if (rangeS < start && rangeE > end)
+                    {
+                        used.Add((rangeS, rangeE));
+
+                        leftover.Add((rangeS, start - 1));
+                        leftover.Add((end + 1, rangeE));
+                        nr.Add((destinationR, destinationR + range - 1));
+                    }
+                    else if (rangeE < start || rangeS > end)
+                    {
+                        leftover.Add((rangeS, rangeE));
+                    }
+                }
+
 
                 used.ForEach(x => usedRanges.Add(x));
                 newRanges.AddRange(nr);
@@ -523,55 +558,5 @@ public class Tasks2023
         }
 
         currentRanges.Select(x => x.Item1).Min().Dump();
-    }
-
-    private (List<(long, long)> newRanges, List<(long, long)> leftOvers, List<(long, long)>
-        unused) CheckRanges(
-            long destinationR,
-            long sourceR,
-            long range,
-            List<(long, long)> ranges)
-    {
-        var newRanges = new List<(long, long)>();
-        var newLeftovers = new List<(long, long)>();
-        var used = new List<(long, long)>();
-
-        var (start, end) = (sourceR, sourceR + range - 1);
-
-        foreach (var (rangeS, rangeE) in ranges)
-        {
-            if (rangeS >= start && rangeE <= end)
-            {
-                used.Add((rangeS, rangeE));
-                newRanges.Add((destinationR + rangeS - start,
-                    destinationR + rangeS - start + (rangeE - rangeS)));
-            }
-            else if ((rangeS >= start && rangeS <= end) && rangeE > end)
-            {
-                used.Add((rangeS, rangeE));
-                newLeftovers.Add((end + 1, rangeE));
-                newRanges.Add((destinationR + (rangeS - start), destinationR + (rangeS - start) + (end - rangeS)));
-            }
-            else if (rangeS < start && (rangeE <= end && rangeE >= start))
-            {
-                used.Add((rangeS, rangeE));
-                newLeftovers.Add((rangeS, start - 1));
-                newRanges.Add((destinationR, destinationR + (rangeE - start)));
-            }
-            else if (rangeS < start && rangeE > end)
-            {
-                used.Add((rangeS, rangeE));
-
-                newLeftovers.Add((rangeS, start - 1));
-                newLeftovers.Add((end + 1, rangeE));
-                newRanges.Add((destinationR, destinationR + range - 1));
-            }
-            else if (rangeE < start || rangeS > end)
-            {
-                newLeftovers.Add((rangeS, rangeE));
-            }
-        }
-
-        return (newRanges, newLeftovers, used);
     }
 }

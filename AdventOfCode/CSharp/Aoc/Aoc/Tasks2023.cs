@@ -476,17 +476,14 @@ public class Tasks2023
             .Select(x => long.Parse(x.Value))
             .ToList();
 
-        var originalRanges = new List<(long, long)>();
+        var currentRanges = new List<(long, long)>();
 
         for (int x = 0; x < seeds.Count; x += 2)
         {
-            originalRanges.Add((seeds[x], seeds[x] + seeds[x + 1] - 1));
+            currentRanges.Add((seeds[x], seeds[x] + seeds[x + 1] - 1));
         }
 
-
-        var currentRanges = originalRanges.Select(x => x).ToList();
         var newRanges = new List<(long, long)>();
-
         foreach (var block in text.Split("\n\n").Skip(1))
         {
             var usedRanges = new HashSet<(long, long)>();   
@@ -494,10 +491,9 @@ public class Tasks2023
             foreach (var line in block.Split("\n").Skip(1))
             {
                 var (destinationR, sourceR, range) = Regex
-                    .Matches(line.Split("\n")[0], @"(\d+)")
+                    .Matches(line, @"(\d+)")
                     .Select(x => long.Parse(x.Value))
                     .ToList();
-
 
                 var nr = new List<(long, long)>();
                 var leftover = new List<(long, long)>();
@@ -550,10 +546,8 @@ public class Tasks2023
                 newRanges.Select(x => x)
                     .ToList()
                     .Concat(currentRanges)
-                    .Concat(originalRanges)
                     .Except(usedRanges)
                     .ToList();
-            originalRanges = currentRanges.Select(x => x).ToList();
             newRanges = new List<(long, long)>();
         }
 

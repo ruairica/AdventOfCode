@@ -532,7 +532,7 @@ public class Tasks2023
                 }
 
 
-                newRanges.AddRange(nr); // newly mapped ranges fdrom the line
+                newRanges.AddRange(nr); // newly mapped ranges from the line
 
                 // unused ranges and leftover ranges from partial overlaps move on to the next line
                 currentRanges = currentRanges.Except(used).ToList();
@@ -554,6 +554,75 @@ public class Tasks2023
     public void day6_1_2023()
     {
         var lines = FP.ReadFile($"{basePath}/day6.txt").Split("\n");
+
+        var times= Regex
+            .Matches(lines[0], @"(\d+)")
+            .Select(x => long.Parse(x.Value))
+            .ToList();
+
+
+        var recordDistances= Regex
+            .Matches(lines[1], @"(\d+)")
+            .Select(x => int.Parse(x.Value))
+            .ToList();
+
+        times.Dump();
+        recordDistances.Dump();
+
+        var results = new List<int>();
+        for (int race = 0; race < times.Count; race++)
+        {
+            var rd = recordDistances[race];
+            var time = times[race];
+            results.Add(0);
+            for (var t = 1; t < time; t++)
+            {
+                var d = (time - t) * t;
+
+                if (d > rd)
+                {
+                    results[race] += 1;
+                }
+            }
+        }
+
+        results.Aggregate((a, b) => a * b).Dump();
+    }
+
+    [Test]
+    public void day6_2_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day6.txt").Split("\n");
+
+        var tt = long.Parse(lines[0].Replace(" ", string.Empty)[5..]);
+        var dd = long.Parse(lines[1].Replace(" ", string.Empty)[9..]);
+        var times = new List<long> { tt };
+        var recordDistances = new List<long> { dd };
+
+        var results = 0;
+        for (int race = 0; race < times.Count; race++)
+        {
+            var rd = recordDistances[race];
+            var time = times[race];
+            for (var t = 1; t < time; t++)
+            {
+                var d = (time - t) * t;
+
+                if (d > rd)
+                {
+                    results+= 1;
+                }
+            }
+        }
+
+        results.Dump();
+    }
+
+    [Test]
+    public void day7_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day7.txt").Split("\n");
+
         foreach (var line in lines)
         {
             line.Dump();

@@ -625,16 +625,14 @@ public class Tasks2023
     {
         var lines = FP.ReadFile($"{basePath}/day7.txt").Split("\n");
 
-        var D = lines.Select(
+        lines.Select(
                 l =>
                 {
                     var (cards, bid) = l.Split(" ");
 
-                    return (new Hand(cards), int.Parse(bid));
+                    return (new Hand(cards, part2: false), int.Parse(bid));
                 })
-            .ToList();
-
-        D.OrderBy(x => x.Item1)
+            .ToList().OrderBy(x => x.Item1)
             .Reverse()
             .Select((d, index) => d.Item2 * (index + 1))
             .Sum()
@@ -646,314 +644,26 @@ public class Tasks2023
     {
         var lines = FP.ReadFile($"{basePath}/day7.txt").Split("\n");
 
-        var D = lines.Select(
+        lines.Select(
                 l =>
                 {
                     var (cards, bid) = l.Split(" ");
-
-                    return (new HandPart2(cards), int.Parse(bid));
+                    return (new Hand(cards, part2: true), int.Parse(bid));
                 })
-            .ToList();
-
-
-        D.OrderBy(x => x.Item1)
+            .OrderBy(x => x.Item1)
             .Reverse()
             .Select((d, index) => d.Item2 * (index + 1))
             .Sum()
             .Dump();
     }
-}
 
-public class HandPart2 : IComparable<HandPart2>
-{
-    public string cards;
-
-    private static List<char> _cardRank = new List<char>
+    [Test]
+    public void day8_1_2023()
     {
-        'A',
-        'K',
-        'Q',
-        'T',
-        '9',
-        '8',
-        '7',
-        '6',
-        '5',
-        '4',
-        '3',
-        '2',
-        'J'
-    };
-
-    public HandPart2(string cards)
-    {
-        this.cards = cards;
-    }
-
-    private static int GetHandRank(string cards)
-    {
-        var groups = cards.GroupBy(x => x)
-            .ToDictionary(x => x.Key.ToString(), x => x.Count());
-
-
-        // 5 of a kind
-        if (groups.Keys.Count == 1)
+        var lines = FP.ReadFile($"{basePath}/day8.txt").Split("\n");
+        foreach (var line in lines)
         {
-            return 7;
+            line.Dump();
         }
-
-        // 4 of a kind
-        if (groups.Keys.Count == 2 && groups.Values.Any(x => x == 4))
-        {
-            if (groups.Keys.Contains("J"))
-            {
-                return 7;
-            }
-            return 6;
-        }
-
-        // full house
-        if (groups.Keys.Count == 2 && groups.Values.Any(x => x == 3))
-        {
-            if (groups.Keys.Contains("J"))
-            {
-                if (groups["J"] == 3)
-                {
-                    return 7;
-                }
-                if (groups["J"] == 2)
-                {
-                    return 7;
-                }
-                if (groups["J"] == 1)
-                {
-                    return 6;
-                }
-            }
-            return 5;
-        }
-
-        // 3 of a kind
-        if (groups.Keys.Count == 3 && groups.Values.Any(x => x == 3))
-        {
-            if (groups.Keys.Contains("J"))
-            {
-                if (groups["J"] == 3)
-                {
-                    return 5;
-                }
-                if (groups["J"] == 2)
-                {
-                    return 7;
-                }
-                if (groups["J"] == 1)
-                {
-                    return 6;
-                }
-            }
-            return 4;
-        }
-
-        // 2 pair
-        if (groups.Keys.Count == 3 && groups.Values.Count(x => x == 2) == 2)
-        {
-            if (groups.Keys.Contains("J"))
-            {
-                if (groups["J"] == 2)
-                {
-                    return 6;
-                }
-                if (groups["J"] == 1)
-                {
-                    return 5;
-                }
-
-            }
-            return 3;
-        }
-
-        // single pair AA2J5
-        if (groups.Keys.Count == 4 && groups.Values.Count(x => x == 2) == 1)
-        {
-            if (groups.Keys.Contains("J"))
-            {
-                return 4;
-            }
-            return 2;
-        }
-
-        // high card, all distict
-        if (groups.Keys.Count == 5)
-        {
-            if (groups.Keys.Contains("J"))
-            {
-                return 2;
-            }
-            return 1;
-        }
-
-        throw new Exception("No hand match foundd");
-    }
-
-
-    public int CompareTo(HandPart2 that)
-    {
-        var cardsleft = this.cards;
-        var cardsright = that.cards;
-
-        var lhr = GetHandRank(cardsleft);
-
-        var rhr = GetHandRank(cardsright);
-
-        if (lhr > rhr)
-        {
-            return -1;
-        }
-
-        if (lhr < rhr)
-        {
-            return 1;
-        }
-
-        for (int i = 0; i < 5; i++)
-        {
-            var cl = cardsleft[i];
-            var cr = cardsright[i];
-
-            var indexOfLeft = _cardRank.IndexOf(cl);
-
-            var indexOfRight = _cardRank.IndexOf(cr);
-
-            if (indexOfLeft < indexOfRight)
-            {
-                return -1;
-            }
-
-            if (indexOfLeft > indexOfRight)
-            {
-                return 1;
-            }
-        }
-
-        return 0;
-    }
-}
-
-
-public class Hand : IComparable<Hand>
-{
-    public string cards;
-
-    private static List<char> _cardRank = new List<char>
-    {
-        'A',
-        'K',
-        'Q',
-        'J',
-        'T',
-        '9',
-        '8',
-        '7',
-        '6',
-        '5',
-        '4',
-        '3',
-        '2'
-    };
-
-    public Hand(string cards)
-    {
-        this.cards = cards;
-    }
-
-    private static int GetHandRank(string cards)
-    {
-        var groups = cards.GroupBy(x => x)
-            .ToDictionary(x => x.Key.ToString(), x => x.Count());
-
-        // 5 of a kind
-        if (groups.Keys.Count == 1)
-        {
-            return 7;
-        }
-
-        // 4 of a kind
-        if (groups.Keys.Count == 2 && groups.Values.Any(x => x == 4))
-        {
-            return 6;
-        }
-
-        // full house
-        if (groups.Keys.Count == 2 && groups.Values.Any(x => x == 3))
-        {
-            return 5;
-        }
-
-        // 3 of a kind
-        if (groups.Keys.Count == 3 && groups.Values.Any(x => x == 3))
-        {
-            return 4;
-        }
-
-        // 2 pair
-        if (groups.Keys.Count == 3 && groups.Values.Count(x => x == 2) == 2)
-        {
-            return 3;
-        }
-
-        // single pair
-        if (groups.Keys.Count == 4 && groups.Values.Count(x => x == 2) == 1)
-        {
-            return 2;
-        }
-
-        // high card, all distinct
-        if (groups.Keys.Count == 5)
-        {
-            return 1;
-        }
-
-        throw new Exception("No hand match foundd");
-    }
-
-    public int CompareTo(Hand that)
-    {
-        var cardsleft = this.cards;
-        var cardsright = that.cards;
-
-        var lhr = GetHandRank(cardsleft);
-
-        var rhr = GetHandRank(cardsright);
-
-        if (lhr > rhr)
-        {
-            return -1;
-        }
-
-        if (lhr < rhr)
-        {
-            return 1;
-        }
-
-        for (int i = 0; i < 5; i++)
-        {
-            var cl = cardsleft[i];
-            var cr = cardsright[i];
-
-            $"{cl} vs {cr}".Dump();
-            var indexOfLeft = _cardRank.IndexOf(cl);
-
-            if (indexOfLeft < _cardRank.IndexOf(cr))
-            {
-                return -1;
-            }
-
-            if (indexOfLeft > _cardRank.IndexOf(cr))
-            {
-                return 1;
-            }
-        }
-
-        return 0;
     }
 }

@@ -632,7 +632,8 @@ public class Tasks2023
 
                     return (new Hand(cards, part2: false), int.Parse(bid));
                 })
-            .ToList().OrderBy(x => x.Item1)
+            .ToList()
+            .OrderBy(x => x.Item1)
             .Reverse()
             .Select((d, index) => d.Item2 * (index + 1))
             .Sum()
@@ -648,6 +649,7 @@ public class Tasks2023
                 l =>
                 {
                     var (cards, bid) = l.Split(" ");
+
                     return (new Hand(cards, part2: true), int.Parse(bid));
                 })
             .OrderBy(x => x.Item1)
@@ -661,9 +663,83 @@ public class Tasks2023
     public void day8_1_2023()
     {
         var lines = FP.ReadFile($"{basePath}/day8.txt").Split("\n");
+
         foreach (var line in lines)
         {
             line.Dump();
+        }
+    }
+
+    [Test]
+    public void day9_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day9.txt").Split("\n");
+
+        var result = new List<int>();
+
+        foreach (var line in lines)
+        {
+            var seqs = new List<List<int>> { line.GetNums() };
+
+            while (!(seqs.Last().Distinct().Count() == 1 && seqs.Last().Last() == 0))
+            {
+                seqs.Add(getDifferences(seqs.Last()).ToList());
+            }
+
+            seqs.Reverse();
+            var finals = new List<int> { 0 };
+
+            for (var i = 1; i < seqs.Count; i++)
+            {
+                finals.Add(seqs[i].Last() + finals.Last());
+            }
+
+            result.Add(finals.Last());
+        }
+
+        result.Sum().Dump();
+
+        IEnumerable<int> getDifferences(IReadOnlyList<int> nums)
+        {
+            for (var i = 1; i < nums.Count; i++)
+            {
+                yield return nums[i] - nums[i - 1];
+            }
+        }
+    }
+
+    [Test]
+    public void day9_2_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day9.txt").Split("\n");
+
+        var result = new List<int>();
+        foreach (var line in lines)
+        {
+            var seqs = new List<List<int>> { line.GetNums() };
+            while (!(seqs.Last().Distinct().Count() == 1 && seqs.Last().Last() == 0))
+            {
+                seqs.Add(getDifferences(seqs.Last()).ToList());
+            }
+
+            seqs.Reverse();
+            var firsts = new List<int> { 0 };
+            for (var i = 1; i < seqs.Count; i++)
+            {
+                firsts.Add(seqs[i].First() - firsts.Last());
+            }
+
+            result.Add(firsts.Last());
+        }
+
+        result.Sum().Dump();
+
+        IEnumerable<int> getDifferences(IReadOnlyList<int> nums)
+        {
+            for (var i = 1; i < nums.Count; i++)
+            {
+                yield return nums[i] - nums[i - 1];
+            }
         }
     }
 }

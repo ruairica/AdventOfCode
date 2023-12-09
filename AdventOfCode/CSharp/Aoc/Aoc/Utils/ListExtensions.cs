@@ -56,4 +56,39 @@ public static class ListExtensions
         fourth = list.Count > 3 ? list[3] : default;
         fifth = list.Count > 4 ? list[4] : default;
     }
+    public static long FindLCM(this List<long> numbers)
+    {
+        // Ensure the list is not empty
+        if (numbers.Count == 0)
+        {
+            throw new ArgumentException("The list cannot be empty.");
+        }
+
+        // Use the helper method to find the LCM of two numbers
+        long lcm = numbers[0];
+        for (int i = 1; i < numbers.Count; i++)
+        {
+            lcm = FindLCM(lcm, numbers[i]);
+        }
+
+        return lcm;
+    }
+
+    // Helper method to find the LCM of two numbers
+    private static long FindLCM(long a, long b)
+    {
+        return Math.Abs(a * b) / FindGCD(a, b);
+    }
+
+    // Helper method to find the Greatest Common Divisor (GCD) of two numbers
+    private static long FindGCD(long a, long b)
+    {
+        while (b != 0)
+        {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
 }

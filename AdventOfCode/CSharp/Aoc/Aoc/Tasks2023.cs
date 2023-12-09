@@ -2,10 +2,12 @@
 using System.IO.MemoryMappedFiles;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks.Dataflow;
 using Aoc.Utils;
 using Aoc.Utils.Grids;
 using Dumpify;
 using FluentAssertions;
+using FluentAssertions.Equivalency.Steps;
 using NUnit.Framework;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -662,12 +664,107 @@ public class Tasks2023
     [Test]
     public void day8_1_2023()
     {
-        var lines = FP.ReadFile($"{basePath}/day8.txt").Split("\n");
+        var (steps, lines) = FP.ReadFile($"{basePath}/day8.txt").Split("\n\n");
 
-        foreach (var line in lines)
+        var dict = lines.Split("\n")
+            .ToDictionary(
+                x => x.Split(" ")[0],
+                x =>
+                {
+                    var lr = x.Split(" = ")[1].TrimEnd(')').TrimStart('(');
+
+                    var (left, right) = lr.Split(", ");
+
+                    return (left, right);
+                });
+
+        var count = 0;
+        var current = "AAA";
+        var goal = "ZZZ";
+
+        while (true)
         {
-            line.Dump();
+            foreach (var step in steps)
+            {
+                if (current == goal)
+                {
+                    count.Dump();
+
+                    return;
+                }
+
+                current = step switch
+                {
+                    'L' => dict[current].left,
+                    'R' => dict[current].right,
+                    _ => throw new Exception("invalid step"),
+                };
+
+                count += 1;
+            }
         }
+    }
+
+    [Test]
+    public void day8_2_2023()
+    {
+        var (steps, lines) = FP.ReadFile($"{basePath}/day8.txt").Split("\n\n");
+
+        var dict = lines.Split("\n")
+            .ToDictionary(
+                x => x.Split(" ")[0],
+                x =>
+                {
+                    var lr = x.Split(" = ")[1].TrimEnd(')').TrimStart('(');
+
+                    var (left, right) = lr.Split(", ");
+
+                    return (left, right);
+                });
+
+        var nodes = dict.Keys.Where(c => c.EndsWith("A")).ToList();
+
+        var cycleLengths = new List<long>();
+
+        foreach (var node in nodes)
+        {
+            // once it hits a z, find the number of times it takes to hit that z again
+            long cycleLength = 0;
+
+            var current = node;
+            var endNode = string.Empty;
+            var endFound = false;
+            foreach (var step in Enumerable.Repeat(steps, 10_000).SelectMany(x => x))
+            {
+                var justFound = false;
+                if (current.EndsWith('Z') && !endFound)
+                {
+                    endNode = current;
+                    endFound = true;
+                    justFound = true;
+                }
+
+                if (current == endNode && endFound && !justFound)
+                {
+                    cycleLengths.Add(cycleLength);
+                    break;
+                }
+
+                current = step switch
+                {
+                    'L' => dict[current].left,
+                    'R' => dict[current].right,
+                    _ => throw new Exception("invalid step"),
+                };
+
+                if (endFound)
+                {
+                    cycleLength += 1;
+                }
+            }
+        }
+
+        cycleLengths.FindLCM().Dump();
     }
 
     [Test]
@@ -714,9 +811,11 @@ public class Tasks2023
         var lines = FP.ReadFile($"{basePath}/day9.txt").Split("\n");
 
         var result = new List<int>();
+
         foreach (var line in lines)
         {
             var seqs = new List<List<int>> { line.GetNums() };
+
             while (!(seqs.Last().Distinct().Count() == 1 && seqs.Last().Last() == 0))
             {
                 seqs.Add(getDifferences(seqs.Last()).ToList());
@@ -724,6 +823,7 @@ public class Tasks2023
 
             seqs.Reverse();
             var firsts = new List<int> { 0 };
+
             for (var i = 1; i < seqs.Count; i++)
             {
                 firsts.Add(seqs[i].First() - firsts.Last());
@@ -740,6 +840,17 @@ public class Tasks2023
             {
                 yield return nums[i] - nums[i - 1];
             }
+        }
+    }
+
+    [Test]
+    public void day10_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day10.txt").Split("\n");
+
+        foreach (var line in lines)
+        {
+            line.Dump();
         }
     }
 }

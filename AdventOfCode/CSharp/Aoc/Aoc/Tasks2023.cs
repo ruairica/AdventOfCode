@@ -965,7 +965,6 @@ public class Tasks2023
                 if (nc.r > cc.r && nc.c == cc.c && nc != lastCoord &&
                     cv is 'S' or '|' or 'F' or '7' && nv is 'S' or '|' or 'J' or 'L')
                 {
-                    "went down".Dump();
                     path.Add(nc);
 
                     break;
@@ -975,7 +974,6 @@ public class Tasks2023
                 if (nc.r < cc.r && nc.c == cc.c && nc != lastCoord &&
                     (cv is 'S' or '|' or 'L' or 'J') && (nv is 'S' or '|' or 'F' or '7'))
                 {
-                    "went up".Dump();
                     path.Add(nc);
 
                     break;
@@ -985,8 +983,6 @@ public class Tasks2023
                 if (nc.r == cc.r && nc.c < cc.c && nc != lastCoord &&
                     (cv is 'S' or '-' or '7' or 'J') && (nv is 'S' or '-' or 'F' or 'L'))
                 {
-                    "went left".Dump();
-
                     path.Add(nc);
 
                     break;
@@ -996,7 +992,6 @@ public class Tasks2023
                 if (nc.r == cc.r && nc.c > cc.c && nc != lastCoord &&
                     (cv is 'S' or '-' or 'F' or 'L') && (nv is 'S' or '-' or '7' or 'J'))
                 {
-                    "went right".Dump();
                     path.Add(nc);
 
                     break;
@@ -1031,6 +1026,111 @@ public class Tasks2023
             });
 
         area.Dump();
+    }
+
+
+    [Test]
+    public void day10_2_2023_Shoelace()
+    {
+        var G = FP.ReadAsCharGrid($"{basePath}/day10.txt");
+
+        var g = new Grid<char>(G);
+        // find S
+        Coord source = new(0, 0);
+
+        g.ForEachWithCoord(
+            (c, coord) =>
+            {
+                if (c == 'S')
+                {
+                    source = coord;
+                }
+            });
+
+        var path = new List<Coord> { source };
+
+        var lastCoord = new Coord(-1, -1);
+
+        while (!(path.Last() == source && path.Count > 1))
+        {
+            if (path.Count > 1)
+            {
+                lastCoord = path[^2];
+            }
+
+            var cc = path.Last();
+            var cv = g[cc];
+            var surrounding = g.GetValidAdjacentNoDiag(cc);
+
+            foreach (var nc in surrounding)
+            {
+                var nv = g[nc];
+
+                // down
+                if (nc.r > cc.r && nc.c == cc.c && nc != lastCoord &&
+                    cv is 'S' or '|' or 'F' or '7' && nv is 'S' or '|' or 'J' or 'L')
+                {
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // up
+                if (nc.r < cc.r && nc.c == cc.c && nc != lastCoord &&
+                    (cv is 'S' or '|' or 'L' or 'J') && (nv is 'S' or '|' or 'F' or '7'))
+                {
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // left
+                if (nc.r == cc.r && nc.c < cc.c && nc != lastCoord &&
+                    (cv is 'S' or '-' or '7' or 'J') && (nv is 'S' or '-' or 'F' or 'L'))
+                {
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // right
+                if (nc.r == cc.r && nc.c > cc.c && nc != lastCoord &&
+                    (cv is 'S' or '-' or 'F' or 'L') && (nv is 'S' or '-' or '7' or 'J'))
+                {
+                    path.Add(nc);
+
+                    break;
+                }
+            }
+        }
+        path.Pop();
+
+        var corners = path.Where(x => g[x] is 'S' or 'F' or 'J' or '7' or 'L');
+
+        // https://en.wikipedia.org/wiki/Pick%27s_theorem relates total area to number of points inside
+        //A = I + B/2 - 1 where I is internal points and B is boundary points
+        // I = A - B/2 + 1
+        var i = CalculateArea(corners.ToList()) - ((double)path.Count / 2) + 1;
+        i.Dump();
+
+
+        //https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#C#
+        // gets area, includes
+        double CalculateArea(List<Coord> coordinates)
+        {
+            var n = coordinates.Count;
+            double area = 0;
+
+            for (var i = 0; i < n; i++)
+            {
+                var j = (i + 1) % n;
+                area += coordinates[i].r * coordinates[j].c;
+                area -= coordinates[j].r * coordinates[i].c;
+            }
+
+            area = Math.Abs(area) / 2.0;
+            return area;
+        }
     }
 
     [Test]

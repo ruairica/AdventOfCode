@@ -26,9 +26,9 @@ public class Grid<T>
 
     public void ForEachWithCoord(Action<T, Coord> action)
     {
-        for (var x = 0; x < Width; x++)
+        for (var x = 0; x < Height; x++)
         {
-            for (int y = 0; y < Height; y++)
+            for (int y = 0; y < Width; y++)
             {
                 action(grid[x][y], new(x, y));
             }
@@ -37,9 +37,9 @@ public class Grid<T>
 
     public Coord? FirstOrDefault(Func<T, bool> func)
     {
-        for (int x = 0; x < this.Width; x++)
+        for (int x = 0; x < this.Height; x++)
         {
-            for (int y = 0; y < this.Height; y++)
+            for (int y = 0; y < this.Width; y++)
             {
                 if (func(grid[x][y]))
                 {
@@ -53,9 +53,9 @@ public class Grid<T>
 
     public IEnumerable<ValCoord<T>> WhereWithCoord(Func<T, Coord, bool> func)
     {
-        for (var x = 0; x < this.Width; x++)
+        for (var x = 0; x < this.Height; x++)
         {
-            for (int y = 0; y < this.Height; y++)
+            for (int y = 0; y < this.Width; y++)
             {
                 if (func(grid[x][y], new(x, y)))
                 {
@@ -138,7 +138,7 @@ public class Grid<T>
     {
         var resultGrid = CopyGrid(this);
 
-        for (var x = 0; x < this.Width; x++)
+        for (var x = 0; x < this.Height; x++)
         {
             for (int y = 0; y < this.grid[x].Count; y++)
             {

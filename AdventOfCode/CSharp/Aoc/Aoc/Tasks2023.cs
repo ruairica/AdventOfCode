@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
@@ -9,6 +10,7 @@ using Dumpify;
 using FluentAssertions;
 using FluentAssertions.Equivalency.Steps;
 using NUnit.Framework;
+using Spectre.Console;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Aoc;
@@ -734,9 +736,11 @@ public class Tasks2023
             var current = node;
             var endNode = string.Empty;
             var endFound = false;
+
             foreach (var step in Enumerable.Repeat(steps, 10_000).SelectMany(x => x))
             {
                 var justFound = false;
+
                 if (current.EndsWith('Z') && !endFound)
                 {
                     endNode = current;
@@ -747,6 +751,7 @@ public class Tasks2023
                 if (current == endNode && endFound && !justFound)
                 {
                     cycleLengths.Add(cycleLength);
+
                     break;
                 }
 
@@ -846,8 +851,192 @@ public class Tasks2023
     [Test]
     public void day10_1_2023()
     {
-        var lines = FP.ReadFile($"{basePath}/day10.txt").Split("\n");
+        var G = FP.ReadAsCharGrid($"{basePath}/day10.txt");
+        var g = new Grid<char>(G);
+        Coord source = new(0, 0);
 
+        g.ForEachWithCoord(
+            (c, coord) =>
+            {
+                if (c == 'S')
+                {
+                    source = coord;
+                }
+            });
+
+        var path = new List<Coord> { source };
+
+        var lastCoord = new Coord(-1, -1);
+
+        while (!(path.Last() == source && path.Count > 1))
+        {
+            if (path.Count > 1)
+            {
+                lastCoord = path[^2];
+            }
+
+            var cc = path.Last();
+            var cv = g[cc];
+            var surrounding = g.GetValidAdjacentNoDiag(cc);
+
+            foreach (var nc in surrounding)
+            {
+                var nv = g[nc];
+
+                // down
+                if (nc.r > cc.r && nc.c == cc.c && nc != lastCoord &&
+                    cv is 'S' or '|' or 'F' or '7' && nv is 'S' or '|' or 'J' or 'L')
+                {
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // up
+                if (nc.r < cc.r && nc.c == cc.c && nc != lastCoord &&
+                    (cv is 'S' or '|' or 'L' or 'J') && (nv is 'S' or '|' or 'F' or '7'))
+                {
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // left
+                if (nc.r == cc.r && nc.c < cc.c && nc != lastCoord &&
+                    (cv is 'S' or '-' or '7' or 'J') && (nv is 'S' or '-' or 'F' or 'L'))
+                {
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // right
+                if (nc.r == cc.r && nc.c > cc.c && nc != lastCoord &&
+                    (cv is 'S' or '-' or 'F' or 'L') && (nv is 'S' or '-' or '7' or 'J'))
+                {
+                    path.Add(nc);
+
+                    break;
+                }
+            }
+        }
+
+        (path.Count / 2).Dump();
+    }
+
+    [Test]
+    public void day10_2_2023()
+    {
+        var G = FP.ReadAsCharGrid($"{basePath}/day10.txt");
+
+        var g = new Grid<char>(G);
+        // find S
+        Coord source = new(0, 0);
+
+        g.ForEachWithCoord(
+            (c, coord) =>
+            {
+                if (c == 'S')
+                {
+                    source = coord;
+                }
+            });
+
+        var path = new List<Coord> { source };
+
+        var lastCoord = new Coord(-1, -1);
+
+        while (!(path.Last() == source && path.Count > 1))
+        {
+            if (path.Count > 1)
+            {
+                lastCoord = path[^2];
+            }
+
+            var cc = path.Last();
+            var cv = g[cc];
+            var surrounding = g.GetValidAdjacentNoDiag(cc);
+
+            foreach (var nc in surrounding)
+            {
+                var nv = g[nc];
+
+                // down
+                if (nc.r > cc.r && nc.c == cc.c && nc != lastCoord &&
+                    cv is 'S' or '|' or 'F' or '7' && nv is 'S' or '|' or 'J' or 'L')
+                {
+                    "went down".Dump();
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // up
+                if (nc.r < cc.r && nc.c == cc.c && nc != lastCoord &&
+                    (cv is 'S' or '|' or 'L' or 'J') && (nv is 'S' or '|' or 'F' or '7'))
+                {
+                    "went up".Dump();
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // left
+                if (nc.r == cc.r && nc.c < cc.c && nc != lastCoord &&
+                    (cv is 'S' or '-' or '7' or 'J') && (nv is 'S' or '-' or 'F' or 'L'))
+                {
+                    "went left".Dump();
+
+                    path.Add(nc);
+
+                    break;
+                }
+
+                // right
+                if (nc.r == cc.r && nc.c > cc.c && nc != lastCoord &&
+                    (cv is 'S' or '-' or 'F' or 'L') && (nv is 'S' or '-' or '7' or 'J'))
+                {
+                    "went right".Dump();
+                    path.Add(nc);
+
+                    break;
+                }
+            }
+        }
+
+        // for each point go right and see how many times it intersects with a pipe on chars "| F 7"
+        // for a given point if it intersects with the shape an odd number of times, it's inside it
+        // just manually checked my source to be J so it is not important
+
+        var hash = path.ToHashSet();
+        var area = 0;
+
+        g.ForEachWithCoord(
+            (_, coord) =>
+            {
+                if (!hash.Contains(coord))
+                {
+                    var pointsToRight = Enumerable
+                        .Range(coord.c + 1, g.Width - 1 - coord.c)
+                        .Select(y => coord with { c = y });
+
+                    var intersections = pointsToRight.Where(x => hash.Contains(x))
+                        .Count(x => g[x] is '|' or 'F' or '7');
+
+                    if (intersections % 2 != 0)
+                    {
+                        area += 1;
+                    }
+                }
+            });
+
+        area.Dump();
+    }
+
+    [Test]
+    public void day11_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day11.txt");
         foreach (var line in lines)
         {
             line.Dump();

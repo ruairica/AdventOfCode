@@ -10,6 +10,7 @@ using Dumpify;
 using FluentAssertions;
 using FluentAssertions.Equivalency.Steps;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using Spectre.Console;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -785,7 +786,7 @@ public class Tasks2023
 
             while (!(seqs.Last().Distinct().Count() == 1 && seqs.Last().Last() == 0))
             {
-                seqs.Add(getDifferences(seqs.Last()).ToList());
+                seqs.Add(seqs.Last().GetDifferences().ToList());
             }
 
             seqs.Reverse();
@@ -800,14 +801,6 @@ public class Tasks2023
         }
 
         result.Sum().Dump();
-
-        IEnumerable<int> getDifferences(IReadOnlyList<int> nums)
-        {
-            for (var i = 1; i < nums.Count; i++)
-            {
-                yield return nums[i] - nums[i - 1];
-            }
-        }
     }
 
     [Test]
@@ -1028,7 +1021,6 @@ public class Tasks2023
         area.Dump();
     }
 
-
     [Test]
     public void day10_2_2023_Shoelace()
     {
@@ -1103,6 +1095,7 @@ public class Tasks2023
                 }
             }
         }
+
         path.Pop();
 
         var corners = path.Where(x => g[x] is 'S' or 'F' or 'J' or '7' or 'L');
@@ -1110,36 +1103,365 @@ public class Tasks2023
         // https://en.wikipedia.org/wiki/Pick%27s_theorem relates total area to number of points inside
         //A = I + B/2 - 1 where I is internal points and B is boundary points
         // I = A - B/2 + 1
-        var i = CalculateArea(corners.ToList()) - ((double)path.Count / 2) + 1;
+        var i = corners.ToList().CalculateShoelaceArea() - ((double)path.Count / 2) + 1;
         i.Dump();
-
-
-        //https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#C#
-        // gets area, includes
-        double CalculateArea(List<Coord> coordinates)
-        {
-            var n = coordinates.Count;
-            double area = 0;
-
-            for (var i = 0; i < n; i++)
-            {
-                var j = (i + 1) % n;
-                area += coordinates[i].r * coordinates[j].c;
-                area -= coordinates[j].r * coordinates[i].c;
-            }
-
-            area = Math.Abs(area) / 2.0;
-            return area;
-        }
     }
 
     [Test]
     public void day11_1_2023()
     {
-        var lines = FP.ReadFile($"{basePath}/day11.txt");
-        foreach (var line in lines)
+        var lines= FP.ReadFile($"{basePath}/day11.txt").Split("\n");
+        lines.Dump();
+    }
+    
+
+    [Test]
+    public void day13_1_2023()
+    {
+        var sections = FP.ReadFile($"{basePath}/day13.txt").Split("\n\n");
+        var total = 0;
+
+        foreach (var (section, si) in sections.Enumerate())
         {
-            line.Dump();
+            var g = new Grid<char>(
+                section.Split("\n").Select(x => x.Select(y => y).ToList()).ToList());
+
+            var biggest = (planes: 0, score: 0);
+
+            for (var i = 1; i < g.Height; i++)
+            {
+                if (g.grid[i].Enumerate().All(x => x.val == g.grid[i - 1][x.index]))
+                {
+                    var hitEdge = false;
+
+                    var top = i - 2;
+                    var bottom = i + 1;
+
+                    var rowsOfSym = 2;
+
+                    if (top == -1 || bottom == g.Height)
+                    {
+                        rowsOfSym += 2;
+                        hitEdge = true;
+                    }
+
+                    while (top >= 0 && bottom < g.Height)
+                    {
+                        var symmetrical = g.grid[top]
+                            .Enumerate()
+                            .All(x => x.val == g.grid[bottom][x.index]);
+
+                        if (symmetrical)
+                        {
+                            rowsOfSym += 2;
+                            top -= 1;
+                            bottom += 1;
+
+                            if (top == -1 || bottom == g.Height)
+                            {
+                                hitEdge = true;
+                                rowsOfSym += 2;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (rowsOfSym > biggest.planes && hitEdge)
+                    {
+                        biggest = (rowsOfSym, i * 100);
+                    }
+                }
+            }
+
+            // cols
+            var cols = g.GetAllColumns();
+
+            for (var i = 1; i < cols.Count; i++)
+            {
+                if (cols[i].Enumerate().All(x => x.val == cols[i - 1][x.index]))
+                {
+                    var left = i - 2;
+                    var right = i + 1;
+
+                    var hitEdge = false;
+                    var colsOfSym = 2;
+
+                    if (left == -1 || right == g.Width)
+                    {
+                        colsOfSym += 2;
+                        hitEdge = true;
+                    }
+
+                    while (left >= 0 && right < g.Width)
+                    {
+                        var symmetrical = cols[left]
+                            .Enumerate()
+                            .All(x => x.val == cols[right][x.index]);
+
+                        if (symmetrical)
+                        {
+                            colsOfSym += 2;
+                            left -= 1;
+                            right += 1;
+
+                            if (left == -1 || right == g.Width)
+                            {
+                                hitEdge = true;
+                                ;
+                                colsOfSym += 2;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (colsOfSym > biggest.planes && hitEdge)
+                    {
+                        biggest = (colsOfSym, i);
+                    }
+                }
+            }
+
+            total += biggest.score;
         }
+
+        total.Dump();
+    }
+
+    [Test]
+    public void day13_2_2023()
+    {
+        var sections = FP.ReadFile($"{basePath}/day13.txt").Split("\n\n");
+        var total = 0;
+
+        foreach (var (section, si) in sections.Enumerate())
+        {
+            var g = new Grid<char>(
+                section.Split("\n").Select(x => x.Select(y => y).ToList()).ToList());
+
+            var biggest = (planes: 0, score: 0);
+
+            // rows
+            for (var i = 1; i < g.Height; i++)
+            {
+                var usedSmudge = false;
+
+                var matches = g.grid[i]
+                    .Enumerate()
+                    .Count(x => x.val == g.grid[i - 1][x.index]);
+
+                if (matches == g.Width - 1)
+                {
+                    usedSmudge = true;
+                }
+
+                if (matches == g.Width || matches == g.Width - 1)
+                {
+                    var hitEdge = false;
+
+                    var top = i - 2;
+                    var bottom = i + 1;
+
+                    var rowsOfSym = 2;
+
+                    if (top == -1 || bottom == g.Height)
+                    {
+                        rowsOfSym += 2;
+                        hitEdge = true;
+                    }
+
+                    while (top >= 0 && bottom < g.Height)
+                    {
+                        var symmetricalHits = g.grid[top]
+                            .Enumerate()
+                            .Count(x => x.val == g.grid[bottom][x.index]);
+
+                        if (symmetricalHits == g.Width)
+                        {
+                            rowsOfSym += 2;
+                            top -= 1;
+                            bottom += 1;
+
+                            if (top == -1 || bottom == g.Height)
+                            {
+                                hitEdge = true;
+                                rowsOfSym += 2;
+                            }
+                        }
+                        else if (symmetricalHits == g.Width - 1 && !usedSmudge)
+                        {
+                            usedSmudge = true;
+                            rowsOfSym += 2;
+                            top -= 1;
+                            bottom += 1;
+
+                            if (top == -1 || bottom == g.Height)
+                            {
+                                hitEdge = true;
+                                rowsOfSym += 2;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (rowsOfSym > biggest.planes && hitEdge && usedSmudge)
+                    {
+                        biggest = (rowsOfSym, i * 100);
+                    }
+                }
+            }
+
+            var cols = g.GetAllColumns();
+
+            for (var i = 1; i < cols.Count; i++)
+            {
+                var usedSmudge = false;
+
+                var matches =
+                    cols[i].Enumerate().Count(x => x.val == cols[i - 1][x.index]);
+
+                if (matches == g.Height - 1)
+                {
+                    usedSmudge = true;
+                }
+
+                if (matches == g.Height || matches == g.Height - 1)
+                {
+                    var left = i - 2;
+                    var right = i + 1;
+
+                    var hitEdge = false;
+                    var colsOfSym = 2;
+
+                    if (left == -1 || right == g.Width)
+                    {
+                        colsOfSym += 2;
+                        hitEdge = true;
+                    }
+
+                    while (left >= 0 && right < g.Width)
+                    {
+                        var symmetricalHits = cols[left]
+                            .Enumerate()
+                            .Count(x => x.val == cols[right][x.index]);
+
+                        if (symmetricalHits == g.Height)
+                        {
+                            colsOfSym += 2;
+                            left -= 1;
+                            right += 1;
+
+                            if (left == -1 || right == g.Width)
+                            {
+                                hitEdge = true;
+                                ;
+                                colsOfSym += 2;
+                            }
+                        }
+                        else if (symmetricalHits == g.Height - 1 && !usedSmudge)
+                        {
+                            usedSmudge = true;
+                            colsOfSym += 2;
+                            left -= 1;
+                            right += 1;
+
+                            if (left == -1 || right == g.Width)
+                            {
+                                hitEdge = true;
+                                ;
+                                colsOfSym += 2;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (colsOfSym > biggest.planes && hitEdge && usedSmudge)
+                    {
+                        biggest = (colsOfSym, i);
+                    }
+                }
+            }
+
+            if (biggest.planes == 0)
+            {
+                $"no planes found for {si}".Dump();
+            }
+
+            total += biggest.score;
+        }
+
+        total.Dump();
+    }
+
+    [Test]
+    public void day15_1_2023()
+    {
+        FP.ReadFile($"{basePath}/day15.txt")
+            .Split(',')
+            .Select(
+                p => p.Select(x => (int)x)
+                    .Aggregate(0, (acc, prev) => ((acc + prev) * 17) % 256))
+            .Sum()
+            .Dump();
+    }
+
+    [Test]
+    public void day15_2_2023()
+    {
+        var parts = FP.ReadFile($"{basePath}/day15.txt").Split(',');
+
+        var boxes = Enumerable.Range(0, 256)
+            .Select(x => new List<(string, int)>())
+            .ToList();
+
+        foreach (var p in parts)
+        {
+            Func<int, int, int> hash = (acc, prev) => ((acc + prev) * 17) % 256;
+
+            if (p.EndsWith('-'))
+            {
+                var label = p[..^1];
+
+                var boxNum = label.Select(x => (int)x).Aggregate(0, hash);
+
+                if (boxes[boxNum].Any(x => x.Item1 == label))
+                {
+                    boxes[boxNum] = boxes[boxNum].Where(x => x.Item1 != label).ToList();
+                }
+            }
+            else
+            {
+                var (label, focal) = p.Split('=');
+                var f = int.Parse(focal);
+
+                var boxNum = label.Select(x => (int)x).Aggregate(0, hash);
+
+                var current = boxes[boxNum].FindIndex(x => x.Item1 == label);
+
+                if (current == -1)
+                {
+                    boxes[boxNum].Add((label, f));
+                }
+                else
+                {
+                    boxes[boxNum][current] = (label, f);
+                }
+            }
+        }
+
+        boxes.Select((b, bi) => b.Select((l, li) => (bi + 1) * (li + 1) * l.Item2).Sum())
+            .Sum()
+            .Dump();
     }
 }

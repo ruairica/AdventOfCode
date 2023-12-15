@@ -1,4 +1,6 @@
-﻿namespace Aoc.Utils;
+﻿using Aoc.Utils.Grids;
+
+namespace Aoc.Utils;
 public static class ListExtensions
 {
     public static T Pop<T>(this List<T> list, int elementIndexer = -1)
@@ -19,6 +21,24 @@ public static class ListExtensions
             index = text.IndexOf(str, index + 1);
         }
         return allIndexOf;
+    }
+
+    //https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#C#
+    // gets area, includes
+    public static double CalculateShoelaceArea(this List<Coord> corners)
+    {
+        var n = corners.Count;
+        double area = 0;
+
+        for (var i = 0; i < n; i++)
+        {
+            var j = (i + 1) % n;
+            area += corners[i].r * corners[j].c;
+            area -= corners[j].r * corners[i].c;
+        }
+
+        area = Math.Abs(area) / 2.0;
+        return area;
     }
 
     // allows a list to be deconstructed to a tuple like in Python.
@@ -73,6 +93,8 @@ public static class ListExtensions
 
         return lcm;
     }
+
+    public static IEnumerable<int> GetDifferences(this IReadOnlyList<int> nums) => nums.Skip(1).Select((val, index) => val - nums[index-1]);
 
     // Helper method to find the LCM of two numbers
     private static long FindLCM(long a, long b)

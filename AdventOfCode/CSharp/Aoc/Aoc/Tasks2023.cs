@@ -1113,9 +1113,10 @@ public class Tasks2023
     public void day11_2023(int scale)
     {
         var g1 = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day11.txt"));
+
         var indexesOfRowsToScale = g1.GetAllRows()
             .Enumerate()
-            .Where(x=> x.val.All(x => x == '.'))
+            .Where(x => x.val.All(x => x == '.'))
             .Select(r => r.index)
             .ToHashSet();
 
@@ -1125,28 +1126,31 @@ public class Tasks2023
             .Select(r => r.index)
             .ToHashSet();
 
-        var galaxies = g1
-            .WhereWithCoord((c, _) => c == '#')
-            .Select(x => x.Coord).ToList();
+        var galaxies = g1.WhereWithCoord((c, _) => c == '#')
+            .Select(x => x.Coord)
+            .ToList();
 
-        var combinations =
-            galaxies
-                .SelectMany((x, i) => galaxies.Skip(i + 1), Tuple.Create);
+        var combinations = galaxies.SelectMany(
+            (x, i) => galaxies.Skip(i + 1),
+            Tuple.Create);
 
         long total = 0;
+
         foreach (var (c1, c2) in combinations)
         {
             var dist = AStarAlgorithm.ManhattanDistance(c1, c2);
 
-            var rowsInWay = indexesOfRowsToScale.Count(s => c1.r > c2.r ? s < c1.r && s > c2.r : s > c1.r && s < c2.r);
-            var colsInWay = indexesOfColsToScale.Count(s => c1.c > c2.c ? s < c1.c && s > c2.c : s > c1.c && s < c2.c);
+            var rowsInWay = indexesOfRowsToScale.Count(
+                s => c1.r > c2.r ? s < c1.r && s > c2.r : s > c1.r && s < c2.r);
 
-            total += dist +  (scale - 1) * (rowsInWay + colsInWay);
+            var colsInWay = indexesOfColsToScale.Count(
+                s => c1.c > c2.c ? s < c1.c && s > c2.c : s > c1.c && s < c2.c);
+
+            total += dist + (scale - 1) * (rowsInWay + colsInWay);
         }
 
         total.Dump();
     }
-
 
     [Test]
     public void day13_1_2023()
@@ -1443,6 +1447,69 @@ public class Tasks2023
         var grid = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day14.txt"));
         grid.Print();
 
+        for (int r = 0; r < grid.Height; r++)
+        {
+            for (var c = 0; c < grid.Width; c++)
+            {
+                var cc = new Coord(r, c);
+                var letter = grid[cc];
+
+                if (letter == 'O')
+                {
+                    var range = Enumerable.Range(0, r)
+                        .Select(x => new Coord(x, c))
+                        .Reverse()
+                        .ToList();
+
+                    var place = range.FindIndex(x => grid[x] == '#' || grid[x] == 'O');
+                    if (place == -1)
+                    {
+                        var nc = new Coord(0, c);
+
+                        if (c == 0)
+                        {
+                            $"p=-1 current is {cc}, and new is {nc}".Dump();
+                        }
+
+                        if (r == 0)
+                        {
+                            continue;
+                        }
+
+                        grid[nc] = 'O';
+                        grid[cc] = '.';
+                    }
+                    else if (place > 0)
+                    {
+                        var nc = range[place - 1];
+
+                        if (c == 0)
+                        {
+                            $"p>0 current is {cc}, and new is {nc}".Dump();
+                        }
+
+                        grid[nc] = 'O';
+                        grid[cc] = '.';
+                    }
+                    else
+                    {
+                        if (c == 0)
+                        {
+                            $"no change {cc}".Dump();
+                        }
+                    }
+                }
+            }
+        }
+
+        grid.Print();
+
+        var poi = grid.WhereWithCoord((ch, _) => ch == 'O')
+            .Select(x => grid.Height - x.Coord.r)
+            .Sum();
+
+        poi.Dump();
+
     }
 
     [Test]
@@ -1505,7 +1572,7 @@ public class Tasks2023
             .Sum()
             .Dump();
     }
-    
+
     [Test]
     public void day16_1_2023()
     {
@@ -1514,7 +1581,7 @@ public class Tasks2023
         var visited = new HashSet<(Coord, Dir)>();
 
         var stack = new Stack<(Coord, Dir)>();
-        stack.Push((new Coord(0,0), Dir.Right));
+        stack.Push((new Coord(0, 0), Dir.Right));
 
         while (stack.Any())
         {
@@ -1526,6 +1593,7 @@ public class Tasks2023
             }
 
             visited.Add((c, d));
+
             List<Dir> toProcess = (g[c], d) switch
             {
                 ('.', _) => new List<Dir> { d },
@@ -1539,21 +1607,23 @@ public class Tasks2023
                 ('\\', Dir.Right) => new List<Dir> { Dir.Down },
                 ('|', Dir.Up) => new List<Dir> { Dir.Up },
                 ('|', Dir.Down) => new List<Dir> { Dir.Down },
-                ('|', _) => new List<Dir> { Dir.Up, Dir.Down},
+                ('|', _) => new List<Dir> { Dir.Up, Dir.Down },
                 ('-', Dir.Left) => new List<Dir> { Dir.Left },
                 ('-', Dir.Right) => new List<Dir> { Dir.Right },
                 ('-', _) => new List<Dir> { Dir.Left, Dir.Right },
                 (_, _) => throw new Exception("invalid")
             };
 
-            toProcess.ForEach(x =>
-            {
-                var (valid, nec) = g.Move(c, x);
-                if (valid)
+            toProcess.ForEach(
+                x =>
                 {
-                    stack.Push((nec, x));
-                }
-            });
+                    var (valid, nec) = g.Move(c, x);
+
+                    if (valid)
+                    {
+                        stack.Push((nec, x));
+                    }
+                });
         }
 
         visited.Select(x => x.Item1).ToHashSet().Count.Dump();
@@ -1564,17 +1634,17 @@ public class Tasks2023
     {
         var g = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day16.txt"));
 
-
         var rows = g.GetAllRowsCoords();
         var cols = g.GetAllColCoords();
 
-        var starting = rows[0].ConvertAll(r => (r, Dir.Down)).Concat(
-                       rows[^1].ConvertAll(r => (r, Dir.Up))).Concat(
-                       cols[0].ConvertAll(c => (c, Dir.Right))).Concat(
-                       cols[^1].ConvertAll(c => (c, Dir.Left)));
-
+        var starting = rows[0]
+            .ConvertAll(r => (r, Dir.Down))
+            .Concat(rows[^1].ConvertAll(r => (r, Dir.Up)))
+            .Concat(cols[0].ConvertAll(c => (c, Dir.Right)))
+            .Concat(cols[^1].ConvertAll(c => (c, Dir.Left)));
 
         long highScore = 0;
+
         foreach (var (sc, sd) in starting)
         {
             var visited = new HashSet<(Coord, Dir)>();
@@ -1592,6 +1662,7 @@ public class Tasks2023
                 }
 
                 visited.Add((c, d));
+
                 List<Dir> toProcess = (g[c], d) switch
                 {
                     ('.', _) => new List<Dir> { d },
@@ -1612,18 +1683,21 @@ public class Tasks2023
                     (_, _) => throw new Exception("invalid")
                 };
 
-                toProcess.ForEach(x =>
-                {
-                    var (valid, nec) = g.Move(c, x);
-                    if (valid)
+                toProcess.ForEach(
+                    x =>
                     {
-                        stack.Push((nec, x));
-                    }
-                });
+                        var (valid, nec) = g.Move(c, x);
+
+                        if (valid)
+                        {
+                            stack.Push((nec, x));
+                        }
+                    });
             }
 
-
-            highScore = Math.Max(highScore, visited.Select(x => x.Item1).ToHashSet().Count);
+            highScore = Math.Max(
+                highScore,
+                visited.Select(x => x.Item1).ToHashSet().Count);
         }
 
         highScore.Dump();

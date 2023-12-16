@@ -1438,6 +1438,14 @@ public class Tasks2023
     }
 
     [Test]
+    public void day14_1_2023()
+    {
+        var grid = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day14.txt"));
+        grid.Print();
+
+    }
+
+    [Test]
     public void day15_1_2023()
     {
         FP.ReadFile($"{basePath}/day15.txt")
@@ -1503,23 +1511,21 @@ public class Tasks2023
     {
         var g = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day16.txt"));
 
-        var visited = new HashSet<Coord>();
+        var visited = new HashSet<(Coord, Dir)>();
 
         var stack = new Stack<(Coord, Dir)>();
-        stack.Push((current: new Coord(0,0), dir: Dir.Right));
+        stack.Push((new Coord(0,0), Dir.Right));
 
-        var count = 0;
         while (stack.Any())
         {
             var (c, d) = stack.Pop();
 
-            $"on {g[c]} headed {d}".Dump();
-            if (visited.Contains(c))
+            if (visited.Contains((c, d)))
             {
                 continue;
             }
-            visited.Add(c);
 
+            visited.Add((c, d));
             List<Dir> toProcess = (g[c], d) switch
             {
                 ('.', _) => new List<Dir> { d },
@@ -1537,36 +1543,89 @@ public class Tasks2023
                 ('-', Dir.Left) => new List<Dir> { Dir.Left },
                 ('-', Dir.Right) => new List<Dir> { Dir.Right },
                 ('-', _) => new List<Dir> { Dir.Left, Dir.Right },
+                (_, _) => throw new Exception("invalid")
             };
-
 
             toProcess.ForEach(x =>
             {
                 var (valid, nec) = g.Move(c, x);
-                x.Dump();
                 if (valid)
                 {
                     stack.Push((nec, x));
                 }
             });
-
-            if (count == 2)
-            {
-                return;
-            }
-            count += 1;
-
-
         }
 
-        visited.Count.Dump();
+        visited.Select(x => x.Item1).ToHashSet().Count.Dump();
     }
 
-    public enum Dir
+    [Test]
+    public void day16_2_2023()
     {
-        Up,
-        Down,
-        Left,
-        Right,
-    };
+        var g = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day16.txt"));
+
+
+        var rows = g.GetAllRowsCoords();
+        var cols = g.GetAllColCoords();
+
+        var starting = rows[0].ConvertAll(r => (r, Dir.Down)).Concat(
+                       rows[^1].ConvertAll(r => (r, Dir.Up))).Concat(
+                       cols[0].ConvertAll(c => (c, Dir.Right))).Concat(
+                       cols[^1].ConvertAll(c => (c, Dir.Left)));
+
+
+        long highScore = 0;
+        foreach (var (sc, sd) in starting)
+        {
+            var visited = new HashSet<(Coord, Dir)>();
+
+            var stack = new Stack<(Coord, Dir)>();
+            stack.Push((sc, sd));
+
+            while (stack.Any())
+            {
+                var (c, d) = stack.Pop();
+
+                if (visited.Contains((c, d)))
+                {
+                    continue;
+                }
+
+                visited.Add((c, d));
+                List<Dir> toProcess = (g[c], d) switch
+                {
+                    ('.', _) => new List<Dir> { d },
+                    ('/', Dir.Up) => new List<Dir> { Dir.Right },
+                    ('/', Dir.Down) => new List<Dir> { Dir.Left },
+                    ('/', Dir.Left) => new List<Dir> { Dir.Down },
+                    ('/', Dir.Right) => new List<Dir> { Dir.Up },
+                    ('\\', Dir.Up) => new List<Dir> { Dir.Left },
+                    ('\\', Dir.Down) => new List<Dir> { Dir.Right },
+                    ('\\', Dir.Left) => new List<Dir> { Dir.Up },
+                    ('\\', Dir.Right) => new List<Dir> { Dir.Down },
+                    ('|', Dir.Up) => new List<Dir> { Dir.Up },
+                    ('|', Dir.Down) => new List<Dir> { Dir.Down },
+                    ('|', _) => new List<Dir> { Dir.Up, Dir.Down },
+                    ('-', Dir.Left) => new List<Dir> { Dir.Left },
+                    ('-', Dir.Right) => new List<Dir> { Dir.Right },
+                    ('-', _) => new List<Dir> { Dir.Left, Dir.Right },
+                    (_, _) => throw new Exception("invalid")
+                };
+
+                toProcess.ForEach(x =>
+                {
+                    var (valid, nec) = g.Move(c, x);
+                    if (valid)
+                    {
+                        stack.Push((nec, x));
+                    }
+                });
+            }
+
+
+            highScore = Math.Max(highScore, visited.Select(x => x.Item1).ToHashSet().Count);
+        }
+
+        highScore.Dump();
+    }
 }

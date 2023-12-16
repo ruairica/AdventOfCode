@@ -2,6 +2,7 @@
 using static Aoc.Tasks2023;
 
 namespace Aoc.Utils.Grids;
+
 public class Grid<T>
 {
     public T this[Coord coord]
@@ -29,24 +30,24 @@ public class Grid<T>
 
     public void ForEachWithCoord(Action<T, Coord> action)
     {
-        for (var x = 0; x < Height; x++)
+        for (var r = 0; r < Height; r++)
         {
-            for (int y = 0; y < Width; y++)
+            for (int c = 0; c < Width; c++)
             {
-                action(grid[x][y], new(x, y));
+                action(grid[r][c], new(r, c));
             }
         }
     }
 
     public Coord? FirstOrDefault(Func<T, bool> func)
     {
-        for (int x = 0; x < this.Height; x++)
+        for (int r = 0; r < this.Height; r++)
         {
-            for (int y = 0; y < this.Width; y++)
+            for (int c = 0; c < this.Width; c++)
             {
-                if (func(grid[x][y]))
+                if (func(grid[r][c]))
                 {
-                    return new Coord(x, y);
+                    return new Coord(r, c);
                 }
             }
         }
@@ -56,13 +57,13 @@ public class Grid<T>
 
     public IEnumerable<ValCoord<T>> WhereWithCoord(Func<T, Coord, bool> func)
     {
-        for (var x = 0; x < this.Height; x++)
+        for (var r = 0; r < this.Height; r++)
         {
-            for (int y = 0; y < this.Width; y++)
+            for (int c = 0; c < this.Width; c++)
             {
-                if (func(grid[x][y], new(x, y)))
+                if (func(grid[r][c], new(r, c)))
                 {
-                    yield return new ValCoord<T>(grid[x][y], new(x, y));
+                    yield return new ValCoord<T>(grid[r][c], new(r, c));
                 }
             }
         }
@@ -73,17 +74,38 @@ public class Grid<T>
         return grid.SelectMany(x => x).All(func);
     }
 
+    public List<List<Coord>> GetAllRowsCoords()
+    {
+        return Enumerable.Range(0, this.Height)
+            .Select(
+                row => Enumerable.Range(0, this.Width)
+                    .Select(col => new Coord(row, col))
+                    .ToList())
+            .ToList();
+    }
+
+    public List<List<Coord>> GetAllColCoords()
+    {
+        return Enumerable.Range(0, this.Width)
+            .Select(
+                col => Enumerable.Range(0, this.Height)
+                    .Select(row => new Coord(row, col))
+                    .ToList())
+            .ToList();
+    }
 
     public List<List<T>> GetAllRows()
     {
         return grid.ConvertAll(x => x);
     }
 
-
     public List<List<T>> GetAllColumns()
     {
         return Enumerable.Range(0, Width)
-            .Select(column => Enumerable.Range(0, Height).Select(row => grid[row][column]).ToList())
+            .Select(
+                column => Enumerable.Range(0, Height)
+                    .Select(row => grid[row][column])
+                    .ToList())
             .ToList();
     }
 
@@ -101,6 +123,7 @@ public class Grid<T>
             .ToList();
 
         row.Reverse();
+
         return row;
     }
 
@@ -118,24 +141,29 @@ public class Grid<T>
             .ToList();
 
         col.Reverse();
+
         return col;
     }
 
     public void Print()
     {
         Console.Write("[");
+
         for (int x = 0; x < this.Height; x++)
         {
             Console.Write($"{Environment.NewLine}[");
             Console.Write(string.Join(", ", this.grid[x]));
             Console.Write($"]");
         }
+
         Console.Write($"{Environment.NewLine}]{Environment.NewLine}");
     }
 
-    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord) => coord.GetValidAdjacentIncludingDiag(this.Width, this.Height);
+    public List<Coord> GetValidAdjacentIncludingDiag(Coord coord) =>
+        coord.GetValidAdjacentIncludingDiag(this.Width, this.Height);
 
-    public List<Coord> GetValidAdjacentNoDiag(Coord coord) => coord.GetValidAdjacentNoDiag(this.Width, this.Height);
+    public List<Coord> GetValidAdjacentNoDiag(Coord coord) =>
+        coord.GetValidAdjacentNoDiag(this.Width, this.Height);
 
     public (bool valid, Coord coord) Move(Coord coord, Dir dir)
     {
@@ -147,10 +175,10 @@ public class Grid<T>
             Dir.Right => coord with { c = coord.c + 1 },
         };
 
-
-        return (!(newCoord.r < 0 || newCoord.r >= this.Height || newCoord.c < 0 || newCoord.c >= this.Width), newCoord);
+        return (
+            !(newCoord.r < 0 || newCoord.r >= this.Height || newCoord.c < 0 ||
+              newCoord.c >= this.Width), newCoord);
     }
-
 
     public Grid<T> SetValues(Func<T, T> func)
     {
@@ -171,11 +199,12 @@ public class Grid<T>
     {
         var resultGrid = new Grid<T>(
             Enumerable.Range(0, grid.Height)
-                .Select(x =>
-                    Enumerable.Range(0, grid.Width)
+                .Select(
+                    x => Enumerable.Range(0, grid.Width)
                         .Select(y => grid.grid[x][y])
                         .ToList())
                 .ToList());
+
         return resultGrid;
     }
 }

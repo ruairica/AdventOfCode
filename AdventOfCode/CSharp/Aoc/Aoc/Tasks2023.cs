@@ -1108,63 +1108,8 @@ public class Tasks2023
         i.Dump();
     }
 
-    [Test]
-    public void day11_1_2023()
-    {
-        var g1 = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day11.txt"));
-        var scaled = new List<List<char>>();
-        // expand rows
-        g1.grid.ForEach(
-            line =>
-            {
-                if (line.All(x => x == '.'))
-                {
-                    scaled.Add(line.ConvertAll(x => x));
-                    scaled.Add(line.ConvertAll(x => x));
-                }
-                else
-                {
-                    scaled.Add(line.ConvertAll(x => x));
-
-                }
-            });
-
-        // expand cols
-        var g2 = new Grid<char>(scaled);
-        var cols = g2.GetAllColumns();
-        var inserts = 0;
-        foreach (var (col, index) in cols.Enumerate())
-        {
-            if (col.All(x => x == '.'))
-            {
-                for (var i = 0; i < g2.Height; i++)
-                {
-                    g2.grid[i].Insert(index + inserts, '.');
-                }
-
-                inserts += 1;
-            }
-        }
-
-        var g3 = new Grid<char>(g2.grid);
-        g3.Print();
-
-        var galaxies = g3
-            .WhereWithCoord((c, coord) => c == '#')
-            .Select(x => x.Coord).ToList();
-
-
-        var combinations = 
-            galaxies
-                .SelectMany((x, i) => galaxies.Skip(i + 1), Tuple.Create);
-
-
-        combinations.Sum(coords =>
-            AStarAlgorithm.ManhattanDistance(coords.Item1, coords.Item2)).Dump();
-    }
-
-    [TestCase(2)]
-    [TestCase(1000000)]
+    [TestCase(2)] // part1 
+    [TestCase(1000000)] // part 2
     public void day11_2023(int scale)
     {
         var g1 = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day11.txt"));
@@ -1191,13 +1136,12 @@ public class Tasks2023
         long total = 0;
         foreach (var (c1, c2) in combinations)
         {
-            // find manhattan dist, check how many of the indexesOfColsToScale and indexesOfRowsToScale are in the way
             var dist = AStarAlgorithm.ManhattanDistance(c1, c2);
 
             var rowsInWay = indexesOfRowsToScale.Count(s => c1.r > c2.r ? s < c1.r && s > c2.r : s > c1.r && s < c2.r);
             var colsInWay = indexesOfColsToScale.Count(s => c1.c > c2.c ? s < c1.c && s > c2.c : s > c1.c && s < c2.c);
 
-            total += dist +  (scale - 1) *(rowsInWay + colsInWay);
+            total += dist +  (scale - 1) * (rowsInWay + colsInWay);
         }
 
         total.Dump();
@@ -1553,4 +1497,76 @@ public class Tasks2023
             .Sum()
             .Dump();
     }
+    
+    [Test]
+    public void day16_1_2023()
+    {
+        var g = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day16.txt"));
+
+        var visited = new HashSet<Coord>();
+
+        var stack = new Stack<(Coord, Dir)>();
+        stack.Push((current: new Coord(0,0), dir: Dir.Right));
+
+        var count = 0;
+        while (stack.Any())
+        {
+            var (c, d) = stack.Pop();
+
+            $"on {g[c]} headed {d}".Dump();
+            if (visited.Contains(c))
+            {
+                continue;
+            }
+            visited.Add(c);
+
+            List<Dir> toProcess = (g[c], d) switch
+            {
+                ('.', _) => new List<Dir> { d },
+                ('/', Dir.Up) => new List<Dir> { Dir.Right },
+                ('/', Dir.Down) => new List<Dir> { Dir.Left },
+                ('/', Dir.Left) => new List<Dir> { Dir.Down },
+                ('/', Dir.Right) => new List<Dir> { Dir.Up },
+                ('\\', Dir.Up) => new List<Dir> { Dir.Left },
+                ('\\', Dir.Down) => new List<Dir> { Dir.Right },
+                ('\\', Dir.Left) => new List<Dir> { Dir.Up },
+                ('\\', Dir.Right) => new List<Dir> { Dir.Down },
+                ('|', Dir.Up) => new List<Dir> { Dir.Up },
+                ('|', Dir.Down) => new List<Dir> { Dir.Down },
+                ('|', _) => new List<Dir> { Dir.Up, Dir.Down},
+                ('-', Dir.Left) => new List<Dir> { Dir.Left },
+                ('-', Dir.Right) => new List<Dir> { Dir.Right },
+                ('-', _) => new List<Dir> { Dir.Left, Dir.Right },
+            };
+
+
+            toProcess.ForEach(x =>
+            {
+                var (valid, nec) = g.Move(c, x);
+                x.Dump();
+                if (valid)
+                {
+                    stack.Push((nec, x));
+                }
+            });
+
+            if (count == 2)
+            {
+                return;
+            }
+            count += 1;
+
+
+        }
+
+        visited.Count.Dump();
+    }
+
+    public enum Dir
+    {
+        Up,
+        Down,
+        Left,
+        Right,
+    };
 }

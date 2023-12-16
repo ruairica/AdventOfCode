@@ -1,4 +1,7 @@
-﻿namespace Aoc.Utils.Grids;
+﻿using Dumpify;
+using static Aoc.Tasks2023;
+
+namespace Aoc.Utils.Grids;
 public class Grid<T>
 {
     public T this[Coord coord]
@@ -133,6 +136,21 @@ public class Grid<T>
     public List<Coord> GetValidAdjacentIncludingDiag(Coord coord) => coord.GetValidAdjacentIncludingDiag(this.Width, this.Height);
 
     public List<Coord> GetValidAdjacentNoDiag(Coord coord) => coord.GetValidAdjacentNoDiag(this.Width, this.Height);
+
+    public (bool valid, Coord coord) Move(Coord coord, Dir dir)
+    {
+        var newCoord = dir switch
+        {
+            Dir.Up => coord with { r = coord.r - 1 },
+            Dir.Down => coord with { r = coord.r + 1 },
+            Dir.Left => coord with { c = coord.c - 1 },
+            Dir.Right => coord with { c = coord.c + 1 },
+        };
+
+
+        return (!(newCoord.r < 0 || newCoord.r >= this.Height || newCoord.c < 0 || newCoord.c >= this.Width), newCoord);
+    }
+
 
     public Grid<T> SetValues(Func<T, T> func)
     {

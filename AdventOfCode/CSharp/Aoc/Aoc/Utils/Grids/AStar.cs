@@ -2,7 +2,7 @@
 
 public static class AStarAlgorithm
 {
-    static int ManhattanDistance(Coord current, Coord target)
+    public static int ManhattanDistance(Coord current, Coord target)
     {
         return Math.Abs(current.r - target.r) + Math.Abs(current.c - target.c);
     }

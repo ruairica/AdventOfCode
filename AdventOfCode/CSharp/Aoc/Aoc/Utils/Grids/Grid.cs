@@ -1,6 +1,4 @@
-﻿using Dumpify;
-using static Aoc.Tasks2023;
-
+﻿
 namespace Aoc.Utils.Grids;
 
 public class Grid<T>
@@ -222,7 +220,7 @@ public class Grid<T>
         this.Transpose();
     }   
 
-    private static Grid<T> CopyGrid(Grid<T> grid)
+    public static Grid<T> CopyGrid(Grid<T> grid)
     {
         var resultGrid = new Grid<T>(
             Enumerable.Range(0, grid.Height)

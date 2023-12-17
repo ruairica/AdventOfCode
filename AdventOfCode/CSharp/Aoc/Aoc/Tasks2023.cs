@@ -17,6 +17,8 @@ using NUnit.Framework.Constraints;
 using Spectre.Console;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Schema;
+using System.Net.Http.Headers;
+using FluentAssertions.Formatting;
 
 namespace Aoc;
 
@@ -1169,7 +1171,6 @@ public class Tasks2023
             var brokens = seq.GetNums();
 
             var result = generatePermutations(pattern);
-            // foreach line in result, check if it matches the brokens
 
             var variations = result.Count(x => MatchesBrokens(x, brokens));
             total += variations;
@@ -2034,5 +2035,25 @@ public class Tasks2023
         }
 
         highScore.Dump();
+    }
+
+    [Test]
+    public void day17_1_2023()
+    {
+        var grid = new Grid<int>(FP.ReadAsGrid($"{basePath}/day17.txt"));
+
+        var starting = new Coord(0, 0);
+        var end = new Coord(grid.Height - 1, grid.Width - 1);
+        grid.Print();
+        grid.Height.Dump();
+        grid.Width.Dump();
+
+
+        // var result = AStarAlgorithm2.AStar(grid, starting, end, Dir.Down);
+        var result2 = AStarAlgorithm2.AStar(grid, starting, end, Dir.Right);
+
+
+        //result.Dump();
+        result2.Dump();
     }
 }

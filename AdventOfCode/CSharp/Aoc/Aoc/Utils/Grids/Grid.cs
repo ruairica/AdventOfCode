@@ -195,6 +195,33 @@ public class Grid<T>
         return resultGrid;
     }
 
+    public void Transpose()
+    {
+        var resultGrid = new Grid<T>(
+            Enumerable.Range(0, this.Width)
+                .Select(
+                    x => Enumerable.Range(0, this.Height)
+                        .Select(y => this.grid[y][x])
+                        .ToList())
+                .ToList());
+
+        this.grid = resultGrid.grid;
+        this.Width = resultGrid.Width;
+        this.Height = resultGrid.Height;
+    }
+
+    public void Rotate90ClockWise()
+    {
+        this.Transpose();
+        this.grid.ForEach(x => x.Reverse());
+    }
+
+    public void Rotate90Counterclockwise()
+    {
+        this.grid.ForEach(x => x.Reverse());
+        this.Transpose();
+    }   
+
     private static Grid<T> CopyGrid(Grid<T> grid)
     {
         var resultGrid = new Grid<T>(

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.Reflection.Metadata.Ecma335;
+using System.Text.Json.Nodes;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks.Dataflow;
 using Aoc.Utils;
@@ -14,6 +16,7 @@ using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using Spectre.Console;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Schema;
 
 namespace Aoc;
 
@@ -1153,6 +1156,273 @@ public class Tasks2023
     }
 
     [Test]
+    public void day12_1_2023()
+    {
+        var total = 0; 
+        var lines= FP.ReadFile($"{basePath}/day12.txt").Split("\n");
+
+        const char operational = '.';
+        const char damaged = '#';
+        foreach (var line in lines)
+        {
+            var (pattern, seq) = line.Split(" ");
+            var brokens = seq.GetNums();
+
+            var result = generatePermutations(pattern);
+            // foreach line in result, check if it matches the brokens
+
+            var variations = result.Count(x => MatchesBrokens(x, brokens));
+            total += variations;
+        }
+
+        total.Dump();
+
+        static bool MatchesBrokens(string line, List<int> b)
+        {
+            var bCopy = b.ConvertAll(x => x);
+
+            line += "."; // add padding so it always ends with an operational
+
+            var toMatch = bCopy.Pop(0);
+
+            var inMatch = false;
+            var matchCount = 0;
+            var finishedMatching = false;
+
+            var matchesFound = 0;
+            foreach (var (letter, index) in line.Enumerate())
+            {
+                if (letter == damaged && !inMatch)
+                {
+                    inMatch = true;
+                    matchCount += 1;
+
+                }
+                else if (letter == damaged && inMatch)
+                {
+                    matchCount += 1;
+                }
+                else if (letter == operational && inMatch)
+                {
+                    inMatch = false;
+
+                    if (matchCount != toMatch)
+                    {
+                        return false;
+                    }
+
+                    matchesFound += 1;
+                    matchCount = 0;
+
+                    if (bCopy.Count == 0 && line.IndexOf(damaged, index + 1) != -1)
+                    {
+                        return false;
+                    }
+
+                    if (bCopy.Count == 0 && line.IndexOf(damaged, index + 1) == -1)
+                    {
+
+                        return true;
+                    }
+                    if (bCopy.Count > 0)
+                    {
+                        toMatch = bCopy.Pop(0);
+                    }
+
+                }
+            }
+
+            if (matchesFound == b.Count && !inMatch)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        
+
+        static List<string> generatePermutations(string input)
+        {
+            List<string> result = new List<string>();
+            generatePermutationsHelper(input.ToCharArray(), 0, result);
+            return result;
+        }
+
+        static void generatePermutationsHelper(char[] chars, int index, List<string> result)
+        {
+            if (index == chars.Length)
+            {
+                result.Add(new string(chars));
+                return;
+            }
+
+            if (chars[index] == '?')
+            {
+                chars[index] = '.';
+                generatePermutationsHelper(chars, index + 1, result);
+
+                chars[index] = '#';
+                generatePermutationsHelper(chars, index + 1, result);
+
+                // Reset to '?' for backtracking
+                chars[index] = '?';
+            }
+            else
+            {
+                generatePermutationsHelper(chars, index + 1, result);
+            }
+        }
+    }
+
+    [Test] // TODO
+    public void day12_2_2023()
+    {
+        var total = 0;
+        var lines = FP.ReadFile($"{basePath}/day12.txt").Split("\n");
+
+        const char operational = '.';
+        const char damaged = '#';
+        var cache = new Dictionary<string, bool>();
+
+        foreach (var line in lines.Skip(1))
+        {
+            var (pattern, seq) = line.Split(" ");
+
+            var newPattern = string.Join('?', Enumerable.Repeat(0, 5).Select(_ => pattern));
+
+            var brokensString = string.Join(',', Enumerable.Repeat(0, 5).Select(_ => seq));
+            var brokens = brokensString.GetNums();
+            var permutations = generatePermutations(newPattern);
+            // foreach line in result, check if it matches the brokens
+
+            var variations = 0;
+
+            foreach (var p in permutations)
+            {
+                if (cache.TryGetValue(p + brokensString, out var result))
+                {
+                    if (result)
+                    {
+                        variations += 1;
+                    }
+                }
+                else
+                { 
+                    var matches = MatchesBrokens(p, brokens);
+                    cache.Add(p + brokensString, matches);
+
+                    if (matches)
+                    {
+                        variations += 1;
+                    }
+                
+                }
+            }
+
+            total += variations;
+            break;
+        }
+
+        total.Dump();
+
+        static bool MatchesBrokens(string line, List<int> b)
+        {
+            var bCopy = b.ConvertAll(x => x);
+
+            line += "."; // add padding so it always ends with an operational
+
+            var toMatch = bCopy.Pop(0);
+
+            var inMatch = false;
+            var matchCount = 0;
+            var finishedMatching = false;
+
+            var matchesFound = 0;
+            foreach (var (letter, index) in line.Enumerate())
+            {
+                if (letter == damaged && !inMatch)
+                {
+                    inMatch = true;
+                    matchCount += 1;
+
+                }
+                else if (letter == damaged && inMatch)
+                {
+                    matchCount += 1;
+                }
+                else if (letter == operational && inMatch)
+                {
+                    inMatch = false;
+
+                    if (matchCount != toMatch)
+                    {
+                        return false;
+                    }
+
+                    matchesFound += 1;
+                    matchCount = 0;
+
+                    if (bCopy.Count == 0 && line.IndexOf(damaged, index + 1) != -1)
+                    {
+                        return false;
+                    }
+
+                    if (bCopy.Count == 0 && line.IndexOf(damaged, index + 1) == -1)
+                    {
+
+                        return true;
+                    }
+                    if (bCopy.Count > 0)
+                    {
+                        toMatch = bCopy.Pop(0);
+                    }
+
+                }
+            }
+
+            if (matchesFound == b.Count && !inMatch)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
+        static List<string> generatePermutations(string input)
+        {
+            List<string> result = new List<string>();
+            generatePermutationsHelper(input.ToCharArray(), 0, result);
+            return result;
+        }
+
+        static void generatePermutationsHelper(char[] chars, int index, List<string> result)
+        {
+            if (index == chars.Length)
+            {
+                result.Add(new string(chars));
+                return;
+            }
+
+            if (chars[index] == '?')
+            {
+                chars[index] = '.';
+                generatePermutationsHelper(chars, index + 1, result);
+
+                chars[index] = '#';
+                generatePermutationsHelper(chars, index + 1, result);
+
+                // Reset to '?' for backtracking
+                chars[index] = '?';
+            }
+            else
+            {
+                generatePermutationsHelper(chars, index + 1, result);
+            }
+        }
+    }
+
+    [Test]
     public void day13_1_2023()
     {
         var sections = FP.ReadFile($"{basePath}/day13.txt").Split("\n\n");
@@ -1464,52 +1734,115 @@ public class Tasks2023
                     var place = range.FindIndex(x => grid[x] == '#' || grid[x] == 'O');
                     if (place == -1)
                     {
-                        var nc = new Coord(0, c);
-
-                        if (c == 0)
-                        {
-                            $"p=-1 current is {cc}, and new is {nc}".Dump();
-                        }
-
                         if (r == 0)
                         {
                             continue;
                         }
 
-                        grid[nc] = 'O';
+                        grid[new Coord(0, c)] = 'O';
                         grid[cc] = '.';
                     }
                     else if (place > 0)
                     {
-                        var nc = range[place - 1];
-
-                        if (c == 0)
-                        {
-                            $"p>0 current is {cc}, and new is {nc}".Dump();
-                        }
-
-                        grid[nc] = 'O';
+                        grid[range[place - 1]] = 'O';
                         grid[cc] = '.';
-                    }
-                    else
-                    {
-                        if (c == 0)
-                        {
-                            $"no change {cc}".Dump();
-                        }
                     }
                 }
             }
         }
-
-        grid.Print();
-
-        var poi = grid.WhereWithCoord((ch, _) => ch == 'O')
+        
+        grid.WhereWithCoord((ch, _) => ch == 'O')
             .Select(x => grid.Height - x.Coord.r)
-            .Sum();
+            .Sum()
+            .Dump();
+    }
 
-        poi.Dump();
+    [Test] //TODO
+    public void day14_2_2023()
+    {
 
+        int cycleCount = 0;
+
+        var grid = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day14.txt"));
+
+        var loadOnNorth = new List<(int load, int cycleNumber)>();
+
+        var seen = new Dictionary<string, int>();
+        while (true)
+        {
+            cycleCount += 1;
+
+            foreach (var dir in new List<Dir> { Dir.Up, Dir.Left, Dir.Down, Dir.Right })
+            {
+                if (cycleCount == 1 && dir == Dir.Up)
+                {
+                    // don't rotate
+                    "didn't transpose".Dump();
+                }
+                else
+                {
+                    "transposed".Dump();
+                    grid.Rotate90ClockWise();
+                }
+                for (int r = 0; r < grid.Height; r++)
+                {
+                    for (var c = 0; c < grid.Width; c++)
+                    {
+                        var cc = new Coord(r, c);
+                        var letter = grid[cc];
+
+                        if (letter == 'O')
+                        {
+                            var range = Enumerable.Range(0, r)
+                                .Select(x => new Coord(x, c))
+                                .Reverse()
+                                .ToList();
+
+                            var place = range.FindIndex(x => grid[x] == '#' || grid[x] == 'O');
+                            if (place == -1)
+                            {
+                                if (r == 0)
+                                {
+                                    continue;
+                                }
+
+                                grid[new Coord(0, c)] = 'O';
+                                grid[cc] = '.';
+                            }
+                            else if (place > 0)
+                            {
+                                grid[range[place - 1]] = 'O';
+                                grid[cc] = '.';
+                            }
+                        }
+                    }
+                }
+
+                loadOnNorth.Add(
+                    (grid.WhereWithCoord((ch, _) => ch == 'O')
+                        .Select(x => grid.Height - x.Coord.r)
+                        .Sum(), cycleCount));
+            }
+
+            var serialized = JsonSerializer.Serialize(grid);
+
+            var found = seen.GetValueOrDefault(serialized);
+
+            if (found != default && cycleCount > 1)
+            {
+                $"FOUND at {found} during {cycleCount}".Dump();
+                break;
+            }
+
+            seen.Add(serialized, cycleCount);
+            if (cycleCount == 50)
+            {
+                break;
+            }
+            break;
+        }
+        
+        grid.Print();
     }
 
     [Test]

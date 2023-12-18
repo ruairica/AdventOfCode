@@ -2112,36 +2112,30 @@ public class Tasks2023
         long pathCount = 0;
         foreach (var line in lines)
         {
-            var parts = line.Split(" ");
             var last = corners.Last();
-            var hexNumber = parts[2][2..^1];
+            var hexNumber = line.Split(" ")[2][2..^1];
             long dist = long.Parse(hexNumber[..^1], System.Globalization.NumberStyles.HexNumber);
             var direction = hexNumber[^1].ToString();
-            
-
-            var rowMultiplier = direction switch
-            {
-                "3" => -1,
-                "1" => 1,
-                _ => 0
-            };
-
-            var colMultiplier = direction switch
-            {
-                "2" => -1,
-                "0" => 1,
-                _ => 0
-            };
 
             corners.Add(
                 new CoordL(
-                    last.r + rowMultiplier * dist,
-                    last.c + colMultiplier * dist));
+                    last.r + direction switch
+                    {
+                        "3" => -1,
+                        "1" => 1,
+                        _ => 0
+                    } * dist,
+                    last.c + direction switch
+                    {
+                        "2" => -1,
+                        "0" => 1,
+                        _ => 0
+                    } * dist));
 
             pathCount += dist;
         }
 
-        var internalPoints = corners.ToList().CalculateShoelaceArea() - ((double)pathCount / 2) + 1;
+        var internalPoints = corners.CalculateShoelaceArea() - ((double)pathCount / 2) + 1;
         (internalPoints + pathCount).Dump();
     }
 }

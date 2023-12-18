@@ -1161,11 +1161,12 @@ public class Tasks2023
     [Test]
     public void day12_1_2023()
     {
-        var total = 0; 
-        var lines= FP.ReadFile($"{basePath}/day12.txt").Split("\n");
+        var total = 0;
+        var lines = FP.ReadFile($"{basePath}/day12.txt").Split("\n");
 
         const char operational = '.';
         const char damaged = '#';
+
         foreach (var line in lines)
         {
             var (pattern, seq) = line.Split(" ");
@@ -1192,13 +1193,13 @@ public class Tasks2023
             var finishedMatching = false;
 
             var matchesFound = 0;
+
             foreach (var (letter, index) in line.Enumerate())
             {
                 if (letter == damaged && !inMatch)
                 {
                     inMatch = true;
                     matchCount += 1;
-
                 }
                 else if (letter == damaged && inMatch)
                 {
@@ -1223,14 +1224,13 @@ public class Tasks2023
 
                     if (bCopy.Count == 0 && line.IndexOf(damaged, index + 1) == -1)
                     {
-
                         return true;
                     }
+
                     if (bCopy.Count > 0)
                     {
                         toMatch = bCopy.Pop(0);
                     }
-
                 }
             }
 
@@ -1241,20 +1241,24 @@ public class Tasks2023
 
             return false;
         }
-        
 
         static List<string> generatePermutations(string input)
         {
             List<string> result = new List<string>();
             generatePermutationsHelper(input.ToCharArray(), 0, result);
+
             return result;
         }
 
-        static void generatePermutationsHelper(char[] chars, int index, List<string> result)
+        static void generatePermutationsHelper(
+            char[] chars,
+            int index,
+            List<string> result)
         {
             if (index == chars.Length)
             {
                 result.Add(new string(chars));
+
                 return;
             }
 
@@ -1290,9 +1294,14 @@ public class Tasks2023
         {
             var (pattern, seq) = line.Split(" ");
 
-            var newPattern = string.Join('?', Enumerable.Repeat(0, 5).Select(_ => pattern));
+            var newPattern = string.Join(
+                '?',
+                Enumerable.Repeat(0, 5).Select(_ => pattern));
 
-            var brokensString = string.Join(',', Enumerable.Repeat(0, 5).Select(_ => seq));
+            var brokensString = string.Join(
+                ',',
+                Enumerable.Repeat(0, 5).Select(_ => seq));
+
             var brokens = brokensString.GetNums();
             var permutations = generatePermutations(newPattern);
             // foreach line in result, check if it matches the brokens
@@ -1309,7 +1318,7 @@ public class Tasks2023
                     }
                 }
                 else
-                { 
+                {
                     var matches = MatchesBrokens(p, brokens);
                     cache.Add(p + brokensString, matches);
 
@@ -1317,11 +1326,11 @@ public class Tasks2023
                     {
                         variations += 1;
                     }
-                
                 }
             }
 
             total += variations;
+
             break;
         }
 
@@ -1340,13 +1349,13 @@ public class Tasks2023
             var finishedMatching = false;
 
             var matchesFound = 0;
+
             foreach (var (letter, index) in line.Enumerate())
             {
                 if (letter == damaged && !inMatch)
                 {
                     inMatch = true;
                     matchCount += 1;
-
                 }
                 else if (letter == damaged && inMatch)
                 {
@@ -1371,14 +1380,13 @@ public class Tasks2023
 
                     if (bCopy.Count == 0 && line.IndexOf(damaged, index + 1) == -1)
                     {
-
                         return true;
                     }
+
                     if (bCopy.Count > 0)
                     {
                         toMatch = bCopy.Pop(0);
                     }
-
                 }
             }
 
@@ -1390,19 +1398,23 @@ public class Tasks2023
             return false;
         }
 
-
         static List<string> generatePermutations(string input)
         {
             List<string> result = new List<string>();
             generatePermutationsHelper(input.ToCharArray(), 0, result);
+
             return result;
         }
 
-        static void generatePermutationsHelper(char[] chars, int index, List<string> result)
+        static void generatePermutationsHelper(
+            char[] chars,
+            int index,
+            List<string> result)
         {
             if (index == chars.Length)
             {
                 result.Add(new string(chars));
+
                 return;
             }
 
@@ -1734,6 +1746,7 @@ public class Tasks2023
                         .ToList();
 
                     var place = range.FindIndex(x => grid[x] == '#' || grid[x] == 'O');
+
                     if (place == -1)
                     {
                         if (r == 0)
@@ -1752,7 +1765,7 @@ public class Tasks2023
                 }
             }
         }
-        
+
         grid.WhereWithCoord((ch, _) => ch == 'O')
             .Select(x => grid.Height - x.Coord.r)
             .Sum()
@@ -1762,7 +1775,6 @@ public class Tasks2023
     [Test] //TODO
     public void day14_2_2023()
     {
-
         int cycleCount = 0;
 
         var grid = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day14.txt"));
@@ -1770,6 +1782,7 @@ public class Tasks2023
         var loadOnNorth = new List<(int load, int cycleNumber)>();
 
         var seen = new Dictionary<string, int>();
+
         while (true)
         {
             cycleCount += 1;
@@ -1786,6 +1799,7 @@ public class Tasks2023
                     "transposed".Dump();
                     grid.Rotate90ClockWise();
                 }
+
                 for (int r = 0; r < grid.Height; r++)
                 {
                     for (var c = 0; c < grid.Width; c++)
@@ -1800,7 +1814,9 @@ public class Tasks2023
                                 .Reverse()
                                 .ToList();
 
-                            var place = range.FindIndex(x => grid[x] == '#' || grid[x] == 'O');
+                            var place = range.FindIndex(
+                                x => grid[x] == '#' || grid[x] == 'O');
+
                             if (place == -1)
                             {
                                 if (r == 0)
@@ -1821,9 +1837,8 @@ public class Tasks2023
                 }
 
                 loadOnNorth.Add(
-                    (grid.WhereWithCoord((ch, _) => ch == 'O')
-                        .Select(x => grid.Height - x.Coord.r)
-                        .Sum(), cycleCount));
+                    (grid.WhereWithCoord((ch, _) => ch == 'O').Select(x => grid.Height - x.Coord.r).Sum(),
+                        cycleCount));
             }
 
             var serialized = JsonSerializer.Serialize(grid);
@@ -1833,17 +1848,20 @@ public class Tasks2023
             if (found != default && cycleCount > 1)
             {
                 $"FOUND at {found} during {cycleCount}".Dump();
+
                 break;
             }
 
             seen.Add(serialized, cycleCount);
+
             if (cycleCount == 50)
             {
                 break;
             }
+
             break;
         }
-        
+
         grid.Print();
     }
 
@@ -2049,10 +2067,8 @@ public class Tasks2023
         grid.Height.Dump();
         grid.Width.Dump();
 
-
         // var result = AStarAlgorithm2.AStar(grid, starting, end, Dir.Down);
         var result2 = AStarAlgorithm2.AStar(grid, starting, end, Dir.Right);
-
 
         //result.Dump();
         result2.Dump();
@@ -2065,6 +2081,7 @@ public class Tasks2023
         var path = new List<Coord> { new(0, 0) };
 
         var corners = new List<Coord>();
+
         foreach (var line in lines)
         {
             var parts = line.Split(" ");
@@ -2072,25 +2089,21 @@ public class Tasks2023
             var dist = int.Parse(parts[1]);
             var last = path.Last();
 
-            var rowMultiplier = dir switch
-            {
-                "U" => -1,
-                "D" => 1,
-                _ => 0
-            };
-
-            var colMultiplier = dir switch
-            {
-                "L" => -1,
-                "R" => 1,
-                _ => 0
-            };
-
             var newCoords = Enumerable.Range(1, dist)
                 .Select(
                     x => new Coord(
-                        last.r + (rowMultiplier * x),
-                        last.c + (colMultiplier * x)))
+                        last.r + dir switch
+                        {
+                            "U" => -1,
+                            "D" => 1,
+                            _ => 0
+                        } * x,
+                        last.c + dir switch
+                        {
+                            "L" => -1,
+                            "R" => 1,
+                            _ => 0
+                        } * x))
                 .ToList();
 
             corners.Add(newCoords.Last());
@@ -2098,9 +2111,12 @@ public class Tasks2023
             path.AddRange(newCoords);
         }
 
-        path = path.Distinct().ToList();
-        var internalPoints = corners.ToList().CalculateShoelaceArea() - ((double)path.Count / 2) + 1;
-        (internalPoints + path.Count).Dump();
+        var pathCount = path.Distinct().Count();
+
+        var internalPoints = corners.ToList().CalculateShoelaceArea() -
+            ((double)pathCount / 2) + 1;
+
+        (internalPoints + pathCount).Dump();
     }
 
     [Test]
@@ -2108,13 +2124,18 @@ public class Tasks2023
     {
         var lines = FP.ReadFile($"{basePath}/day18.txt").Split("\n");
 
-        var corners = new List<CoordL>() { new (0,0)};
+        var corners = new List<CoordL>() { new(0, 0) };
         long pathCount = 0;
+
         foreach (var line in lines)
         {
             var last = corners.Last();
             var hexNumber = line.Split(" ")[2][2..^1];
-            long dist = long.Parse(hexNumber[..^1], System.Globalization.NumberStyles.HexNumber);
+
+            long dist = long.Parse(
+                hexNumber[..^1],
+                System.Globalization.NumberStyles.HexNumber);
+
             var direction = hexNumber[^1].ToString();
 
             corners.Add(
@@ -2135,7 +2156,9 @@ public class Tasks2023
             pathCount += dist;
         }
 
-        var internalPoints = corners.CalculateShoelaceArea() - ((double)pathCount / 2) + 1;
+        var internalPoints =
+            corners.CalculateShoelaceArea() - ((double)pathCount / 2) + 1;
+
         (internalPoints + pathCount).Dump();
     }
 }

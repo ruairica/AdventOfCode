@@ -8,7 +8,7 @@ public static class AStarAlgorithm2
 {
     public static int ManhattanDistance(Coord current, Coord target)
     {
-        return Math.Abs(current.r - target.r) + Math.Abs(current.c - target.c);
+        return 0;// Math.Abs(current.r - target.r) + Math.Abs(current.c - target.c);
     }
 
     public static int AStar(Grid<int> grid, Coord start, Coord target, Dir dir)

@@ -19,6 +19,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Schema;
 using System.Net.Http.Headers;
 using FluentAssertions.Formatting;
+using System.Reflection;
 
 namespace Aoc;
 
@@ -2055,5 +2056,92 @@ public class Tasks2023
 
         //result.Dump();
         result2.Dump();
+    }
+
+    [Test]
+    public void day18_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day18.txt").Split("\n");
+        var path = new List<Coord> { new(0, 0) };
+
+        var corners = new List<Coord>();
+        foreach (var line in lines)
+        {
+            var parts = line.Split(" ");
+            var dir = parts[0];
+            var dist = int.Parse(parts[1]);
+            var last = path.Last();
+
+            var rowMultiplier = dir switch
+            {
+                "U" => -1,
+                "D" => 1,
+                _ => 0
+            };
+
+            var colMultiplier = dir switch
+            {
+                "L" => -1,
+                "R" => 1,
+                _ => 0
+            };
+
+            var newCoords = Enumerable.Range(1, dist)
+                .Select(
+                    x => new Coord(
+                        last.r + (rowMultiplier * x),
+                        last.c + (colMultiplier * x)))
+                .ToList();
+
+            corners.Add(newCoords.Last());
+
+            path.AddRange(newCoords);
+        }
+
+        path = path.Distinct().ToList();
+        var internalPoints = corners.ToList().CalculateShoelaceArea() - ((double)path.Count / 2) + 1;
+        (internalPoints + path.Count).Dump();
+    }
+
+    [Test]
+    public void day18_2_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day18.txt").Split("\n");
+
+        var corners = new List<CoordL>() { new (0,0)};
+        long pathCount = 0;
+        foreach (var line in lines)
+        {
+            var parts = line.Split(" ");
+            var last = corners.Last();
+            var hexNumber = parts[2][2..^1];
+            long dist = long.Parse(hexNumber[..^1], System.Globalization.NumberStyles.HexNumber);
+            var direction = hexNumber[^1].ToString();
+            
+
+            var rowMultiplier = direction switch
+            {
+                "3" => -1,
+                "1" => 1,
+                _ => 0
+            };
+
+            var colMultiplier = direction switch
+            {
+                "2" => -1,
+                "0" => 1,
+                _ => 0
+            };
+
+            corners.Add(
+                new CoordL(
+                    last.r + rowMultiplier * dist,
+                    last.c + colMultiplier * dist));
+
+            pathCount += dist;
+        }
+
+        var internalPoints = corners.ToList().CalculateShoelaceArea() - ((double)pathCount / 2) + 1;
+        (internalPoints + pathCount).Dump();
     }
 }

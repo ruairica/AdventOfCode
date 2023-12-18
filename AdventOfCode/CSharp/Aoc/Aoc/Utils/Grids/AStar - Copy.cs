@@ -71,9 +71,7 @@ public static class AStarAlgorithm2
                 strings.Reverse();
                 strings.ForEach(x => x.Dump());
 
-                finalG.Add(current.G);
-
-                continue;
+                return current.G;
             }
 
             // var neighbourCoords = grid
@@ -82,12 +80,12 @@ public static class AStarAlgorithm2
 
             var neighbourCoords = new Coord(current.Row, current.Column)
                 .GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height)
-                .Where(c => !closed.Contains((c.coord, c.dir))).ToList();
+                .ToList();
 
             if (current.Dir == current.Parent?.Dir &&
                 current.Parent?.Dir == current.Parent?.Parent?.Dir)
             {
-                $"max line lenght===================================== {current.Dir}, {current.Parent?.Dir}, {current.Parent?.Parent?.Dir}".Dump();
+                //$"max line lenght===================================== {current.Dir}, {current.Parent?.Dir}, {current.Parent?.Parent?.Dir}".Dump();
                 if (current.Dir is Dir.Down or Dir.Up)
                 {
                                         neighbourCoords = neighbourCoords.Where(x => x.dir is Dir.Left or Dir.Right)
@@ -116,10 +114,10 @@ public static class AStarAlgorithm2
             // get neighbor coords,
             // check parent for direction by looking at parent,
             // check straight count, to see if you can go forwards,
-            $"--current: {current.Row}, {current.Column}. {current.Dir}".Dump();
-            foreach (var item in neighbourCoords)
+            //$"--current: {current.Row}, {current.Column}. {current.Dir}".Dump();
+            //foreach (var item in neighbourCoords)
             {
-                $"---  valid neighbour : {item.coord.r}, {item.coord.c}. {item.dir}".Dump();
+               // $"---  valid neighbour : {item.coord.r}, {item.coord.c}. {item.dir}".Dump();
             }
 
             foreach (var (nc, nd) in neighbourCoords)
@@ -127,15 +125,15 @@ public static class AStarAlgorithm2
                 var gScore = current.G + grid[nc];
 
                 var neighbour =
-                    openQ.FirstOrDefault(x => x.Row == nc.r && x.Column == nc.c && x.Dir == nd);
+                    openQ.FirstOrDefault(x => x.Row == nc.r && x.Column == nc.c);
 
                 if (neighbour is null)
                 {
                     if (current.Dir == nd && current.Parent?.Dir == nd &&
                         current.Parent?.Parent?.Dir == nd)
                     {
-                        $"{nc.r}, {nc.c} : had to continue past loop {current.Dir}, {current.Parent?.Dir}, {current.Parent?.Parent?.Dir}"
-                            .Dump();
+                        //$"{nc.r}, {nc.c} : had to continue past loop {current.Dir}, {current.Parent?.Dir}, {current.Parent?.Parent?.Dir}"
+                           // .Dump();
                         continue;
                     }
 
@@ -165,7 +163,7 @@ public static class AStarAlgorithm2
                         continue;
                     }
 
-                    $"---------------------updated {nc.r}, {nc.c}".Dump();
+                    //$"---------------------updated {nc.r}, {nc.c}".Dump();
                     neighbour.Dir = updatedDir;
                     neighbour.G = gScore;
                     neighbour.Parent = current;

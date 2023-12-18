@@ -24,7 +24,7 @@ public static class ListExtensions
     }
 
     //https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#C#
-    // gets area, includes
+    // gets area, includes, just verts, not edges.
     public static double CalculateShoelaceArea(this List<Coord> corners)
     {
         var n = corners.Count;
@@ -38,6 +38,22 @@ public static class ListExtensions
         }
 
         area = Math.Abs(area) / 2.0;
+        return area;
+    }
+
+    public static double CalculateShoelaceArea(this List<CoordL> corners)
+    {
+        var n = corners.Count;
+        long  area = 0;
+
+        for (var i = 0; i < n; i++)
+        {
+            var j = (i + 1) % n;
+            area += corners[i].r * corners[j].c;
+            area -= corners[j].r * corners[i].c;
+        }
+
+        area = Math.Abs(area) / 2;
         return area;
     }
 

@@ -2194,8 +2194,7 @@ public class Tasks2023
                     .ToList());
 
         acceptance.AddRange(
-            ratings
-                .Select(r => (r, processRating("in", r)))
+            ratings.Select(r => (r, processRating("in", r)))
                 .Where(r => r.Item2 == "A")
                 .Select(x => x.r));
 
@@ -2231,5 +2230,234 @@ public class Tasks2023
         List<Dictionary<string, int>> acceptance = new();
 
         var (WORKFLOWS, RATINGS) = FP.ReadFile($"{basePath}/day19.txt").Split("\n\n");
+    }
+
+    [Test]
+    public void day20_1_2023()
+    {
+        var lines = FP.ReadFile($"{basePath}/day20.txt").Split("\n");
+
+        var flipFlops = new Dictionary<string, bool>();
+        var sendTo = new Dictionary<string, List<string>>();
+
+
+        var conjunctions = new Dictionary<string, List<(string, bool)>>();
+
+        foreach (var line in lines)
+        {
+            if (line.StartsWith('%'))
+            {
+                var (from, to) = line.Split(" -> ").Select(x => x.Trim()).ToList();
+                flipFlops.Add(from[1..], false);
+                sendTo.Add(from[1..], to.Split(", ").ToList());
+            }
+            else if (line.StartsWith('&'))
+            {
+                var (from, to) = line.Split(" -> ").Select(x => x.Trim()).ToList();
+
+                conjunctions.Add(
+                    from[1..],
+                    new List<(string, bool)>());
+
+                sendTo.Add(from[1..], to.Split(", ").ToList());
+            }
+            else if (line.StartsWith("broadcaster"))
+            {
+                var (_, to) = line.Split(" -> ").Select(x => x.Trim()).ToList();
+                sendTo.Add("broadcaster", to.Split(", ").ToList());
+            }
+            else
+            {
+                line.Dump();
+                throw new Exception("failed to parse");
+            }
+        }
+
+        // anything that has a send to to a conjuction, needs to be in the conjuction values
+        foreach (var (k, v) in sendTo)
+        {
+            foreach (var dest in v)
+            {
+                if (conjunctions.ContainsKey(dest))
+                {
+                    conjunctions[dest].Add((k, false));
+                }
+            }
+        }
+
+        var q = new Queue<(string, bool, string)>();
+        long highs = 0;
+        long lows = 0;
+        foreach (var _ in Enumerable.Range(1, 1000))
+        {
+            //"====================".Dump();
+            q.Enqueue(("broadcaster", false, "button"));
+            while (q.Any())
+            {
+                
+                var (module, pulse, from) = q.Dequeue();
+                // $"{from} -> {pulse} -> {module}".Dump();
+                if (pulse)
+                {
+                    highs += 1;
+                }
+                else
+                {
+                    lows += 1;
+                }
+
+                if (flipFlops.ContainsKey(module))
+                {
+                    if (pulse)
+                    {
+                        continue;
+                    }
+
+                    var invert = !flipFlops[module];
+                    flipFlops[module] = invert;
+                    sendTo[module].ForEach(x => q.Enqueue((x, invert, module)));
+                }
+                else if (conjunctions.ContainsKey(module))
+                {
+                    var index = conjunctions[module].FindIndex(x => x.Item1 == from);
+
+                    if (index == -1)
+                    {
+                        throw new Exception("invalid index");
+                    }
+                    conjunctions[module][index] = (conjunctions[module][index].Item1, pulse);
+
+                    var allHigh = conjunctions[module].All(x => x.Item2);
+
+                    foreach (var s in sendTo[module])
+                    {
+                        q.Enqueue((s, !allHigh, module));
+                    }
+                }
+                else if (module == "broadcaster")
+                {
+                    foreach (var dest in sendTo[module])
+                    {
+                        q.Enqueue((dest, pulse, "broadcaster"));
+                    }
+                }
+            }
+        }
+
+        lows.Dump();
+        highs.Dump();
+
+
+        (lows * highs).Dump();
+    }
+
+    [Test]
+    public void day20_2_2023() // TODO
+    {
+        var lines = FP.ReadFile($"{basePath}/day20.txt").Split("\n");
+
+        var flipFlops = new Dictionary<string, bool>();
+        var sendTo = new Dictionary<string, List<string>>();
+        var conjunctions = new Dictionary<string, List<(string, bool)>>();
+
+        foreach (var line in lines)
+        {
+            if (line.StartsWith('%'))
+            {
+                var (from, to) = line.Split(" -> ").Select(x => x.Trim()).ToList();
+                flipFlops.Add(from[1..], false);
+                sendTo.Add(from[1..], to.Split(", ").ToList());
+            }
+            else if (line.StartsWith('&'))
+            {
+                var (from, to) = line.Split(" -> ").Select(x => x.Trim()).ToList();
+
+                conjunctions.Add(
+                    from[1..],
+                    new List<(string, bool)>());
+
+                sendTo.Add(from[1..], to.Split(", ").ToList());
+            }
+            else if (line.StartsWith("broadcaster"))
+            {
+                var (_, to) = line.Split(" -> ").Select(x => x.Trim()).ToList();
+                sendTo.Add("broadcaster", to.Split(", ").ToList());
+            }
+            else
+            {
+                line.Dump();
+                throw new Exception("failed to parse");
+            }
+        }
+
+        // anything that has a send to to a conjuction, needs to be in the conjuction values
+        foreach (var (k, v) in sendTo)
+        {
+            foreach (var dest in v)
+            {
+                if (conjunctions.ContainsKey(dest))
+                {
+                    conjunctions[dest].Add((k, false));
+                }
+            }
+        }
+
+        var q = new Queue<(string, bool, string)>();
+        long highs = 0;
+        long lows = 0;
+        foreach (var press in Enumerable.Range(1, 10_000_000_00))
+        {
+            //"====================".Dump();
+            q.Enqueue(("broadcaster", false, "button"));
+            while (q.Any())
+            {
+
+                var (module, pulse, from) = q.Dequeue();
+                // $"{from} -> {pulse} -> {module}".Dump();
+                if (module == "rx" && !pulse)
+                {
+                    press.Dump();
+                    return;
+                }
+
+                if (flipFlops.ContainsKey(module))
+                {
+                    if (pulse)
+                    {
+                        continue;
+                    }
+
+                    var invert = !flipFlops[module];
+                    flipFlops[module] = invert;
+                    sendTo[module].ForEach(x => q.Enqueue((x, invert, module)));
+                }
+                else if (conjunctions.ContainsKey(module))
+                {
+                    var index = conjunctions[module].FindIndex(x => x.Item1 == from);
+
+                    if (index == -1)
+                    {
+                        throw new Exception("invalid index");
+                    }
+                    conjunctions[module][index] = (conjunctions[module][index].Item1, pulse);
+
+                    var allHigh = conjunctions[module].All(x => x.Item2);
+
+                    foreach (var s in sendTo[module])
+                    {
+                        q.Enqueue((s, !allHigh, module));
+                    }
+                }
+                else if (module == "broadcaster")
+                {
+                    foreach (var dest in sendTo[module])
+                    {
+                        q.Enqueue((dest, pulse, "broadcaster"));
+                    }
+                }
+            }
+        }
+
+        "Didn't find".Dump();
     }
 }

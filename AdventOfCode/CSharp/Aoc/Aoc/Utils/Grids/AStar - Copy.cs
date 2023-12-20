@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.ComponentModel.Design;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Dumpify;
 
@@ -8,19 +9,19 @@ public static class AStarAlgorithm2
 {
     public static int ManhattanDistance(Coord current, Coord target)
     {
-        return 0;// Math.Abs(current.r - target.r) + Math.Abs(current.c - target.c);
+        return 1;// Math.Abs(current.r - target.r) + Math.Abs(current.c - target.c);
     }
 
     public static int AStar(Grid<int> grid, Coord start, Coord target, Dir dir)
     {
-        HashSet<(Coord, Dir?)> closed = new();
+        HashSet<(Coord, Dir?, int)> closed = new();
         var finalG = new List<int>();
         var openQ = new List<AStarNode2>
         {
             new AStarNode2(
                 start.r,
                 start.c,
-                dir,
+                0,
                 0,
                 ManhattanDistance(start, target),
                 parent: null)
@@ -37,7 +38,7 @@ public static class AStarAlgorithm2
             for (var i = 1; i < openQ.Count; i++)
             {
                 if (openQ[i].F < current.F ||
-                    (openQ[i].F == current.F && openQ[i].H < current.H))
+                    (openQ[i].F == current.F && openQ[i].LineLength < current.LineLength))
                 {
                     current = openQ[i];
                     currentIndex = i;
@@ -46,8 +47,15 @@ public static class AStarAlgorithm2
 
             openQ.RemoveAt(currentIndex);
 
-            closed.Add((new Coord(current.Row, current.Column), current.Dir));
-            $"processing {current.Row}, {current.Column}, {current.Dir}".Dump();
+            if (closed.Contains(
+                    (new Coord(current.Row, current.Column), current.Dir,
+                        current.LineLength)))
+            {
+                continue;
+            }
+
+            closed.Add((new Coord(current.Row, current.Column), current.Dir, current.LineLength));
+            $"processing {current.Row}, {current.Column}, {current.Dir}, {current.LineLength}, {current.G}".Dump();
 
             if (current.Row == target.r && current.Column == target.c)
             {
@@ -55,11 +63,13 @@ public static class AStarAlgorithm2
 
                 var strings = new List<string>();
 
+                var t = new List<(int, int)>();
                 while (true)
                 {
                     strings.Add(
                         $"r:{printing.Row}, c:{printing.Column}, d:{printing.Dir}, g:{printing.G}");
 
+                    t.Add((printing.Row, printing.Column));
                     printing = printing.Parent;
 
                     if (printing is null)
@@ -70,8 +80,19 @@ public static class AStarAlgorithm2
 
                 strings.Reverse();
                 strings.ForEach(x => x.Dump());
+                finalG.Add(current.G);
 
-                return current.G;
+                foreach (var a in t)
+                {
+                    grid.grid[a.Item1][a.Item2] = 0;
+                }
+                break;
+
+                //grid.Print();
+
+                openQ.ForEach(x => $"{x.Row}, {x.Column}".Dump());
+
+                continue;
             }
 
             // var neighbourCoords = grid
@@ -82,18 +103,23 @@ public static class AStarAlgorithm2
                 .GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height)
                 .ToList();
 
-            if (current.Dir == current.Parent?.Dir &&
-                current.Parent?.Dir == current.Parent?.Parent?.Dir)
+
+            var nl = new List<(Coord, Dir, int)>();
+            if (current.LineLength == 2)
             {
-                //$"max line lenght===================================== {current.Dir}, {current.Parent?.Dir}, {current.Parent?.Parent?.Dir}".Dump();
+                $"max line lenght===================================== {current.Dir}, {current.Parent?.Dir}, {current.Parent?.Parent?.Dir}".Dump();
                 if (current.Dir is Dir.Down or Dir.Up)
                 {
-                                        neighbourCoords = neighbourCoords.Where(x => x.dir is Dir.Left or Dir.Right)
+                    nl = neighbourCoords
+                        .Where(x => x.dir is Dir.Left or Dir.Right)
+                        .Select(x => (x.coord,x.dir, 0))
                         .ToList();
                 }
                 else
                 {
-                    neighbourCoords = neighbourCoords.Where(x => x.dir is Dir.Down or Dir.Up)
+                    nl = neighbourCoords.Where(x => x.dir is Dir.Down or Dir.Up)
+                        .Select(x => (x.coord, x.dir, 0))
+
                         .ToList();
                 }
             }
@@ -107,7 +133,17 @@ public static class AStarAlgorithm2
                     Dir.Right => Dir.Left,
                     _ => throw new Exception("invalid dir")
                 };
-                neighbourCoords = neighbourCoords.Where(x => x.dir != opposite).ToList();
+                "normal".Dump();
+                nl = neighbourCoords.Where(x => x.dir != opposite)
+                    .Select(x =>
+                    {
+                        var cl = current.LineLength;
+                        var y = (x.coord, x.dir,
+                                x.dir == current.Dir ? (cl + 1) : 0);
+
+                        $"{current.Dir}, {y.dir}, {y.Item3}".Dump();
+                        return y;
+                    }).ToList();
             }
 
             // can't go backwards, can only got at most 3 forward
@@ -115,17 +151,17 @@ public static class AStarAlgorithm2
             // check parent for direction by looking at parent,
             // check straight count, to see if you can go forwards,
             //$"--current: {current.Row}, {current.Column}. {current.Dir}".Dump();
-            //foreach (var item in neighbourCoords)
+            foreach (var (coord, d, l) in nl)
             {
-               // $"---  valid neighbour : {item.coord.r}, {item.coord.c}. {item.dir}".Dump();
+               $"---{current.LineLength}  valid neighbour : {coord.r}, {coord.c}, {d}, {l}".Dump();
             }
 
-            foreach (var (nc, nd) in neighbourCoords)
+            foreach (var (nc, nd, ll) in nl)
             {
                 var gScore = current.G + grid[nc];
 
                 var neighbour =
-                    openQ.FirstOrDefault(x => x.Row == nc.r && x.Column == nc.c);
+                    openQ.FirstOrDefault(x => x.Row == nc.r && x.Column == nc.c && x.LineLength == ll);
 
                 if (neighbour is null)
                 {
@@ -134,13 +170,14 @@ public static class AStarAlgorithm2
                     {
                         //$"{nc.r}, {nc.c} : had to continue past loop {current.Dir}, {current.Parent?.Dir}, {current.Parent?.Parent?.Dir}"
                            // .Dump();
-                        continue;
+                        //continue;
                     }
 
                     openQ.Add(
                         new AStarNode2(
                             nc.r,
                             nc.c,
+                            ll,
                             nd,
                             gScore,
                             ManhattanDistance(nc, target),
@@ -148,6 +185,7 @@ public static class AStarAlgorithm2
                 }
                 else if (gScore < neighbour.G)
                 {
+                    throw new Exception("shouldn't happen");    
                     var updatedDir = (neighbour.Row - current.Row,
                             neighbour.Column - current.Column) switch
                         {
@@ -163,16 +201,27 @@ public static class AStarAlgorithm2
                         continue;
                     }
 
-                    //$"---------------------updated {nc.r}, {nc.c}".Dump();
+                    $"---------------------updated {nc.r}, {nc.c}".Dump();
                     neighbour.Dir = updatedDir;
                     neighbour.G = gScore;
                     neighbour.Parent = current;
+                }
+                else
+                {
+                    $"current g, {current.G}, existing g: {neighbour.G}".Dump();
                 }
             }
         }
 
         // No path found
         finalG.Dump();
+
+        foreach (var (coord, _, _) in closed)
+        {
+            //grid.grid[coord.r][coord.c] = 0;
+        }
+
+        grid.Print();
         return -1;
     }
 
@@ -202,10 +251,12 @@ public class AStarNode2
     public int H { get; set; } // Heuristic estimate to target node
     public Dir? Dir { get; set; } // Number of straight moves
     public AStarNode2? Parent { get; set; }
+    public int LineLength { get; set; }
 
     public AStarNode2(
         int row,
         int column,
+        int ll,
         Dir? dir,
         int g = 0,
         int h = 0,
@@ -217,5 +268,6 @@ public class AStarNode2
         H = h;
         Parent = parent;
         Dir = dir;
+        LineLength = ll;
     }
 }

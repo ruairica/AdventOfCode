@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dumpify" Version="0.6.1" />
+    <PackageReference Include="Dumpify" Version="0.6.3" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="NUnit" Version="4.0.0" />
@@ -42,6 +42,7 @@
 	  <None Remove="inputs\2023\day16.txt" />
 	  <None Remove="inputs\2023\day17.txt" />
 	  <None Remove="inputs\2023\day18.txt" />
+	  <None Remove="inputs\2023\day19.txt" />
 	  <None Remove="inputs\2023\day2.txt" />
 	  <None Remove="inputs\2023\day3.txt" />
 	  <None Remove="inputs\2023\day4.txt" />

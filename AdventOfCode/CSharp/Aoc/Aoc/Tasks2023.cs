@@ -20,6 +20,7 @@ using System.Xml.Schema;
 using System.Net.Http.Headers;
 using FluentAssertions.Formatting;
 using System.Reflection;
+using System.Collections.Immutable;
 
 namespace Aoc;
 
@@ -2160,5 +2161,189 @@ public class Tasks2023
             corners.CalculateShoelaceArea() - ((double)pathCount / 2) + 1;
 
         (internalPoints + pathCount).Dump();
+    }
+
+    [Test]
+    public void day19_1_2023()
+    {
+        List<Dictionary<string, int>> acceptance = new();
+        var (WORKFLOWS, RATINGS) = FP.ReadFile($"{basePath}/day19.txt").Split("\n\n");
+
+        var ratings = RATINGS.Split("\n")
+            .Select(
+                r => r.GetNums()
+                    .Enumerate()
+                    .ToDictionary(
+                        k => k.index switch
+                        {
+                            0 => "x",
+                            1 => "m",
+                            2 => "a",
+                            3 => "s",
+                            _ => throw new Exception("invalid index")
+                        },
+                        v => v.val))
+            .ToList();
+
+        var workflows = WORKFLOWS.Split("\n")
+            .ToDictionary(
+                k => k[..k.IndexOf('{')],
+                v => v[(v.IndexOf('{') + 1) .. v.IndexOf('}')]
+                    .Split(',')
+                    .Select(x => new Condition(x))
+                    .ToList());
+
+        acceptance.AddRange(
+            ratings
+                .Select(r => (r, processRating("in", r)))
+                .Where(r => r.Item2 == "A")
+                .Select(x => x.r));
+
+        acceptance.Sum(x => x.Values.Sum()).Dump();
+
+        string processRating(string workflowName, Dictionary<string, int> rating)
+        {
+            foreach (var condition in workflows[workflowName])
+            {
+                var output = condition.GetOutput(rating);
+
+                if (string.IsNullOrEmpty(output))
+                {
+                    continue;
+                }
+
+                if (output is "A" or "R")
+                {
+                    return output;
+                }
+
+                return processRating(output, rating);
+            }
+
+            throw new Exception("Failed to process rating");
+        }
+    }
+
+    [Test]
+    public void day19_2_2023() // TODO
+    {
+        List<Dictionary<string, int>> rejections = new();
+        List<Dictionary<string, int>> acceptance = new();
+
+        var (WORKFLOWS, RATINGS) = FP.ReadFile($"{basePath}/day19.txt").Split("\n\n");
+
+        var ratings = RATINGS.Split("\n")
+            .Select(
+                r => r.GetNums()
+                    .Enumerate()
+                    .ToDictionary(
+                        k => k.index switch
+                        {
+                            0 => "x",
+                            1 => "m",
+                            2 => "a",
+                            3 => "s",
+                            _ => throw new Exception("invalid index")
+                        },
+                        v => v.val));
+
+        var workflows = WORKFLOWS.Split("\n")
+            .ToDictionary(
+                k => k[..k.IndexOf('{')],
+                v => v[(v.IndexOf('{') + 1)..v.IndexOf('}')]
+                    .Split(',')
+                    .Select(x => new Condition(x))
+                    .ToList());
+
+        foreach (var r in ratings)
+        {
+            // start at workflow 'in'
+            var o = processRating("in", r);
+
+            if (o == "A")
+            {
+                acceptance.Add(r);
+            }
+            else if (o == "R")
+            {
+                rejections.Add(r);
+            }
+            else
+            {
+                throw new Exception("invalid output");
+            }
+        }
+
+        acceptance.Sum(x => x.Values.Sum()).Dump();
+
+        string processRating(string workflowName, Dictionary<string, int> rating)
+        {
+            var currentWorkflow = workflows[workflowName];
+
+            foreach (var condition in currentWorkflow)
+            {
+                var output = condition.GetOutput(rating);
+
+                if (string.IsNullOrEmpty(output))
+                {
+                    continue;
+                }
+
+                if (output is "A" or "R")
+                {
+                    return output;
+                }
+
+                return processRating(output, rating);
+            }
+
+            throw new Exception("Failed to process rating");
+        }
+    }
+
+    public record Condition(string Rule)
+    {
+        public bool hasCondition()
+        {
+            return Rule.Contains('<') || Rule.Contains('>');
+        }
+
+        public string? GetOutput(Dictionary<string, int> rating)
+        {
+            if (!hasCondition())
+            {
+                return Rule;
+            }
+
+            if (Rule.Contains('<'))
+            {
+                var parts = Rule.Split('<');
+                var left = parts[0];
+                var right = parts[1][..parts[1].IndexOf(':')];
+
+                if (rating[left] < int.Parse(right))
+                {
+                    return Rule[(Rule.IndexOf(':') + 1)..];
+                }
+
+                return null;
+            }
+
+            if (Rule.Contains('>'))
+            {
+                var parts = Rule.Split('>');
+                var left = parts[0];
+                var right = parts[1][..parts[1].IndexOf(':')];
+
+                if (rating[left] > int.Parse(right))
+                {
+                    return Rule[(Rule.IndexOf(':') + 1)..];
+                }
+
+                return null;
+            }
+
+            throw new Exception("Couldn't find rule");
+        }
     }
 }

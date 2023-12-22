@@ -2290,13 +2290,11 @@ public class Tasks2023
         long lows = 0;
         foreach (var _ in Enumerable.Range(1, 1000))
         {
-            //"====================".Dump();
             q.Enqueue(("broadcaster", false, "button"));
             while (q.Any())
             {
                 
                 var (module, pulse, from) = q.Dequeue();
-                // $"{from} -> {pulse} -> {module}".Dump();
                 if (pulse)
                 {
                     highs += 1;
@@ -2344,10 +2342,6 @@ public class Tasks2023
             }
         }
 
-        lows.Dump();
-        highs.Dump();
-
-
         (lows * highs).Dump();
     }
 
@@ -2385,12 +2379,10 @@ public class Tasks2023
             }
             else
             {
-                line.Dump();
                 throw new Exception("failed to parse");
             }
         }
 
-        // anything that has a send to to a conjuction, needs to be in the conjuction values
         foreach (var (k, v) in sendTo)
         {
             foreach (var dest in v)
@@ -2459,5 +2451,48 @@ public class Tasks2023
         }
 
         "Didn't find".Dump();
+    }
+
+    [Test]
+    public void day21_1_2023()
+    {
+        var grid = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day21.txt"));
+
+        var start = grid.FirstOrDefault(x => x == 'S') ?? throw new Exception("did not find s");
+
+        var q = new Queue<(Coord, int)>();
+        var finals = new HashSet<Coord>();
+        q.Enqueue((start, 0));
+        var requiredSteps = 64;
+        var seen = new HashSet<(Coord, int)>();
+        while (q.Any())
+        {
+            var (cc, step) = q.Dequeue();
+
+            if (seen.Contains((cc, step)))
+            {
+                continue;
+            }
+
+            seen.Add((cc, step));
+            if (step > requiredSteps)
+            {
+                break;
+            }
+
+            if (step == requiredSteps)
+            {
+                finals.Add(cc);
+            }
+
+            var neighbours = grid.GetValidAdjacentNoDiag(cc).FindAll(x => grid[x] != '#');
+
+            foreach (var item in neighbours)
+            {
+                q.Enqueue((item, step + 1));
+            }
+        }
+
+        finals.Count.Dump();
     }
 }

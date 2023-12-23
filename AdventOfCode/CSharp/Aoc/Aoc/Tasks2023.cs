@@ -586,6 +586,19 @@ public class Tasks2023
     }
 
     [Test]
+    public void day6_1_2023_Alt()
+    {
+        var lines = FP.ReadFile($"{basePath}/day6.txt").Split("\n");
+
+        lines[0].GetNums().Zip(lines[1].GetNums(), (t, rd) => (time: t, record: rd))
+            .Select(
+                x => Enumerable.Range(1, x.time)
+                    .Count(t => ((x.time - t) * t) > x.record))
+            .Aggregate((a, b) => a * b)
+            .Dump();
+    }
+
+    [Test]
     public void day6_2_2023()
     {
         var lines = FP.ReadFile($"{basePath}/day6.txt").Split("\n");

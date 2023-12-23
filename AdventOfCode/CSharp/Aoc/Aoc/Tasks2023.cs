@@ -2044,39 +2044,33 @@ public class Tasks2023
     public void day17_1_2023()
     {
         var grid = new Grid<int>(FP.ReadAsGrid($"{basePath}/day17.txt"));
-
-        var starting = new Coord(0, 0);
+        var start = new Coord(0, 0);
         var end = new Coord(grid.Height - 1, grid.Width - 1);
 
         var q = new PriorityQueue<(Coord, Dir?, int, int), int>();
-        q.Enqueue((starting, null, 0, 0), 0);
+        q.Enqueue((start, null, 0, 0), 0);
         var seen = new HashSet<(Coord, Dir?, int)>();
         while (q.Count > 0)
         {
-            var (c, dir, dist, heat) = q.Dequeue();
+            var (cc, dir, dist, heat) = q.Dequeue();
 
-            if (seen.Contains((c, dir, dist)))
+            if (seen.Contains((cc, dir, dist)))
             {
                 continue;
             }
 
-            seen.Add((c, dir, dist));
+            seen.Add((cc, dir, dist));
 
-            if (c == end)
+            if (cc == end)
             {
                 heat.Dump();
                 break;
             }
-            Dir? opposite = dir switch
-            {
-                Dir.Up => Dir.Down,
-                Dir.Down => Dir.Up,
-                Dir.Left => Dir.Right,
-                Dir.Right => Dir.Left,
-                _ => null
-            };
+            var opposite = GetOppositeDirection(dir);
 
-            var neighbours = c.GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height).Where(x => x.dir != opposite);
+            var neighbours = cc
+                .GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height)
+                .Where(x => x.dir != opposite);
 
             foreach (var (nc, nd) in neighbours)
             {
@@ -2085,7 +2079,8 @@ public class Tasks2023
                 if (nd == dir || dir is null)
                 {
                     if (dist < 3)
-                    { q.Enqueue((nc, nd, dist + 1, newHeat), newHeat);
+                    { 
+                        q.Enqueue((nc, nd, dist + 1, newHeat), newHeat);
                     }
                 }
                 else
@@ -2094,6 +2089,18 @@ public class Tasks2023
                 }
 
             }
+        }
+
+        Dir? GetOppositeDirection(Dir? dir)
+        {
+            return dir switch
+            {
+                Dir.Up => Dir.Down,
+                Dir.Down => Dir.Up,
+                Dir.Left => Dir.Right,
+                Dir.Right => Dir.Left,
+                _ => null
+            };
         }
     }
 
@@ -2105,40 +2112,34 @@ public class Tasks2023
         var starting = new Coord(0, 0);
         var end = new Coord(grid.Height - 1, grid.Width - 1);
 
+
+        //                        <(coord, dir, dist, heat), heat>
         var q = new PriorityQueue<(Coord, Dir?, int, int), int>();
+        //                       <(coord, dir, dist)>
+        var visited = new HashSet<(Coord, Dir?, int)>();
+
         q.Enqueue((starting, null, 0, 0), 0);
-        var seen = new HashSet<(Coord, Dir?, int)>();
         while (q.Count > 0)
         {
-            var (c, dir, dist, heat) = q.Dequeue();
+            var (cc, dir, dist, heat) = q.Dequeue();
 
-            if (seen.Contains((c, dir, dist)))
+            if (visited.Contains((cc, dir, dist)))
             {
                 continue;
             }
 
-            seen.Add((c, dir, dist));
+            visited.Add((cc, dir, dist));
 
-            if (c == end && dist >= 4)
+            if (cc == end && dist >= 4)
             {
-                dist.Dump();
                 heat.Dump();
                 break;
             }
-            Dir? opposite = dir switch
-            {
-                Dir.Up => Dir.Down,
-                Dir.Down => Dir.Up,
-                Dir.Left => Dir.Right,
-                Dir.Right => Dir.Left,
-                _ => null
-            };
 
-            var neighbours = c.GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height).Where(x => x.dir != opposite);
+            var neighbours = cc
+                .GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height)
+                .Where(x => x.dir != GetOppositeDirection(dir)); // can never go backwards
 
-            /*
-             * Once an ultra crucible starts moving in a direction, it needs to move a minimum of four blocks in that direction before it can turn (or even before it can stop at the end). However, it will eventually start to get wobbly: an ultra crucible can move a maximum of ten consecutive blocks without turning.
-             */
             foreach (var (nc, nd) in neighbours)
             {
                 var newHeat = heat + grid[nc];
@@ -2159,6 +2160,18 @@ public class Tasks2023
                 }
 
             }
+        }
+
+        Dir? GetOppositeDirection(Dir? dir)
+        {
+            return dir switch
+            {
+                Dir.Up => Dir.Down,
+                Dir.Down => Dir.Up,
+                Dir.Left => Dir.Right,
+                Dir.Right => Dir.Left,
+                _ => null
+            };
         }
     }
 

@@ -2637,6 +2637,7 @@ public class Tasks2023
                         nums[4],
                         nums[5]);
                 })
+            .OrderBy(x => (x.sz, x.ez))
             .ToList();
 
         // get them to settle
@@ -2662,35 +2663,6 @@ public class Tasks2023
         }
 
         total.Dump();
-
-        // bricks that are supported by more than one brick are safe to disintegrate
-        // brixks that are not supporting any other brick are safe to disintegrate
-        /*var safeToDisint = updatedBrickPos.Where(
-                b => updatedBrickPos.Count(
-                    x => (x.sz == b.sz - 1 || x.ez == b.ez - 1) &&
-                         Enumerable.Range(x.sx, x.ex - x.sx + 1)
-                             .Intersect(Enumerable.Range(b.sx, b.ex - b.sx + 1))
-                             .Any() &&
-                         Enumerable.Range(x.sy, x.ey - x.sy + 1)
-                             .Intersect(Enumerable.Range(b.sy, b.ey - b.sy + 1))
-                             .Any()) > 1)
-            .ToList();
-
-        safeToDisint.AddRange(
-            updatedBrickPos.Where(
-                b => !updatedBrickPos.Any(
-                    x => (x.sz == b.sz + 1 || x.ez == b.ez + 1) &&
-                         Enumerable.Range(x.sx, x.ex - x.sx + 1)
-                             .Intersect(Enumerable.Range(b.sx, b.ex - b.sx + 1))
-                             .Any() &&
-                         Enumerable.Range(x.sy, x.ey - x.sy + 1)
-                             .Intersect(Enumerable.Range(b.sy, b.ey - b.sy + 1))
-                             .Any())));
-
-        safeToDisint = safeToDisint.Distinct().ToList();
-
-        // 382 too low
-        safeToDisint.Count.Dump();*/
     }
 
     private static (bool fell, List<Brick> newBricks) RunBricksFall(List<Brick> bricks)

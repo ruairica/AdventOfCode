@@ -590,7 +590,9 @@ public class Tasks2023
     {
         var lines = FP.ReadFile($"{basePath}/day6.txt").Split("\n");
 
-        lines[0].GetNums().Zip(lines[1].GetNums(), (t, rd) => (time: t, record: rd))
+        lines[0]
+            .GetNums()
+            .Zip(lines[1].GetNums(), (t, rd) => (time: t, record: rd))
             .Select(
                 x => Enumerable.Range(1, x.time)
                     .Count(t => ((x.time - t) * t) > x.record))
@@ -2063,6 +2065,7 @@ public class Tasks2023
         var q = new PriorityQueue<(Coord, Dir?, int, int), int>();
         q.Enqueue((start, null, 0, 0), 0);
         var seen = new HashSet<(Coord, Dir?, int)>();
+
         while (q.Count > 0)
         {
             var (cc, dir, dist, heat) = q.Dequeue();
@@ -2077,12 +2080,13 @@ public class Tasks2023
             if (cc == end)
             {
                 heat.Dump();
+
                 break;
             }
+
             var opposite = GetOppositeDirection(dir);
 
-            var neighbours = cc
-                .GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height)
+            var neighbours = cc.GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height)
                 .Where(x => x.dir != opposite);
 
             foreach (var (nc, nd) in neighbours)
@@ -2092,7 +2096,7 @@ public class Tasks2023
                 if (nd == dir || dir is null)
                 {
                     if (dist < 3)
-                    { 
+                    {
                         q.Enqueue((nc, nd, dist + 1, newHeat), newHeat);
                     }
                 }
@@ -2100,7 +2104,6 @@ public class Tasks2023
                 {
                     q.Enqueue((nc, nd, 1, newHeat), newHeat);
                 }
-
             }
         }
 
@@ -2125,13 +2128,13 @@ public class Tasks2023
         var starting = new Coord(0, 0);
         var end = new Coord(grid.Height - 1, grid.Width - 1);
 
-
         //                        <(coord, dir, dist, heat), heat>
         var q = new PriorityQueue<(Coord, Dir?, int, int), int>();
         //                       <(coord, dir, dist)>
         var visited = new HashSet<(Coord, Dir?, int)>();
 
         q.Enqueue((starting, null, 0, 0), 0);
+
         while (q.Count > 0)
         {
             var (cc, dir, dist, heat) = q.Dequeue();
@@ -2146,11 +2149,11 @@ public class Tasks2023
             if (cc == end && dist >= 4)
             {
                 heat.Dump();
+
                 break;
             }
 
-            var neighbours = cc
-                .GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height)
+            var neighbours = cc.GetValidAdjacentNoDiagWithDir(grid.Width, grid.Height)
                 .Where(x => x.dir != GetOppositeDirection(dir)); // can never go backwards
 
             foreach (var (nc, nd) in neighbours)
@@ -2171,7 +2174,6 @@ public class Tasks2023
                         q.Enqueue((nc, nd, 1, newHeat), newHeat);
                     }
                 }
-
             }
         }
 
@@ -2635,75 +2637,35 @@ public class Tasks2023
                         nums[4],
                         nums[5]);
                 })
-            .OrderBy(x => (x.sz, x.ez)) // this is potentially dodgey
+            .OrderBy(x => x.sz) // this is potentially dodgey
             .ToList();
 
+        // get them to settle
         // step 1, any brick not supported needs to fall down,
-        var updatedBrickPos = new HashSet<Brick>();
+        var (_, settledBricks) = RunBricksFall(bricks);
 
-        foreach (var ob in bricks)
+        // check for every brick, would making it fall, cause any other bricks to fall
+        var total = 0;
+        for (var i = 0; i < settledBricks.Count; i++)
         {
-            var brickCopy = ob;
+            // remove the brick
+            // if !fall from runbricks, then add one to total
+            var withRemoved = settledBricks.Select(x => x).ToList();
+            withRemoved.RemoveAt(i);
 
-            if (brickCopy.sz == 1 || brickCopy.ez == 1)
+            var (fell, _) = RunBricksFall(withRemoved);
+
+            if (!fell)
             {
-                updatedBrickPos.Add(brickCopy);
-
-                continue;
-            }
-
-            // a brick is supported if there is a brick with a z value one below it, and it's x,y values are within the range of the brick
-
-            var supported = Supported(brickCopy);
-
-            if (supported)
-            {
-                updatedBrickPos.Add(brickCopy);
-
-                continue;
-            }
-
-            var found = false;
-            var count = 0;
-
-            while (!supported)
-            {
-                brickCopy = brickCopy with
-                {
-                    sz = brickCopy.sz - 1, ez = brickCopy.ez - 1
-                };
-
-                supported = Supported(brickCopy);
-
-                if (supported)
-                {
-                    updatedBrickPos.Add(brickCopy);
-                    found = true;
-
-                    break;
-                }
-
-                if (count == 100)
-                {
-                    //brickCopy.Dump();
-                    //throw new Exception("infinite loop");
-                }
-
-                count += 1;
-            }
-
-            if (!found)
-            {
-                ob.Dump();
-                brickCopy.Dump();
-
-                throw new Exception("failed to find support");
+                total += 1;
             }
         }
 
+        total.Dump();
+
         // bricks that are supported by more than one brick are safe to disintegrate
         // brixks that are not supporting any other brick are safe to disintegrate
-        var safeToDisint = updatedBrickPos.Where(
+        /*var safeToDisint = updatedBrickPos.Where(
                 b => updatedBrickPos.Count(
                     x => (x.sz == b.sz - 1 || x.ez == b.ez - 1) &&
                          Enumerable.Range(x.sx, x.ex - x.sx + 1)
@@ -2728,23 +2690,77 @@ public class Tasks2023
         safeToDisint = safeToDisint.Distinct().ToList();
 
         // 382 too low
-        safeToDisint.Count.Dump();
+        safeToDisint.Count.Dump();*/
+    }
+
+    private static (bool fell, List<Brick> newBricks) RunBricksFall(List<Brick> bricks)
+    {
+        var updatedBrickPos = new List<Brick>();
 
         bool Supported(Brick b)
         {
-            var supported = updatedBrickPos.Any(
-                x => (x.sz == b.sz - 1 || x.ez == b.ez - 1) &&
+            if (b.sz == 1)
+            {
+                return true;
+            }
+
+            return updatedBrickPos.Any(
+                x => (x.sz == b.sz - 1) &&
                      Enumerable.Range(x.sx, x.ex - x.sx + 1)
                          .Intersect(Enumerable.Range(b.sx, b.ex - b.sx + 1))
-                         .Any() &&
-                     Enumerable.Range(x.sy, x.ey - x.sy + 1)
+                         .Any() 
+                     && Enumerable.Range(x.sy, x.ey - x.sy + 1)
                          .Intersect(Enumerable.Range(b.sy, b.ey - b.sy + 1))
                          .Any());
-
-            var isOnFloor = (b.sz == 1 || b.ez == 1);
-
-            return supported || isOnFloor;
         }
+
+        var fell = false;
+
+        foreach (var ob in bricks)
+        {
+            var brickCopy = ob;
+
+            if (brickCopy.sz == 1 || brickCopy.ez == 1)
+            {
+                updatedBrickPos.Add(brickCopy);
+
+                continue;
+            }
+
+
+            var supported = Supported(brickCopy);
+
+            if (supported)
+            {
+                updatedBrickPos.Add(brickCopy);
+
+                continue;
+            }
+
+            var found = false;
+            var count = 0;
+            fell = true;
+
+            while (!supported)
+            {
+                brickCopy = brickCopy with
+                {
+                    sz = brickCopy.sz - 1, ez = brickCopy.ez - 1
+                };
+
+                supported = Supported(brickCopy);
+
+                if (supported)
+                {
+                    updatedBrickPos.Add(brickCopy);
+                    found = true;
+
+                    break;
+                }
+            }
+        }
+
+        return (fell, updatedBrickPos);
     }
 }
 

@@ -2619,7 +2619,7 @@ public class Tasks2023
         finals.Count.Dump();
     }
 
-    [Test]
+    [Test] // TODO
     public void day22_1_2023()
     {
         var lines = FP.ReadFile($"{basePath}/day22.txt").Split("\n");
@@ -2637,7 +2637,6 @@ public class Tasks2023
                         nums[4],
                         nums[5]);
                 })
-            .OrderBy(x => x.sz) // this is potentially dodgey
             .ToList();
 
         // get them to settle
@@ -2650,13 +2649,14 @@ public class Tasks2023
         {
             // remove the brick
             // if !fall from runbricks, then add one to total
-            var withRemoved = settledBricks.Select(x => x).ToList();
+            var withRemoved = new List<Brick>(settledBricks);
             withRemoved.RemoveAt(i);
 
             var (fell, _) = RunBricksFall(withRemoved);
 
             if (!fell)
             {
+                settledBricks[i].Dump();
                 total += 1;
             }
         }
@@ -2695,7 +2695,14 @@ public class Tasks2023
 
     private static (bool fell, List<Brick> newBricks) RunBricksFall(List<Brick> bricks)
     {
-        var updatedBrickPos = new List<Brick>();
+        foreach (var b in bricks)
+        {
+            if (b.ex < b.sx || b.ey < b.sy || b.ez < b.sz)
+            {
+                throw new Exception("expected start coord to be less than end coord");
+            }
+        }
+        var newBrickFormation = new List<Brick>();
 
         bool Supported(Brick b)
         {
@@ -2704,7 +2711,7 @@ public class Tasks2023
                 return true;
             }
 
-            return updatedBrickPos.Any(
+            return newBrickFormation.Any(
                 x => (x.sz == b.sz - 1) &&
                      Enumerable.Range(x.sx, x.ex - x.sx + 1)
                          .Intersect(Enumerable.Range(b.sx, b.ex - b.sx + 1))
@@ -2719,26 +2726,15 @@ public class Tasks2023
         foreach (var ob in bricks)
         {
             var brickCopy = ob;
-
-            if (brickCopy.sz == 1 || brickCopy.ez == 1)
-            {
-                updatedBrickPos.Add(brickCopy);
-
-                continue;
-            }
-
-
             var supported = Supported(brickCopy);
 
             if (supported)
             {
-                updatedBrickPos.Add(brickCopy);
+                newBrickFormation.Add(brickCopy);
 
                 continue;
             }
 
-            var found = false;
-            var count = 0;
             fell = true;
 
             while (!supported)
@@ -2752,15 +2748,13 @@ public class Tasks2023
 
                 if (supported)
                 {
-                    updatedBrickPos.Add(brickCopy);
-                    found = true;
-
+                    newBrickFormation.Add(brickCopy);
                     break;
                 }
             }
         }
 
-        return (fell, updatedBrickPos);
+        return (fell, newBrickFormation.OrderBy(x => (x.sz, x.ez)).ToList());
     }
 }
 

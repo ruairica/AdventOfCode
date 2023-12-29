@@ -51,10 +51,10 @@ public class Tasks2023
 
         lines.Select(
                 line => numStrings.SelectMany(
-                    x => line.AllIndexOf(x).Where(e => e != -1).Select(y => (y, x))))
+                    x => line.AllIndexOf(x).Where(e => e != -1).Select(y => (index: y, str: x))))
             .Sum(
                 digits => int.Parse(
-                    $"{dict[digits.MinBy(x => x.Item1).Item2]}{dict[digits.MaxBy(x => x.Item1).Item2]}"))
+                    $"{dict[digits.MinBy(x => x.index).str]}{dict[digits.MaxBy(x => x.index).str]}"))
             .Dump();
     }
 
@@ -410,7 +410,7 @@ public class Tasks2023
 
             foreach (var num in Enumerable.Range(cardNumber + 1, count))
             {
-                copies.AddOrUpdate(num, 1 + numOfCopies);
+                copies.AddOrIncrement(num, 1 + numOfCopies);
             }
         }
 
@@ -1139,22 +1139,21 @@ public class Tasks2023
             (x, i) => galaxies.Skip(i + 1),
             Tuple.Create);
 
-        long total = 0;
+        combinations.Sum(
+                x =>
+                {
+                    var (c1, c2) = x;
+                    var dist = AStarAlgorithm.ManhattanDistance(c1, c2);
 
-        foreach (var (c1, c2) in combinations)
-        {
-            var dist = AStarAlgorithm.ManhattanDistance(c1, c2);
+                    var rowsInWay = indexesOfRowsToScale.Count(
+                        s => c1.r > c2.r ? s < c1.r && s > c2.r : s > c1.r && s < c2.r);
 
-            var rowsInWay = indexesOfRowsToScale.Count(
-                s => c1.r > c2.r ? s < c1.r && s > c2.r : s > c1.r && s < c2.r);
+                    var colsInWay = indexesOfColsToScale.Count(
+                        s => c1.c > c2.c ? s < c1.c && s > c2.c : s > c1.c && s < c2.c);
 
-            var colsInWay = indexesOfColsToScale.Count(
-                s => c1.c > c2.c ? s < c1.c && s > c2.c : s > c1.c && s < c2.c);
-
-            total += dist + (scale - 1) * (rowsInWay + colsInWay);
-        }
-
-        total.Dump();
+                    return (long)dist + (scale - 1) * (rowsInWay + colsInWay);
+                })
+            .Dump();
     }
 
     [Test]

@@ -341,7 +341,7 @@ public class Tasks2022
                 var copy = currentPath.ConvertAll(x => x);
                 while (copy.Count > 0)
                 {
-                    sizes.AddOrUpdate(CreateKey(copy), size);
+                    sizes.AddOrIncrement(CreateKey(copy), size);
                     copy.Pop();
                 }
             }
@@ -385,7 +385,7 @@ public class Tasks2022
                 var copy = currentPath.Select(x => x).ToList();
                 while (copy.Count > 0)
                 {
-                    sizes.AddOrUpdate(CreateKey(copy), size);
+                    sizes.AddOrIncrement(CreateKey(copy), size);
                     copy.Pop();
                 }
             }

@@ -2080,7 +2080,7 @@ public class Tasks2021
         //    look at running tests with -l "console;verbosity=detailed"' to see if it streams the output
     }
 
-// copy from part 1 for part 2
+    // copy from part 1 for part 2
     private bool IsCorrupted(IEnumerable<char> line)
     {
         var matches = new Dictionary<char, char>()

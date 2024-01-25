@@ -1,5 +1,4 @@
-﻿
-namespace Aoc.Utils.Grids;
+﻿namespace Utils.Grids;
 
 public class Grid<T>
 {

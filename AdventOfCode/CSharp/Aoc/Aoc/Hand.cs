@@ -48,59 +48,59 @@ public class Hand : IComparable<Hand>
                 return 7;
             // 4 of a kind
             case 2 when groups.Values.Any(x => x == 4):
-            {
-                return this.part2 && groups.ContainsKey("J") ? 7 : 6;
-            }
+                {
+                    return this.part2 && groups.ContainsKey("J") ? 7 : 6;
+                }
             // full house
             case 2 when groups.Values.Any(x => x == 3):
-            {
-                if (this.part2 && groups.TryGetValue("J", out var group))
                 {
-                    return group switch
+                    if (this.part2 && groups.TryGetValue("J", out var group))
                     {
-                        3 => 7,
-                        2 => 7,
-                        1 => 6,
-                    };
+                        return group switch
+                        {
+                            3 => 7,
+                            2 => 7,
+                            1 => 6,
+                        };
+                    }
+                    return 5;
                 }
-                return 5;
-            }
             // 3 of a kind
             case 3 when groups.Values.Any(x => x == 3):
-            {
-                if (this.part2 && groups.TryGetValue("J", out int group))
                 {
-                    return group switch
+                    if (this.part2 && groups.TryGetValue("J", out int group))
                     {
-                        3 => 5,
-                        2 => 7,
-                        1 => 6,
-                    };
-                }
-                return 4;
-            }
-            // 2 pair
-            case 3 when groups.Values.Count(x => x == 2) == 2:
-            {
-                if (this.part2 && groups.TryGetValue("J", out var value))
-                {
-                    return value switch
-                    {
-                        2 => 6,
-                        1 => 5
-                    };
-                }
-                return 3;
-            }
-            // single pair AA2J5
-            case 4 when groups.Values.Count(x => x == 2) == 1:
-            {
-                if (this.part2 && groups.ContainsKey("J"))
-                {
+                        return group switch
+                        {
+                            3 => 5,
+                            2 => 7,
+                            1 => 6,
+                        };
+                    }
                     return 4;
                 }
-                return 2;
-            }
+            // 2 pair
+            case 3 when groups.Values.Count(x => x == 2) == 2:
+                {
+                    if (this.part2 && groups.TryGetValue("J", out var value))
+                    {
+                        return value switch
+                        {
+                            2 => 6,
+                            1 => 5
+                        };
+                    }
+                    return 3;
+                }
+            // single pair AA2J5
+            case 4 when groups.Values.Count(x => x == 2) == 1:
+                {
+                    if (this.part2 && groups.ContainsKey("J"))
+                    {
+                        return 4;
+                    }
+                    return 2;
+                }
             case 5 when this.part2 && groups.ContainsKey("J"):
                 return 2;
             case 5:

@@ -1,6 +1,6 @@
-﻿using Aoc.Utils.Grids;
+﻿using Utils.Grids;
 
-namespace Aoc.Utils;
+namespace Utils;
 public static class ListExtensions
 {
     public static T Pop<T>(this List<T> list, int elementIndexer = -1)

@@ -1,4 +1,4 @@
-﻿namespace Aoc.Utils.Grids;
+﻿namespace Utils.Grids;
 
 public static class GridExtensions
 {

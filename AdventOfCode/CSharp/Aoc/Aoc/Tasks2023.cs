@@ -51,7 +51,9 @@ public class Tasks2023
 
         lines.Select(
                 line => numStrings.SelectMany(
-                    x => line.AllIndexOf(x).Where(e => e != -1).Select(y => (index: y, str: x))))
+                    x => line.AllIndexOf(x)
+                        .Where(e => e != -1)
+                        .Select(y => (index: y, str: x))))
             .Sum(
                 digits => int.Parse(
                     $"{dict[digits.MinBy(x => x.index).str]}{dict[digits.MaxBy(x => x.index).str]}"))
@@ -2302,7 +2304,7 @@ public class Tasks2023
         var workflows = WORKFLOWS.Split("\n")
             .ToDictionary(
                 k => k[..k.IndexOf('{')],
-                v => v[(v.IndexOf('{') + 1) .. v.IndexOf('}')]
+                v => v[(v.IndexOf('{') + 1)..v.IndexOf('}')]
                     .Split(',')
                     .Select(x => new Condition(x))
                     .ToList());
@@ -2645,6 +2647,7 @@ public class Tasks2023
 
         // check for every brick, would making it fall, cause any other bricks to fall
         var total = 0;
+
         for (var i = 0; i < settledBricks.Count; i++)
         {
             // remove the brick
@@ -2664,6 +2667,131 @@ public class Tasks2023
         total.Dump();
     }
 
+    class PetOwner
+    {
+        public string Name { get; set; }
+        public List<string> Pets { get; set; }
+    }
+
+    class Pet
+    {
+        public string Name { get; set; }
+        public double Age { get; set; }
+    }
+
+
+    [Test]
+    public void linq_tests()
+    {
+        // anything sepecial to do with range?
+        //Enumerable.Range(1, 10).Skip(1).Select(val => (val, Math.Pow(val, 2)))
+        //  .Where((_, i) => i % 2 == 0).Dump();
+
+        //select with index, useful for enumerate style functions, also select many with index
+        // where with index, not that useful 
+        // maybe a simple selectmany with selector functiion
+        // selectmany with selector function? , explain this.....
+
+
+
+        // select many with index..., figure this out
+        // aggregate with and without seed ? 
+
+        //this type of group by...
+        /*
+         *    var query = petsList.GroupBy(
+        pet => Math.Floor(pet.Age),
+        pet => pet.Age,
+        (baseAge, ages) => new
+        {
+            Key = baseAge,
+            Count = ages.Count(),
+            Min = ages.Min(),
+            Max = ages.Max()
+        });
+         *
+         */
+
+        // firtordefault/singleOD provide default value
+        var f = Enumerable.Range(1, 10).FirstOrDefault(x => x % 2 == 0, -1);
+        //var l = Enumerable.Range(1, 10).LastOrDefault(x => x % 2 == 0, -1);
+        //var s = Enumerable.Range(1, 10).SingleOrDefault(x => x % 2 == 0, -1);
+
+        //take with range, can be a shorter version of  skip then take
+        Enumerable.Range(1, 10).Take(2..7);
+        Enumerable.Range(1, 10).Take(..^1);
+        /*
+
+        var mins = Enumerable.Range(1, 9).Select(x => (10 - x) * x).Dump().Max();
+        var min = Enumerable.Range(1, 9).Max(x => (10 - x) * x);
+
+
+        mins.Dump();
+        min.Dump();*/
+        Enumerable.Range(1, 5).Select((value, index) => (value, index)).Dump();
+        Enumerable.Range(1, 5).Where((value, index) => index % 2 == 0).Dump();
+
+        var x = Enumerable.Range(1, 5)
+            .SelectMany((value, index) => new List<(int, int)> { (value, index) })
+            .Dump();
+
+        PetOwner[] petOwners =
+        {
+            new () { Name = "Higa", Pets = new List<string> { "Scruffy", "Sam" } },
+            new () { Name = "Hines", Pets = new List<string> { "Dusty" } }
+        };
+
+        petOwners.SelectMany(x => x.Pets, (petOwner, pet) => $"{petOwner.Name} - {pet}")
+            .Dump();
+
+
+        var value = new List<int> { 1, 3, 5 }.FirstOrDefault(x => x % 2 == 0);
+        value.Dump();
+
+
+
+        var max = Enumerable.Range(1, 4).Select(x => (5 - x) * x).Dump().Max().Dump();
+        var max2 = Enumerable.Range(1, 4).Max(x => (5 - x) * x).Dump();
+
+        var pageNumber = 2;
+        var pageSize = 10;
+        Enumerable.Range(1, 50).Take(((pageNumber - 1) * pageSize)..(pageNumber * pageSize)).Dump();
+        Enumerable.Range(1, 50).Skip((pageNumber - 1) * pageSize).Take(pageSize).Dump();
+
+        var range = Enumerable.Range(1, 3).ToList();
+
+        var combinations = range.SelectMany(
+            (_, i) => range.Skip(i + 1),
+            (parent, child) => new List<(int, int)> { (parent, child), (child, parent) })
+            .SelectMany(x => x);
+
+        combinations.Dump();
+
+
+        // Create a list of pets.
+        var petsList =
+            new List<Pet>
+            {
+                new() { Name="Barley", Age=8.3 },
+                new() { Name="Boots", Age=4.9 },
+                new() { Name="Whiskers", Age=1.5 },
+                new() { Name="Daisy", Age=4.3 }
+            };
+
+        var query = petsList.GroupBy(
+            pet => Math.Floor(pet.Age),
+            pet => pet.Age,
+            (key, values) => $"Key: {key}, Count: {values.Count()}, Minimum: {values.Min()}, Maximum: {values.Max()}");
+
+        var og = petsList.GroupBy(pet => Math.Floor(pet.Age), pet => pet.Age);
+        og.Dump();
+        query.Dump();
+
+        Enumerable.Range(1, 4).Max(x => (5 - x) * x).Dump();
+        Enumerable.Range(1, 4).Select(x => (5 - x) * x).Dump().Max().Dump();
+
+    }
+
     private static (bool fell, List<Brick> newBricks) RunBricksFall(List<Brick> bricks)
     {
         foreach (var b in bricks)
@@ -2673,6 +2801,7 @@ public class Tasks2023
                 throw new Exception("expected start coord to be less than end coord");
             }
         }
+
         var newBrickFormation = new List<Brick>();
 
         bool Supported(Brick b)
@@ -2686,8 +2815,8 @@ public class Tasks2023
                 x => (x.sz == b.sz - 1) &&
                      Enumerable.Range(x.sx, x.ex - x.sx + 1)
                          .Intersect(Enumerable.Range(b.sx, b.ex - b.sx + 1))
-                         .Any() 
-                     && Enumerable.Range(x.sy, x.ey - x.sy + 1)
+                         .Any() &&
+                     Enumerable.Range(x.sy, x.ey - x.sy + 1)
                          .Intersect(Enumerable.Range(b.sy, b.ey - b.sy + 1))
                          .Any());
         }
@@ -2712,7 +2841,8 @@ public class Tasks2023
             {
                 brickCopy = brickCopy with
                 {
-                    sz = brickCopy.sz - 1, ez = brickCopy.ez - 1
+                    sz = brickCopy.sz - 1,
+                    ez = brickCopy.ez - 1
                 };
 
                 supported = Supported(brickCopy);
@@ -2720,6 +2850,7 @@ public class Tasks2023
                 if (supported)
                 {
                     newBrickFormation.Add(brickCopy);
+
                     break;
                 }
             }

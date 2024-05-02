@@ -31,6 +31,23 @@ public class Tasks2021
         }
 
         result.Dump();
+
+        // part 1
+        lines
+           .Skip(1)
+           .Zip(lines, (first, second) => first > second ? 1 : 0)
+           .Sum()
+           .Dump();
+
+        // part 2
+        var newChunks = lines
+           .Select((val, index) => lines.Skip(index).Take(3).Sum()).ToList();
+
+        newChunks.Skip(1)
+           .Zip(newChunks, (first, second) => first > second ? 1 : 0)
+           .Sum()
+           .Dump();
+         
     }
 
     [Test]

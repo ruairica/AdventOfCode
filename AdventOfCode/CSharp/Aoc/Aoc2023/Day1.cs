@@ -1,11 +1,23 @@
-﻿using Utils;
-using Dumpify;
+﻿using Dumpify;
+using Utils;
 
 namespace Aoc2023;
 
 public class Day1 : Day
 {
     public override void Part1()
+    {
+        var input = FP.ReadLines(FilePath);
+
+        input.Select(x =>
+            {
+                var nums = x.Where(char.IsDigit).ToList();
+                return $"{nums[0]}{nums[^1]}";
+            })
+            .Select(int.Parse).Sum().Dump();
+    }
+
+    public override void Part2()
     {
         List<string> numStrings =
         [
@@ -28,7 +40,7 @@ public class Day1 : Day
 
         numStrings.AddRange(collection);
 
-        var lines = FP.ReadFile(this.FilePath).Split("\n");
+        var lines = FP.ReadFile(FilePath).Split("\n");
 
         lines.Select(
                 line => numStrings.SelectMany(
@@ -39,10 +51,5 @@ public class Day1 : Day
                 digits => int.Parse(
                     $"{dict[digits.MinBy(x => x.index).str]}{dict[digits.MaxBy(x => x.index).str]}"))
             .Dump();
-    }
-
-    public override void Part2()
-    {
-        this.FilePath.Dump();
     }
 }

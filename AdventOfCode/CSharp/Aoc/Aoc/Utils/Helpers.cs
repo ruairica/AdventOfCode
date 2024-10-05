@@ -1,10 +1,11 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Aoc.Utils
 {
     public static class Helpers
     {
-        public static double Median<T>(this IEnumerable<T> items) where T : struct, IComparable<T>
+        public static double Median<T>(this IEnumerable<T> items) where T : INumber<T>
         {
             if (items == null)
                 throw new ArgumentNullException(nameof(items));

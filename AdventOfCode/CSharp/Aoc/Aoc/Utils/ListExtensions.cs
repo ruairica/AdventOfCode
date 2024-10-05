@@ -11,9 +11,9 @@ public static class ListExtensions
         return element;
     }
 
-    public static IList<int> AllIndexOf(this string text, string str)
+    public static List<int> AllIndexOf(this string text, string str)
     {
-        IList<int> allIndexOf = new List<int>();
+        List<int> allIndexOf = [];
         int index = text.IndexOf(str);
         while (index != -1)
         {

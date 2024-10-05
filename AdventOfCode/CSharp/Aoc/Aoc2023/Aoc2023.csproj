@@ -8,11 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dumpify" Version="0.6.4" />
+    <PackageReference Include="Dumpify" Version="0.6.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<Content Include="inputs/**">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 </Project>

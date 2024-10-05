@@ -417,7 +417,7 @@ public class Tasks2022
         var g = FP.ReadAsGrid("./inputs/2022/day8.txt");
 
         // all edges
-        var visibleTrees = g.Count * 4 - 4;
+        var visibleTrees = g.Length * 4 - 4;
 
         var grid = new Grid<int>(g);
 

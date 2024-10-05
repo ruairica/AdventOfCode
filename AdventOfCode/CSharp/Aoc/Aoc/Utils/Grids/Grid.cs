@@ -17,11 +17,18 @@ public class Grid<T>
 
     public int Height { get; set; }
 
-    public List<List<T>> grid;
+    public T[][] grid;
+
+    public Grid(T[][] grid)
+    {
+        this.grid = grid;
+        Width = grid[0].Length;
+        Height = grid.Length;
+    }
 
     public Grid(List<List<T>> grid)
     {
-        this.grid = grid;
+        this.grid = grid.Select(x => x.ToArray()).ToArray();
         Width = grid[0].Count;
         Height = grid.Count;
     }
@@ -92,9 +99,9 @@ public class Grid<T>
             .ToList();
     }
 
-    public List<List<T>> GetAllRows()
+    public T[][] GetAllRows()
     {
-        return grid.ConvertAll(x => x);
+        return grid.Select(x => x).ToArray();
     }
 
     public List<List<T>> GetAllColumns()
@@ -184,7 +191,7 @@ public class Grid<T>
 
         for (var x = 0; x < this.Height; x++)
         {
-            for (int y = 0; y < this.grid[x].Count; y++)
+            for (int y = 0; y < this.grid[x].Length; y++)
             {
                 resultGrid.grid[x][y] = func(this.grid[x][y]);
             }
@@ -200,23 +207,33 @@ public class Grid<T>
                 .Select(
                     x => Enumerable.Range(0, this.Height)
                         .Select(y => this.grid[y][x])
-                        .ToList())
-                .ToList());
+                        .ToArray())
+                .ToArray());
 
         this.grid = resultGrid.grid;
         this.Width = resultGrid.Width;
         this.Height = resultGrid.Height;
     }
 
+    // TODO check these still work
     public void Rotate90ClockWise()
     {
         this.Transpose();
-        this.grid.ForEach(x => x.Reverse());
+        for (int i = 0; i < this.Height; i++)
+        {
+            this.grid[i] = this.grid[i].Reverse().ToArray();
+        }
     }
 
     public void Rotate90Counterclockwise()
     {
-        this.grid.ForEach(x => x.Reverse());
+
+        List<int> x = new();
+
+        for (int i = 0; i < this.Height; i++)
+        {
+            this.grid[i] = this.grid[i].Reverse().ToArray();
+        }
         this.Transpose();
     }
 
@@ -227,8 +244,8 @@ public class Grid<T>
                 .Select(
                     x => Enumerable.Range(0, grid.Width)
                         .Select(y => grid.grid[x][y])
-                        .ToList())
-                .ToList());
+                        .ToArray())
+                .ToArray());
 
         return resultGrid;
     }

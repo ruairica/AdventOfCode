@@ -10,13 +10,13 @@ public static class FP
     public static string[] ReadLines(string path) =>
         ReadFile(path).Split("\n");
 
-    public static List<List<int>> ReadAsGrid(string path) =>
+    public static int[][] ReadAsGrid(string path) =>
         ReadLines(path)
-              .Select(x => x.Select(y => int.Parse(y.ToString())).ToList())
-              .ToList();
+              .Select(x => x.Select(y => int.Parse(y.ToString())).ToArray())
+              .ToArray();
 
-    public static List<List<char>> ReadAsCharGrid(string path) =>
+    public static char[][] ReadAsCharGrid(string path) =>
         ReadLines(path)
-            .Select(x => x.Select(y => y).ToList())
-            .ToList();
+            .Select(x => x.Select(y => y).ToArray())
+            .ToArray();
 }

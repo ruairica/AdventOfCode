@@ -209,8 +209,8 @@ public class Tasks2023
         var grid = FP.ReadAsCharGrid($"{basePath}/day3.txt");
         var result = 0;
         var counted = new HashSet<(int, int)>();
-        var width = grid[0].Count;
-        var height = grid.Count;
+        var width = grid[0].Length;
+        var height = grid.Length;
 
         for (int r = 0; r < width; r++)
         {
@@ -299,8 +299,8 @@ public class Tasks2023
     {
         var grid = FP.ReadAsCharGrid($"{basePath}/day3.txt");
         var counted = new HashSet<(int, int)>();
-        var width = grid[0].Count;
-        var height = grid.Count;
+        var width = grid[0].Length;
+        var height = grid.Length;
 
         var gears = new Dictionary<(int, int), List<int>>();
 

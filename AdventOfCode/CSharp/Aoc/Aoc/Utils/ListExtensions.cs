@@ -1,4 +1,4 @@
-﻿using Aoc.Utils.Grids;
+using Aoc.Utils.Grids;
 
 namespace Aoc.Utils;
 public static class ListExtensions

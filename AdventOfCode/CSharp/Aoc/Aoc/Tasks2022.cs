@@ -1,4 +1,4 @@
-﻿namespace Aoc;
+namespace Aoc;
 using System.Text.RegularExpressions;
 using Aoc.Utils;
 using Aoc.Utils.Grids;
@@ -437,7 +437,6 @@ public class Tasks2022
         visibleTrees.Dump();
     }
 
-
     [Test]
     public void day8_2_2022()
     {
@@ -566,7 +565,6 @@ public class Tasks2022
                 tail = newTail;
             }
         }
-
 
         visited.Count.Dump();
     }

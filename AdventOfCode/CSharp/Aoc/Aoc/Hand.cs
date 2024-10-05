@@ -1,13 +1,11 @@
-﻿using Dumpify;
-
 namespace Aoc;
 
 public class Hand : IComparable<Hand>
 {
     public string cards;
-    bool part2;
+    readonly bool part2;
 
-    private List<char> _cardRank = new List<char>
+    private readonly List<char> _cardRank = new List<char>
     {
         'A',
         'K',
@@ -109,7 +107,6 @@ public class Hand : IComparable<Hand>
                 throw new Exception("No hand match foundd");
         }
     }
-
 
     public int CompareTo(Hand that)
     {

@@ -1,4 +1,4 @@
-﻿namespace Aoc;
+namespace Aoc;
 
 using System.Linq;
 using Aoc.Utils;
@@ -47,7 +47,7 @@ public class Tasks2021
            .Zip(newChunks, (first, second) => first > second ? 1 : 0)
            .Sum()
            .Dump();
-         
+
     }
 
     [Test]
@@ -731,40 +731,40 @@ public class Tasks2021
                         ""
                     };
 
-                    numberMatches[1] = signals.Single(x => x.Count() == 2);
-                    numberMatches[4] = signals.Single(x => x.Count() == 4);
-                    numberMatches[7] = signals.Single(x => x.Count() == 3);
-                    numberMatches[8] = signals.Single(x => x.Count() == 7);
+                    numberMatches[1] = signals.Single(x => x.Length == 2);
+                    numberMatches[4] = signals.Single(x => x.Length == 4);
+                    numberMatches[7] = signals.Single(x => x.Length == 3);
+                    numberMatches[8] = signals.Single(x => x.Length == 7);
 
                     numberMatches[9] = signals.Single(
-                        x => x.Count() == 6 &&
+                        x => x.Length == 6 &&
                              x.Intersect(numberMatches[4]).Count() == 4);
 
                     numberMatches[9] = signals.Single(
-                        x => x.Count() == 6 &&
+                        x => x.Length == 6 &&
                              x.Intersect(numberMatches[4]).Count() == 4);
 
                     numberMatches[6] = signals.Single(
-                        x => x.Count() == 6 &&
+                        x => x.Length == 6 &&
                              x.Intersect(numberMatches[4]).Count() == 3 &&
                              x.Intersect(numberMatches[1]).Count() == 1);
 
                     numberMatches[0] = signals.Single(
-                        x => x.Count() == 6 &&
+                        x => x.Length == 6 &&
                              x.Intersect(numberMatches[4]).Count() == 3 &&
                              x.Intersect(numberMatches[1]).Count() == 2);
 
                     numberMatches[3] = signals.Single(
-                        x => x.Count() == 5 &&
+                        x => x.Length == 5 &&
                              x.Intersect(numberMatches[1]).Count() == 2);
 
                     numberMatches[5] = signals.Single(
-                        x => x.Count() == 5 &&
+                        x => x.Length == 5 &&
                              x.Intersect(numberMatches[4]).Count() == 3 &&
                              x.Intersect(numberMatches[1]).Count() != 2);
 
                     numberMatches[2] = signals.Single(
-                        x => x.Count() == 5 &&
+                        x => x.Length == 5 &&
                              x.Intersect(numberMatches[4]).Count() == 2);
 
                     return long.Parse(
@@ -1011,7 +1011,7 @@ public class Tasks2021
             foreach (var letter in line)
             {
                 //  first invalid character
-                if (matches.Values.Contains(letter))
+                if (matches.ContainsValue(letter))
                 {
                     stack.Push(letter);
                 }
@@ -1059,7 +1059,7 @@ public class Tasks2021
 
                     foreach (var letter in line)
                     {
-                        if (matches.Keys.Contains(letter))
+                        if (matches.ContainsKey(letter))
                         {
                             stack.Push(letter);
                         }
@@ -2109,7 +2109,7 @@ public class Tasks2021
 
         foreach (var letter in line)
         {
-            if (matches.Values.Contains(letter))
+            if (matches.ContainsValue(letter))
             {
                 stack.Push(letter);
             }

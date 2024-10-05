@@ -1,5 +1,4 @@
-﻿namespace Utils.Grids;
-
+namespace Utils.Grids;
 
 public record ValCoord<T>(T Val, Coord Coord);
 

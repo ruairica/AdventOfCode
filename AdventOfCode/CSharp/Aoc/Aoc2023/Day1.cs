@@ -1,4 +1,4 @@
-﻿using Dumpify;
+using Dumpify;
 using Utils;
 
 namespace Aoc2023;
@@ -14,7 +14,9 @@ public class Day1 : Day
                 var nums = x.Where(char.IsDigit).ToList();
                 return $"{nums[0]}{nums[^1]}";
             })
+
             .Select(int.Parse).Sum().Dump();
+
     }
 
     public override void Part2()

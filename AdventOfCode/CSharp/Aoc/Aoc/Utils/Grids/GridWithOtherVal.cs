@@ -1,4 +1,4 @@
-﻿namespace Aoc.Utils.Grids;
+namespace Aoc.Utils.Grids;
 
 public class GridWithOtherVal<T>
 {
@@ -94,7 +94,6 @@ public class GridWithOtherVal<T>
     {
         return grid.Select(x => x).ToList();
     }
-
 
     public List<List<GridItem<T>>> GetAllColumns()
     {

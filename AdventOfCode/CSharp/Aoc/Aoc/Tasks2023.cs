@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Aoc.Utils;
 using Aoc.Utils.Grids;
@@ -2342,10 +2342,9 @@ public class Tasks2023
     [Test]
     public void day19_2_2023() // TODO
     {
-        List<Dictionary<string, int>> rejections = new();
-        List<Dictionary<string, int>> acceptance = new();
-
-        var (WORKFLOWS, RATINGS) = FP.ReadFile($"{basePath}/day19.txt").Split("\n\n");
+        _ = new List<Dictionary<string, int>>();
+        _ = new List<Dictionary<string, int>>();
+        var (_, _) = FP.ReadFile($"{basePath}/day19.txt").Split("\n\n");
     }
 
     [Test]
@@ -2392,9 +2391,9 @@ public class Tasks2023
         {
             foreach (var dest in v)
             {
-                if (conjunctions.ContainsKey(dest))
+                if (conjunctions.TryGetValue(dest, out var value))
                 {
-                    conjunctions[dest].Add((k, false));
+                    value.Add((k, false));
                 }
             }
         }
@@ -2420,30 +2419,30 @@ public class Tasks2023
                     lows += 1;
                 }
 
-                if (flipFlops.ContainsKey(module))
+                if (flipFlops.TryGetValue(module, out var value))
                 {
                     if (pulse)
                     {
                         continue;
                     }
 
-                    var invert = !flipFlops[module];
+                    var invert = flipFlops[module] = !value;
                     flipFlops[module] = invert;
                     sendTo[module].ForEach(x => q.Enqueue((x, invert, module)));
                 }
-                else if (conjunctions.ContainsKey(module))
+                else if (conjunctions.TryGetValue(module, out var value))
                 {
-                    var index = conjunctions[module].FindIndex(x => x.Item1 == from);
+                    var index = value.FindIndex(x => x.Item1 == from);
 
                     if (index == -1)
                     {
                         throw new Exception("invalid index");
                     }
 
-                    conjunctions[module][index] =
-                        (conjunctions[module][index].Item1, pulse);
+                    value[index] =
+                        (value[index].Item1, pulse);
 
-                    var allHigh = conjunctions[module].All(x => x.Item2);
+                    var allHigh = value.All(x => x.Item2);
 
                     foreach (var s in sendTo[module])
                     {
@@ -2503,9 +2502,9 @@ public class Tasks2023
         {
             foreach (var dest in v)
             {
-                if (conjunctions.ContainsKey(dest))
+                if (conjunctions.TryGetValue(dest, out var value))
                 {
-                    conjunctions[dest].Add((k, false));
+                    value.Add((k, false));
                 }
             }
         }
@@ -2531,30 +2530,30 @@ public class Tasks2023
                     return;
                 }
 
-                if (flipFlops.ContainsKey(module))
+                if (flipFlops.TryGetValue(module, out var value))
                 {
                     if (pulse)
                     {
                         continue;
                     }
 
-                    var invert = !flipFlops[module];
+                    var invert = flipFlops[module] = !value;
                     flipFlops[module] = invert;
                     sendTo[module].ForEach(x => q.Enqueue((x, invert, module)));
                 }
-                else if (conjunctions.ContainsKey(module))
+                else if (conjunctions.TryGetValue(module, out var value))
                 {
-                    var index = conjunctions[module].FindIndex(x => x.Item1 == from);
+                    var index = value.FindIndex(x => x.Item1 == from);
 
                     if (index == -1)
                     {
                         throw new Exception("invalid index");
                     }
 
-                    conjunctions[module][index] =
-                        (conjunctions[module][index].Item1, pulse);
+                    value[index] =
+                        (value[index].Item1, pulse);
 
-                    var allHigh = conjunctions[module].All(x => x.Item2);
+                    var allHigh = value.All(x => x.Item2);
 
                     foreach (var s in sendTo[module])
                     {
@@ -2667,18 +2666,17 @@ public class Tasks2023
         total.Dump();
     }
 
-    class PetOwner
+    sealed class PetOwner
     {
         public string Name { get; set; }
         public List<string> Pets { get; set; }
     }
 
-    class Pet
+    sealed class Pet
     {
         public string Name { get; set; }
         public double Age { get; set; }
     }
-
 
     [Test]
     public void linq_tests()
@@ -2691,8 +2689,6 @@ public class Tasks2023
         // where with index, not that useful 
         // maybe a simple selectmany with selector functiion
         // selectmany with selector function? , explain this.....
-
-
 
         // select many with index..., figure this out
         // aggregate with and without seed ? 
@@ -2744,11 +2740,8 @@ public class Tasks2023
         petOwners.SelectMany(x => x.Pets, (petOwner, pet) => $"{petOwner.Name} - {pet}")
             .Dump();
 
-
         var value = new List<int> { 1, 3, 5 }.FirstOrDefault(x => x % 2 == 0);
         value.Dump();
-
-
 
         var max = Enumerable.Range(1, 4).Select(x => (5 - x) * x).Dump().Max().Dump();
         var max2 = Enumerable.Range(1, 4).Max(x => (5 - x) * x).Dump();
@@ -2766,7 +2759,6 @@ public class Tasks2023
             .SelectMany(x => x);
 
         combinations.Dump();
-
 
         // Create a list of pets.
         var petsList =

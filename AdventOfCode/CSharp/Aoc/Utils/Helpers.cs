@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace Utils;
 
@@ -6,8 +6,7 @@ public static class Helpers
 {
     public static double Median<T>(this IEnumerable<T> items) where T : struct, IComparable<T>
     {
-        if (items == null)
-            throw new ArgumentNullException(nameof(items));
+        ArgumentNullException.ThrowIfNull(items);
 
         var sortedList = items.OrderBy(x => x).ToList();
         int count = sortedList.Count;

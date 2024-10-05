@@ -1,4 +1,4 @@
-﻿namespace Utils.Grids;
+namespace Utils.Grids;
 
 public class Grid<T>
 {

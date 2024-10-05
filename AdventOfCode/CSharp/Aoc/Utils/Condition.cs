@@ -1,5 +1,4 @@
-﻿namespace Utils;
-
+namespace Utils;
 
 public record Condition(string Rule)
 {

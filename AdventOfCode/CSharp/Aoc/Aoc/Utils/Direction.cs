@@ -1,4 +1,4 @@
-﻿namespace Aoc.Utils;
+namespace Aoc.Utils;
 
 public enum Dir
 {

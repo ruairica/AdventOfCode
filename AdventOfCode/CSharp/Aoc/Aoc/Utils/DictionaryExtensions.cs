@@ -1,4 +1,4 @@
-﻿namespace Aoc.Utils;
+namespace Aoc.Utils;
 
 public static class DictionaryExtensions
 {

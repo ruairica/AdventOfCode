@@ -1,5 +1,4 @@
-﻿namespace Aoc.Utils;
-
+namespace Aoc.Utils;
 
 public record Condition(string Rule)
 {

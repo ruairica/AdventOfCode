@@ -1,4 +1,4 @@
-﻿namespace Aoc.Utils.Grids;
+namespace Aoc.Utils.Grids;
 
 public static class AStarAlgorithm
 {

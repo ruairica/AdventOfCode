@@ -1,5 +1,4 @@
-﻿namespace Aoc.Utils.Grids;
-
+namespace Aoc.Utils.Grids;
 
 public record ValCoord<T>(T Val, Coord Coord);
 

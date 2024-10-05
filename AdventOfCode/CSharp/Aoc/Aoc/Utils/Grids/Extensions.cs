@@ -1,4 +1,4 @@
-﻿namespace Aoc.Utils.Grids;
+namespace Aoc.Utils.Grids;
 
 public static class GridExtensions
 {
@@ -7,7 +7,6 @@ public static class GridExtensions
     public static readonly List<Coord> dirsNoDiags = new() { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
 
     public static readonly List<(Coord coord, Dir dir)> dirsNoDiagsDir = new() { (new(0, 1), Dir.Right), (new(0, -1), Dir.Left), (new(1, 0), Dir.Down), (new(-1, 0), Dir.Up) };
-
 
     public static List<Coord> GetValidAdjacentIncludingDiag(this Coord coord, int Width, int Height)
     {

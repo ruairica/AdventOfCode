@@ -1,4 +1,4 @@
-﻿using Utils.Grids;
+using Utils.Grids;
 
 namespace Utils;
 public static class ListExtensions

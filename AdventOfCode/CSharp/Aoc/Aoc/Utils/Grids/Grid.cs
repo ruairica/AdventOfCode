@@ -1,4 +1,4 @@
-﻿
+
 namespace Aoc.Utils.Grids;
 
 public class Grid<T>
@@ -227,8 +227,8 @@ public class Grid<T>
 
     public void Rotate90Counterclockwise()
     {
-
-        List<int> x = new();
+        _ = new
+        List<int>();
 
         for (int i = 0; i < this.Height; i++)
         {

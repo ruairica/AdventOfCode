@@ -2430,19 +2430,19 @@ public class Tasks2023
                     flipFlops[module] = invert;
                     sendTo[module].ForEach(x => q.Enqueue((x, invert, module)));
                 }
-                else if (conjunctions.TryGetValue(module, out var value))
+                else if (conjunctions.TryGetValue(module, out var value2))
                 {
-                    var index = value.FindIndex(x => x.Item1 == from);
+                    var index = value2.FindIndex(x => x.Item1 == from);
 
                     if (index == -1)
                     {
                         throw new Exception("invalid index");
                     }
 
-                    value[index] =
-                        (value[index].Item1, pulse);
+                    value2[index] =
+                        (value2[index].Item1, pulse);
 
-                    var allHigh = value.All(x => x.Item2);
+                    var allHigh = value2.All(x => x.Item2);
 
                     foreach (var s in sendTo[module])
                     {
@@ -2541,19 +2541,19 @@ public class Tasks2023
                     flipFlops[module] = invert;
                     sendTo[module].ForEach(x => q.Enqueue((x, invert, module)));
                 }
-                else if (conjunctions.TryGetValue(module, out var value))
+                else if (conjunctions.TryGetValue(module, out var value2))
                 {
-                    var index = value.FindIndex(x => x.Item1 == from);
+                    var index = value2.FindIndex(x => x.Item1 == from);
 
                     if (index == -1)
                     {
                         throw new Exception("invalid index");
                     }
 
-                    value[index] =
-                        (value[index].Item1, pulse);
+                    value2[index] =
+                        (value2[index].Item1, pulse);
 
-                    var allHigh = value.All(x => x.Item2);
+                    var allHigh = value2.All(x => x.Item2);
 
                     foreach (var s in sendTo[module])
                     {

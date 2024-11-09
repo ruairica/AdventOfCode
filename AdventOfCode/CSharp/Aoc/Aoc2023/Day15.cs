@@ -3,7 +3,7 @@ using Utils;
 
 namespace Aoc2023;
 
-public class Day15 :Day
+public class Day15 : Day
 {
     public override void Part1()
     {

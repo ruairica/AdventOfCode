@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -21,6 +21,9 @@
     <None Remove="inputs\Day1_1.txt" />
     <None Remove="inputs\Day1_2.txt" />
     <None Remove="inputs\Day1_3.txt" />
+    <None Remove="inputs\Day2_1.txt" />
+    <None Remove="inputs\Day2_2.txt" />
+    <None Remove="inputs\Day2_3.txt" />
   </ItemGroup>
 
   <ItemGroup>

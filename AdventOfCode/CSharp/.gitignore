@@ -3,6 +3,8 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+*token.txt
+**/Aoc2024/inputs/
 # User-specific files
 *.rsuser
 *.suo

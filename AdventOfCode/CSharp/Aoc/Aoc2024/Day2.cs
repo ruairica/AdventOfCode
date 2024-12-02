@@ -18,7 +18,7 @@ public class Day2 :Day
             .Lines()
             .Select(line => line.GetNums())
             .Select(Variations)
-            .Count(copies => copies.Any(Safe))
+            .Count(variations => variations.Any(Safe))
             .Dump();
     }
 
@@ -43,5 +43,5 @@ public class Day2 :Day
     }
 
     private static List<List<int>> Variations(List<int> nums) =>
-        Range(0, nums.Count).Select(x => nums.Where((el, index) => index != x).Select(e => e).ToList()).ToList();
+        Range(0, nums.Count).Select(x => nums.Where((_, index) => index != x).Select(e => e).ToList()).ToList();
 }

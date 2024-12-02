@@ -5,19 +5,21 @@ public class Day2 :Day
 {
     public override void Part1()
     {
-        var text = Text();
-
-        var count = text.Lines().Select(line => line.GetNums()).Count(Safe);
-
-        count.Dump();
+        Text()
+            .Lines()
+            .Select(line => line.GetNums())
+            .Count(Safe)
+            .Dump();
     }
 
     public override void Part2()
     {
-        var text = Text().Dump();
-        var count = text.Lines().Select(line => line.GetNums()).Select(Copies).Count(copies => copies.Any(Safe));
-
-        count.Dump();
+        Text()
+            .Lines()
+            .Select(line => line.GetNums())
+            .Select(Variations)
+            .Count(copies => copies.Any(Safe))
+            .Dump();
     }
 
     private static bool Safe(List<int> nums)
@@ -27,42 +29,19 @@ public class Day2 :Day
             return false;
         }
 
-        var isasc = false;
-        var asc = nums.OrderBy(x => x).ToList();
-        foreach (var i in Range(0, nums.Count))
-        {
-            isasc = nums[i] == asc[i];
-            if (!isasc)
-            {
-                break;
-            }
-        }
-
-        var desc = nums.OrderByDescending(x => x).ToList();
-        var isdesc = false;
-        foreach (var i in Range(0, nums.Count))
-        {
-            isdesc = nums[i] == desc[i];
-            if (!isdesc)
-            { break; }
-        }
-
+        var isasc = nums.Zip(nums.OrderBy(x => x), (i1, i2) => i1 == i2).All(x => x);
+        var isdesc = nums.Zip(nums.OrderByDescending(x => x), (i1, i2) => i1 == i2).All(x => x);
 
         if (!isdesc && !isasc)
         {
             return false;
         }
 
-
-        var s = nums.Zip(nums.Skip(1), (i1, i2) =>
-        {
-            var diff = Math.Abs(i2 - i1);
-            return diff is >= 1 and <= 3;
-        });
-
-        return s.All(x => x);
+        return nums
+            .Zip(nums.Skip(1), (i1, i2) => Math.Abs(i2 - i1) is >= 1 and <= 3)
+            .All(x => x);
     }
 
-    private List<List<int>> Copies(List<int> nums) =>
+    private static List<List<int>> Variations(List<int> nums) =>
         Range(0, nums.Count).Select(x => nums.Where((el, index) => index != x).Select(e => e).ToList()).ToList();
 }

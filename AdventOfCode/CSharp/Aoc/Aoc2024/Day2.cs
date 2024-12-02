@@ -7,7 +7,7 @@ public class Day2 :Day
     {
         Text()
             .Lines()
-            .Select(line => line.GetNums())
+            .Select(line => line.Nums())
             .Count(Safe)
             .Dump();
     }
@@ -16,7 +16,7 @@ public class Day2 :Day
     {
         Text()
             .Lines()
-            .Select(line => line.GetNums())
+            .Select(line => line.Nums())
             .Select(Variations)
             .Count(variations => variations.Any(Safe))
             .Dump();

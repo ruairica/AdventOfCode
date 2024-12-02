@@ -6,7 +6,7 @@ public class Day1 : Day
     {
         var input = Text()
             .Lines()
-            .Select(line => line.GetNums())
+            .Select(line => line.Nums())
             .Select(x => (x[0], x[1]))
             .ToList();
 
@@ -22,7 +22,7 @@ public class Day1 : Day
     {
         var input = Text()
             .Lines()
-            .Select(line => line.GetNums())
+            .Select(line => line.Nums())
             .Select(x => (x[0], x[1]))
             .ToList();
 

@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Aoc.Utils;
-using Aoc.Utils.Grids;
 using Dumpify;
 using NUnit.Framework;
+using Utils;
+using Utils.Grids;
 
 namespace Aoc;
 
@@ -40,7 +40,7 @@ public class Tasks2023
         };
 
         var dict = new Dictionary<string, int>();
-        numStrings.Enumerate().ToList().ForEach(x => dict.Add(x.val, x.index + 1));
+        numStrings.Index().ToList().ForEach(x => dict.Add(x.val, x.index + 1));
 
         var collection = Enumerable.Range(1, 9).Select(x => x.ToString()).ToList();
         collection.ForEach(x => dict.Add(x, int.Parse(x)));
@@ -209,8 +209,8 @@ public class Tasks2023
         var grid = FP.ReadAsCharGrid($"{basePath}/day3.txt");
         var result = 0;
         var counted = new HashSet<(int, int)>();
-        var width = grid[0].Length;
-        var height = grid.Length;
+        var width = grid[0].Count;
+        var height = grid.Count;
 
         for (int r = 0; r < width; r++)
         {
@@ -299,8 +299,8 @@ public class Tasks2023
     {
         var grid = FP.ReadAsCharGrid($"{basePath}/day3.txt");
         var counted = new HashSet<(int, int)>();
-        var width = grid[0].Length;
-        var height = grid.Length;
+        var width = grid[0].Count;
+        var height = grid.Count;
 
         var gears = new Dictionary<(int, int), List<int>>();
 
@@ -395,7 +395,7 @@ public class Tasks2023
 
         var copies = new Dictionary<int, int>();
 
-        foreach (var (line, index) in lines.Enumerate())
+        foreach (var (line, index) in lines.Index())
         {
             var cardNumber = index + 1;
             var allNums = line.Split(":")[1];
@@ -432,7 +432,7 @@ public class Tasks2023
 
         maps.Dump();
 
-        foreach (var (block, blockIndex) in text.Split("\n\n").Skip(1).Enumerate())
+        foreach (var (block, blockIndex) in text.Split("\n\n").Skip(1).Index())
         {
             foreach (var line in block.Split("\n").Skip(1))
             {
@@ -441,7 +441,7 @@ public class Tasks2023
                     .Select(x => long.Parse(x.Value))
                     .ToList();
 
-                foreach (var (map, i) in maps.Enumerate()
+                foreach (var (map, i) in maps.Index()
                              .Where(x => x.val.Count == blockIndex + 1))
                 {
                     var current = map.Last();
@@ -561,9 +561,9 @@ public class Tasks2023
     {
         var lines = FP.ReadFile($"{basePath}/day6.txt").Split("\n");
 
-        var times = lines[0].GetNums();
+        var times = lines[0].Nums();
 
-        var recordDistances = lines[1].GetNums();
+        var recordDistances = lines[1].Nums();
 
         var results = new List<int>();
 
@@ -593,8 +593,8 @@ public class Tasks2023
         var lines = FP.ReadFile($"{basePath}/day6.txt").Split("\n");
 
         lines[0]
-            .GetNums()
-            .Zip(lines[1].GetNums(), (t, rd) => (time: t, record: rd))
+            .Nums()
+            .Zip(lines[1].Nums(), (t, rd) => (time: t, record: rd))
             .Select(
                 x => Enumerable.Range(1, x.time)
                     .Count(t => ((x.time - t) * t) > x.record))
@@ -790,11 +790,11 @@ public class Tasks2023
 
         foreach (var line in lines)
         {
-            var seqs = new List<List<int>> { line.GetNums() };
+            var seqs = new List<List<int>> { line.Nums() };
 
             while (!(seqs.Last().Distinct().Count() == 1 && seqs.Last().Last() == 0))
             {
-                seqs.Add(seqs.Last().GetDifferences().ToList());
+                seqs.Add(seqs.Last().Differences().ToList());
             }
 
             seqs.Reverse();
@@ -820,7 +820,7 @@ public class Tasks2023
 
         foreach (var line in lines)
         {
-            var seqs = new List<List<int>> { line.GetNums() };
+            var seqs = new List<List<int>> { line.Nums() };
 
             while (!(seqs.Last().Distinct().Count() == 1 && seqs.Last().Last() == 0))
             {
@@ -1122,13 +1122,13 @@ public class Tasks2023
         var g1 = new Grid<char>(FP.ReadAsCharGrid($"{basePath}/day11.txt"));
 
         var indexesOfRowsToScale = g1.GetAllRows()
-            .Enumerate()
+            .Index()
             .Where(x => x.val.All(x => x == '.'))
             .Select(r => r.index)
             .ToHashSet();
 
         var indexesOfColsToScale = g1.GetAllColumns()
-            .Enumerate()
+            .Index()
             .Where(x => x.val.All(x => x == '.'))
             .Select(r => r.index)
             .ToHashSet();
@@ -1145,7 +1145,7 @@ public class Tasks2023
                 x =>
                 {
                     var (c1, c2) = x;
-                    var dist = AStarAlgorithm.ManhattanDistance(c1, c2);
+                    var dist = c1.ManhattanDistance(c2);
 
                     var rowsInWay = indexesOfRowsToScale.Count(
                         s => c1.r > c2.r ? s < c1.r && s > c2.r : s > c1.r && s < c2.r);
@@ -1170,7 +1170,7 @@ public class Tasks2023
         foreach (var line in lines)
         {
             var (pattern, seq) = line.Split(" ");
-            var brokens = seq.GetNums();
+            var brokens = seq.Nums();
 
             var result = generatePermutations(pattern);
 
@@ -1194,7 +1194,7 @@ public class Tasks2023
 
             var matchesFound = 0;
 
-            foreach (var (letter, index) in line.Enumerate())
+            foreach (var (letter, index) in line.Index())
             {
                 if (letter == damaged && !inMatch)
                 {
@@ -1302,7 +1302,7 @@ public class Tasks2023
                 ',',
                 Enumerable.Repeat(0, 5).Select(_ => seq));
 
-            var brokens = brokensString.GetNums();
+            var brokens = brokensString.Nums();
             var permutations = generatePermutations(newPattern);
             // foreach line in result, check if it matches the brokens
 
@@ -1350,7 +1350,7 @@ public class Tasks2023
 
             var matchesFound = 0;
 
-            foreach (var (letter, index) in line.Enumerate())
+            foreach (var (letter, index) in line.Index())
             {
                 if (letter == damaged && !inMatch)
                 {
@@ -1442,7 +1442,7 @@ public class Tasks2023
         var sections = FP.ReadFile($"{basePath}/day13.txt").Split("\n\n");
         var total = 0;
 
-        foreach (var (section, si) in sections.Enumerate())
+        foreach (var (section, si) in sections.Index())
         {
             var g = new Grid<char>(
                 section.Split("\n").Select(x => x.Select(y => y).ToList()).ToList());
@@ -1451,7 +1451,7 @@ public class Tasks2023
 
             for (var i = 1; i < g.Height; i++)
             {
-                if (g.grid[i].Enumerate().All(x => x.val == g.grid[i - 1][x.index]))
+                if (g.grid[i].Index().All(x => x.val == g.grid[i - 1][x.index]))
                 {
                     var hitEdge = false;
 
@@ -1469,7 +1469,7 @@ public class Tasks2023
                     while (top >= 0 && bottom < g.Height)
                     {
                         var symmetrical = g.grid[top]
-                            .Enumerate()
+                            .Index()
                             .All(x => x.val == g.grid[bottom][x.index]);
 
                         if (symmetrical)
@@ -1502,7 +1502,7 @@ public class Tasks2023
 
             for (var i = 1; i < cols.Count; i++)
             {
-                if (cols[i].Enumerate().All(x => x.val == cols[i - 1][x.index]))
+                if (cols[i].Index().All(x => x.val == cols[i - 1][x.index]))
                 {
                     var left = i - 2;
                     var right = i + 1;
@@ -1519,7 +1519,7 @@ public class Tasks2023
                     while (left >= 0 && right < g.Width)
                     {
                         var symmetrical = cols[left]
-                            .Enumerate()
+                            .Index()
                             .All(x => x.val == cols[right][x.index]);
 
                         if (symmetrical)
@@ -1560,7 +1560,7 @@ public class Tasks2023
         var sections = FP.ReadFile($"{basePath}/day13.txt").Split("\n\n");
         var total = 0;
 
-        foreach (var (section, si) in sections.Enumerate())
+        foreach (var (section, si) in sections.Index())
         {
             var g = new Grid<char>(
                 section.Split("\n").Select(x => x.Select(y => y).ToList()).ToList());
@@ -1573,7 +1573,7 @@ public class Tasks2023
                 var usedSmudge = false;
 
                 var matches = g.grid[i]
-                    .Enumerate()
+                    .Index()
                     .Count(x => x.val == g.grid[i - 1][x.index]);
 
                 if (matches == g.Width - 1)
@@ -1599,7 +1599,7 @@ public class Tasks2023
                     while (top >= 0 && bottom < g.Height)
                     {
                         var symmetricalHits = g.grid[top]
-                            .Enumerate()
+                            .Index()
                             .Count(x => x.val == g.grid[bottom][x.index]);
 
                         if (symmetricalHits == g.Width)
@@ -1647,7 +1647,7 @@ public class Tasks2023
                 var usedSmudge = false;
 
                 var matches =
-                    cols[i].Enumerate().Count(x => x.val == cols[i - 1][x.index]);
+                    cols[i].Index().Count(x => x.val == cols[i - 1][x.index]);
 
                 if (matches == g.Height - 1)
                 {
@@ -1671,7 +1671,7 @@ public class Tasks2023
                     while (left >= 0 && right < g.Width)
                     {
                         var symmetricalHits = cols[left]
-                            .Enumerate()
+                            .Index()
                             .Count(x => x.val == cols[right][x.index]);
 
                         if (symmetricalHits == g.Height)
@@ -2287,8 +2287,8 @@ public class Tasks2023
 
         var ratings = RATINGS.Split("\n")
             .Select(
-                r => r.GetNums()
-                    .Enumerate()
+                r => r.Nums()
+                    .Index()
                     .ToDictionary(
                         k => k.index switch
                         {
@@ -2627,7 +2627,7 @@ public class Tasks2023
         var bricks = lines.Select(
                 x =>
                 {
-                    var nums = x.GetNums();
+                    var nums = x.Nums();
 
                     return new Brick(
                         nums[0],

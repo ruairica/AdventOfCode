@@ -1,7 +1,8 @@
+using Utils;
+using Utils.Grids;
+
 namespace Aoc;
 using System.Text.RegularExpressions;
-using Aoc.Utils;
-using Aoc.Utils.Grids;
 using Dumpify;
 using NUnit.Framework;
 
@@ -417,7 +418,7 @@ public class Tasks2022
         var g = FP.ReadAsGrid("./inputs/2022/day8.txt");
 
         // all edges
-        var visibleTrees = g.Length * 4 - 4;
+        var visibleTrees = g.Count * 4 - 4;
 
         var grid = new Grid<int>(g);
 
@@ -448,16 +449,16 @@ public class Tasks2022
         grid.ForEachWithCoord((val, coord) =>
         {
             var currentScore = 1;
-            var up = grid.GetAllValuesUpFromCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
+            var up = grid.GetAllValuesUpFromCoord(coord).Index().FirstOrDefault(x => x.val >= val);
             currentScore *= (up == default ? coord.r : up.index + 1);
 
-            var left = grid.GetAllValuesLeftOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
+            var left = grid.GetAllValuesLeftOfCoord(coord).Index().FirstOrDefault(x => x.val >= val);
             currentScore *= (left == default ? coord.c : left.index + 1);
 
-            var right = grid.GetAllValuesRightOfCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
+            var right = grid.GetAllValuesRightOfCoord(coord).Index().FirstOrDefault(x => x.val >= val);
             currentScore *= (right == default ? grid.Width - 1 - coord.c : right.index + 1);
 
-            var down = grid.GetAllValuesDownFromCoord(coord).Enumerate().FirstOrDefault(x => x.val >= val);
+            var down = grid.GetAllValuesDownFromCoord(coord).Index().FirstOrDefault(x => x.val >= val);
             currentScore *= (down == default ? grid.Height - 1 - coord.r : down.index + 1);
 
             maxScore = Math.Max(maxScore, currentScore);

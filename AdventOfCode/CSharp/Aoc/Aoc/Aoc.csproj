@@ -60,5 +60,9 @@
 	  <None Remove="inputs\day16.txt" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Utils\Utils.csproj" />
+	</ItemGroup>
+
 
 </Project>

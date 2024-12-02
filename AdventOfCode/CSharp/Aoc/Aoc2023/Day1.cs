@@ -35,7 +35,7 @@ public class Day1 : Day
         ];
 
         var dict = new Dictionary<string, int>();
-        numStrings.Enumerate().ToList().ForEach(x => dict.Add(x.val, x.index + 1));
+        numStrings.Index().ToList().ForEach(x => dict.Add(x.val, x.index + 1));
 
         var collection = Enumerable.Range(1, 9).Select(x => x.ToString()).ToList();
         collection.ForEach(x => dict.Add(x, int.Parse(x)));

@@ -40,4 +40,6 @@ public static class GridExtensions
             .Select(e => (new Coord(coord.r + e.coord.r, coord.c + e.coord.c), e.dir))
             .ToList();
     }
+
+    public static int ManhattanDistance(this Coord current, Coord target) => Math.Abs(current.r - target.r) + Math.Abs(current.c - target.c);
 }

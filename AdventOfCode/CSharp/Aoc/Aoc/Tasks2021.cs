@@ -1,8 +1,9 @@
+using Utils;
+using Utils.Grids;
+
 namespace Aoc;
 
 using System.Linq;
-using Aoc.Utils;
-using Aoc.Utils.Grids;
 using Dumpify;
 using NUnit.Framework;
 
@@ -1877,24 +1878,6 @@ public class Tasks2021
     }
 
     [Test]
-    public void day15_1()
-    {
-        var grid = File.ReadAllText("./inputs/day15.txt")
-            .Trim()
-            .Replace("\r\n", "\n")
-            .Split("\n")
-            .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
-            .ToList();
-
-        var cost = AStarAlgorithm.AStar(
-            new Grid<int>(grid),
-            new Coord(0, 0),
-            new Coord(grid.Count - 1, grid[0].Count - 1));
-
-        cost.Dump();
-    }
-
-    [Test]
     public void day15_1_2021_Dijkstra()
     {
         var grid = new Grid<int>(FP.ReadAsGrid("./inputs/day15.txt"));
@@ -1930,52 +1913,6 @@ public class Tasks2021
                         q.Enqueue((adj, newCost), newCost);
                     });
         }
-    }
-
-    [Test]
-    public void day15_2()
-    {
-        var grid = File.ReadAllText("./inputs/day15.txt")
-            .Trim()
-            .Replace("\r\n", "\n")
-            .Split("\n")
-            .Select(x => x.Select(x => int.Parse(x.ToString())).ToList())
-            .ToList();
-
-        var rows = grid.Select(x => x.Select(x => x).ToList()).ToList();
-
-        new Grid<int>(grid).Print();
-
-        // rows
-        for (int i = 1; i <= 4; i++)
-        {
-            for (int j = 0; j < grid.Count; j++)
-            {
-                var newValsInRow = rows[j].Select(x => (x + i) > 9 ? x + i - 9 : x + i);
-                grid[j] = grid[j].Concat(newValsInRow).ToList();
-            }
-        }
-
-        rows = grid.Select(x => x.Select(x => x).ToList()).ToList();
-
-        // cols
-        for (int i = 1; i <= 4; i++)
-        {
-            var newRows = rows
-                .Select(c => c.Select(e => e + i > 9 ? e + i - 9 : e + i).ToList())
-                .ToList();
-
-            grid.AddRange(newRows);
-        }
-
-        var g = new Grid<int>(grid);
-
-        var cost = AStarAlgorithm.AStar(
-            g,
-            new Coord(0, 0),
-            new Coord(grid.Count - 1, grid[0].Count - 1));
-
-        cost.Dump();
     }
 
     [Test]

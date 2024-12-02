@@ -22,7 +22,7 @@ public static class Helpers
         return Convert.ToDouble(sortedList[middleIndex]);
     }
 
-    public static IEnumerable<(T val, int index)> Enumerate<T>(this IEnumerable<T> list) =>
+    public static IEnumerable<(T val, int index)> Index<T>(this IEnumerable<T> list) =>
         list.Select((x, i) => (x, i));
 
     public static int ConvertToDecimal(List<int> binary)
@@ -30,7 +30,7 @@ public static class Helpers
         return binary.Select((t, m) => t * (int)Math.Pow(2, binary.Count - 1 - m)).Sum();
     }
 
-    public static List<int> GetNums(this string input) => Regex.Matches(input, @"-?\d+").Select(x => int.Parse(x.Value)).ToList();
+    public static List<int> Nums(this string input) => Regex.Matches(input, @"-?\d+").Select(x => int.Parse(x.Value)).ToList();
 
-    public static List<long> GetLongs(this string input) => Regex.Matches(input, @"-?\d+").Select(x => long.Parse(x.Value)).ToList();
+    public static List<long> Longs(this string input) => Regex.Matches(input, @"-?\d+").Select(x => long.Parse(x.Value)).ToList();
 }

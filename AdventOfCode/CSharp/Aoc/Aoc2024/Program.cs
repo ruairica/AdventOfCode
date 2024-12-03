@@ -8,8 +8,7 @@ public class Program
         /*
         dotnet run {day} {part}
         use below for hot reload + less console output
-        dotnet watch run 1 1 --property WarningLevel=0
-         
+        dotnet watch run 1 1 -q --property WarningLevel=0
          */
         var (day, part) = (int.Parse(args[0]), int.Parse(args[1]));
 

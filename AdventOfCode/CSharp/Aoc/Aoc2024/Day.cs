@@ -8,9 +8,10 @@ public abstract class Day
 
     public string Text()
     {
-        var path = $"./inputs/{GetType().Name}.txt";
+        var path = $"C:/Source/personal/AdventOfCode/AdventOfCode/CSharp/Aoc/Aoc2024/inputs/{GetType().Name}.txt";
         if (File.Exists(path))
         {
+            "filexists".Dump();
             return ReadFile(path);
         }
 

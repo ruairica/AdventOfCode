@@ -1,5 +1,3 @@
-using Utils.Grids;
-
 namespace Aoc2024;
 
 public class Day4 : Day

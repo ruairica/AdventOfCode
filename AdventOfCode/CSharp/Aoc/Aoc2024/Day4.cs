@@ -15,14 +15,13 @@ public class Day4 : Day
         // vert
         count += g.GetAllColumns().Sum(Count);
 
+        // go across the top row
         foreach (var c in Range(0, g.Width))
         {
-            foreach (var cc in new List<Coord> { new(0, c), })
-            {
-                count += diagcount(cc, g);
-            }
+            count += diagcount(new Coord(0, c), g);
         }
 
+        // go down LHS and RHS  columns, skipping first element to avoid overlap with above
         foreach (var c in Range(1, g.Height - 1))
         {
             foreach (var cc in new List<Coord> { new(c, 0), new(c, g.Width - 1) })
@@ -48,10 +47,7 @@ public class Day4 : Day
 
         foreach (var c in Range(0, g.Width))
         {
-            foreach (var cc in new List<Coord> { new(0, c), })
-            {
-                points.AddRange(findCentresOfX(cc, g));
-            }
+            points.AddRange(findCentresOfX(new Coord(0, c), g));
         }
 
         foreach (var c in Range(1, g.Height - 1))
@@ -96,7 +92,7 @@ public class Day4 : Day
                 else
                 {
                     var s = string.Join("", l);
-                    ind.AddRange(s.AllIndexOf("MAS").Concat(s.AllIndexOf("SAM")).Select(x => l2[x+1]));
+                    ind.AddRange(s.AllIndexOf("MAS").Concat(s.AllIndexOf("SAM")).Select(x => l2[x + 1]));
                     valid = false;
                 }
             }
@@ -150,5 +146,4 @@ public class Day4 : Day
             !(newCoord.r < 0 || newCoord.r >= g.Height || newCoord.c < 0 ||
               newCoord.c >= g.Width), newCoord);
     }
-
 }

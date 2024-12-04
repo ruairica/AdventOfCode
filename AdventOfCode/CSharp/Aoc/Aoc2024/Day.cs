@@ -11,7 +11,7 @@ public abstract class Day
         var path = $"./inputs/{GetType().Name}.txt";
         if (File.Exists(path))
         {
-            return ReadFileNoReplace(path);
+            return ReadFile(path);
         }
 
         var client = new HttpClient();

@@ -2,7 +2,7 @@
   "profiles": {
     "Aoc2024": {
       "commandName": "Project",
-      "commandLineArgs": "4 1"
+      "commandLineArgs": "5 both"
     }
   }
 }

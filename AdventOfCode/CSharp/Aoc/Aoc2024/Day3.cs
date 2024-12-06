@@ -7,7 +7,6 @@ public class Day3 : Day
 {
     public override void Part1()
     {
-
         Part1RegexBetter(Text().Dump());
         Regex.Matches(Text(), @"mul\(\d+,\d+\)")
             .Select(x => x.Value)

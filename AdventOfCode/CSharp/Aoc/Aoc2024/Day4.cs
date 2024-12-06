@@ -1,3 +1,5 @@
+using System.Reflection.Metadata.Ecma335;
+
 namespace Aoc2024;
 
 public class Day4 : Day
@@ -35,6 +37,28 @@ public class Day4 : Day
             var s = string.Join("", x);
             return s.AllIndexOf("XMAS").Count + s.AllIndexOf("SAMX").Count;
         }
+
+        Part1Redo().Dump();
+    }
+
+    private int Part1Redo()
+    {
+        var g = new Grid<char>(Text().CharGrid());
+        var count = 0;
+        g.ForEachWithCoord((c, coord) =>
+        {
+            if (c != 'X')
+            {
+                return;
+            }
+
+            count += GridExtensions.dirsWithDiags
+                .Select(dir =>
+                    Range(1, 3).Select(x => new Coord(coord.r + x * dir.r, coord.c + x * dir.c)).ToList())
+                .Where(path => path.All(x => g.InBounds(x)))
+                .Count(path => g[path[0]] == 'M' && g[path[1]] == 'A' && g[path[2]] == 'S');
+        });
+        return count;
     }
 
     public override void Part2()

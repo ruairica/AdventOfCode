@@ -11,7 +11,6 @@ public abstract class Day
         var path = $"C:/Source/personal/AdventOfCode/AdventOfCode/CSharp/Aoc/Aoc2024/inputs/{GetType().Name}.txt";
         if (File.Exists(path))
         {
-            "filexists".Dump();
             return ReadFile(path);
         }
 

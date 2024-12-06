@@ -66,6 +66,8 @@ public class Grid<T>
         }
     }
 
+    public bool InBounds(Coord c) => c.r >= 0 && c.r < this.Height && c.c >= 0  && c.c < this.Width;
+
     public bool AllValues(Func<T, bool> func)
     {
         return grid.SelectMany(x => x).All(func);

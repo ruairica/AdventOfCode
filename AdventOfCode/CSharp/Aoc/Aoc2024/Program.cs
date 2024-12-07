@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Aoc2024;
 
@@ -26,10 +27,15 @@ public class Program
         }
         else if (part == "both")
         {
+            var sw = Stopwatch.StartNew();
+            $"Day {day}".Dump();
             "Part 1:".Dump();
             solution.Part1();
+            var p1time = sw.Elapsed.TotalSeconds;
+            $"Completed in {p1time} seconds".Dump();
             "Part 2:".Dump();
             solution.Part2();
+            $"Completed in {sw.Elapsed.TotalSeconds - p1time}".Dump();
         }
     }
 }

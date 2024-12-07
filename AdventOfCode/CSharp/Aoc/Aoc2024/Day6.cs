@@ -50,9 +50,11 @@ public class Day6 :Day
         var start = position;
 
         var total = 0;
+
+        // could imrpove this : only needed to check the squares that are in the original (part 1) path of the guard
         for (int r = 0; r < g.Height; r++)
         {
-            for (int c = 0; c < g.Height; c++)
+            for (int c = 0; c < g.Width; c++)
             {
                 var currentPos = new Coord(r, c);
                 if (currentPos != start && g[currentPos] != '#')
@@ -66,7 +68,6 @@ public class Day6 :Day
 
         total.Dump();
     }
-
 
     private bool CreatesInfiniteLoop(Coord start, Grid<char> grid)
     {

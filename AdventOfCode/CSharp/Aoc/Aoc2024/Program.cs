@@ -35,7 +35,7 @@ public class Program
             $"Completed in {p1time} seconds".Dump();
             "Part 2:".Dump();
             solution.Part2();
-            $"Completed in {sw.Elapsed.TotalSeconds - p1time}".Dump();
+            $"Completed in {sw.Elapsed.TotalSeconds - p1time} seconds".Dump();
         }
     }
 }

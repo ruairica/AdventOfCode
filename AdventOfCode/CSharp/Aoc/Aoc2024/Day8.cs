@@ -18,10 +18,8 @@ public class Day8 : Day
         });
 
 
-        foreach (var (k, v) in antennaMap)
+        foreach (var (k, points) in antennaMap)
         {
-            var points = v;
-
             // combinations taken from day11_2023
             var combinations = points.SelectMany(
                 (x, i) => points.Skip(i + 1),
@@ -68,20 +66,19 @@ public class Day8 : Day
             }
         });
 
-        foreach (var (k, v) in antennaMap)
+        foreach (var (k, points) in antennaMap)
         {
-            var points = v;
-
             // combinations taken from day11_2023
             var combinations = points.SelectMany(
                 (x, i) => points.Skip(i + 1),
-                Tuple.Create);
+                (p, c) => (p, c));
 
             foreach (var (c1, c2) in combinations)
             {
                 var rDiff1 = c1.r - c2.r;
                 var cDiff1 = c1.c - c2.c;
                 var anti1 = new Coord(c1.r + rDiff1, c1.c + cDiff1);
+
 
                 while (g.InBounds(anti1))
                 {

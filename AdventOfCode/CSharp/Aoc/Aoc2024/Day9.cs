@@ -5,8 +5,8 @@ public class Day9 : Day
     public override void Part1()
     {
         var text = Text();
-        long curentFileId = 0;
-        var values = new List<long>();
+        int curentFileId = 0;
+        var values = new List<int>();
 
         foreach (var ci in Range(0, text.Length))
         {
@@ -49,16 +49,16 @@ public class Day9 : Day
         {
         }
 
-        values.Index().Sum(x => x.val * x.index).Dump();
+        values.Index().Sum(x => (long)(x.val * x.index)).Dump();
     }
 
     public override void Part2()
     {
         var text = Text();
-        var values = new List<long>();
-        var freeDict = new Dictionary<long, long>(); // {startingIndex, size}
-        var blockDict = new Dictionary<long, (long size, long fileId)>();
-        long curentFileId = 0;
+        var values = new List<int>();
+        var freeDict = new SortedDictionary<int, int>(); // {startingIndex, size}
+        var blockDict = new Dictionary<int, (int size, int fileId)>();
+        var curentFileId = 0;
         foreach (var ci in Range(0, text.Length))
         {
             if (ci % 2 == 0)
@@ -88,7 +88,6 @@ public class Day9 : Day
             if (blockDict.TryGetValue(index, out var v))
             {
                 var swapVal = freeDict
-                    .OrderBy(x => x.Key)
                     .FirstOrDefault(x => x.Value >= v.size && x.Key < index);
 
                 if (swapVal is { Key: 0, Value: 0 })
@@ -97,13 +96,13 @@ public class Day9 : Day
                 }
 
                 // put the file id in the blank
-                foreach (var i in Range((int)swapVal.Key, (int)v.size))
+                foreach (var i in Range(swapVal.Key, v.size))
                 {
                     values[i] = v.fileId;
                 }
 
                 // put the in the blank in old file id
-                foreach (var i in Range(index, (int)v.size))
+                foreach (var i in Range(index, v.size))
                 {
                     values[i] = -1;
                 }
@@ -124,7 +123,7 @@ public class Day9 : Day
         values
             .Index()
             .Where(x => x.val != -1)
-            .Sum(x => x.val * x.index)
+            .Sum(x => (long)(x.val * x.index))
             .Dump();
     }
 }

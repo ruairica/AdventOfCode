@@ -27,15 +27,15 @@ public class Program
         }
         else if (part == "both")
         {
-            var sw = Stopwatch.StartNew();
             $"Day {day}".Dump();
             "Part 1:".Dump();
+            var sw = Stopwatch.StartNew();
             solution.Part1();
-            var p1time = sw.Elapsed.TotalSeconds;
-            $"Completed in {p1time} seconds".Dump();
+            $"Completed in {sw.Elapsed.TotalSeconds} seconds".Dump();
             "Part 2:".Dump();
+            sw = Stopwatch.StartNew();
             solution.Part2();
-            $"Completed in {sw.Elapsed.TotalSeconds - p1time} seconds".Dump();
+            $"Completed in {sw.Elapsed.TotalSeconds} seconds".Dump();
         }
     }
 }

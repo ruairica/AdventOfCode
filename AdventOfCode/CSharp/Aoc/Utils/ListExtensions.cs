@@ -119,7 +119,7 @@ public static class ListExtensions
     }
 
     // Helper method to find the Greatest Common Divisor (GCD) of two numbers
-    private static long FindGCD(long a, long b)
+    public static long FindGCD(long a, long b)
     {
         while (b != 0)
         {

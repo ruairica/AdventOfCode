@@ -32,24 +32,22 @@ public class Day13 : Day
                 }
             }
 
-            costs.Dump();
             return costs.Count == 0 ? 0 : costs.Min();
         }).Sum().Dump();
     }
 
     public override void Part2()
     {
-
-        "hello".Dump();
+        var extra = 10000000000000;
         Text().Split("\n\n").Select(chunk =>
         {
             var lines = chunk.Split("\n");
 
-            var (ax, ay) = lines[0].Nums().Select(x => (decimal)x).ToList();
-            var (bx, by) = lines[1].Nums().Select(x => (decimal)x).ToList();
-            var (px, py) = lines[2].Nums().Select(x => (decimal)x).ToList();
+            var (ax, ay) = lines[0].Longs();
+            var (bx, by) = lines[1].Longs();
+            var (px, py) = lines[2].Longs();
 
-
+            (px, py) = (px + extra, py + extra);
 
             //https://en.wikipedia.org/wiki/Cramer%27s_rule
             // a1 * x + b1 * y = c1
@@ -63,22 +61,24 @@ public class Day13 : Day
             // i = (c1b2 - b1c2)/ (a1b2 - b1a2)
             // j = (a1c2 - c1a2) / (a1b2 -b1a2)
 
+            var i = ((px * by - bx * py) % (ax * by - bx * ay) == 0)
+                ? (px * by - bx * py) / (ax * by - bx * ay)
+                : 0;
 
-            var i = (px * by - bx * py) / (ax * by - bx * ay);
-            var j  = (ax * py - px * ay) / (ax * by - bx * ay);
+            //var i = (px * by - bx * py) / (ax * by - bx * ay);
+            var j  = (ax * py - px * ay) % (ax * by - bx * ay) == 0
+                ? (ax * py - px * ay) / (ax * by - bx * ay)
+                : 0;
+
+
             // find i  j. return i * 3 + j because of costs
-
-            $"{i}, {j}".Dump();
-            if (i % 1 == 0 && j % 1 == 0)
-            {
-                return 3 * i + j;
-            }
-            else
+            if (i == 0 || j == 0)
             {
                 return 0;
             }
 
+            return 3 * i + j;
+
         }).Sum().Dump();
-        var extra = 10000000000000;
     }
 }

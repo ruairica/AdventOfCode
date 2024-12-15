@@ -1,5 +1,3 @@
-using Dumpify;
-
 namespace Utils.Grids;
 
 public class Grid<T>
@@ -149,14 +147,12 @@ public class Grid<T>
     public void Print()
     {
         Console.Write("[");
-
         for (int x = 0; x < this.Height; x++)
         {
             Console.Write($"{Environment.NewLine}[");
-            Console.Write(string.Join("", this.grid[x]));
-            Console.Write($"]");
+            Console.Write(string.Join(", ", this.grid[x]));
+            Console.Write("]");
         }
-
         Console.Write($"{Environment.NewLine}]{Environment.NewLine}");
     }
 

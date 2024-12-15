@@ -98,7 +98,8 @@ public class Day15 : Day
 
                 if (newCoordChar == '#') continue;
 
-                foreach (var (last, sl) in toMove.AsEnumerable().Reverse().Zip(toMove.AsEnumerable().Reverse().Skip(1)))
+                var reversedToMove = toMove.AsEnumerable().Reverse().ToList();
+                foreach (var (last, sl) in reversedToMove.Zip(reversedToMove.Skip(1)))
                 {
                     g[last] = g[sl];
                 }
@@ -110,7 +111,6 @@ public class Day15 : Day
             else // going up or down
             {
                 List<Coord> toMove = [];
-
                 var q = new Queue<Coord>();
                 q.Enqueue(newCoord);
                 q.Enqueue(newCoordChar switch
@@ -120,7 +120,6 @@ public class Day15 : Day
                 });
 
                 var hitWall = false;
-
                 var visited = new HashSet<Coord>();
                 while (q.TryDequeue(out var pc))
                 {
@@ -158,7 +157,6 @@ public class Day15 : Day
                         g[g.Move(pair, md).coord] = g[pair];
                         g[pair] = '.';
                     }
-
 
                     var temp = robot;
                     robot = g.Move(robot, md).coord;

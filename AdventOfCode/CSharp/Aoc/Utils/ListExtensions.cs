@@ -92,6 +92,17 @@ public static class ListExtensions
         fourth = list.Count > 3 ? list[3] : default;
         fifth = list.Count > 4 ? list[4] : default;
     }
+
+    public static void Deconstruct<T>(this IList<T> list, out T first, out T second, out T third, out T fourth, out T fifth, out T sixth)
+    {
+        first = list.Count > 0 ? list[0] : default;
+        second = list.Count > 1 ? list[1] : default;
+        third = list.Count > 2 ? list[2] : default;
+        fourth = list.Count > 3 ? list[3] : default;
+        fifth = list.Count > 4 ? list[4] : default;
+        sixth = list.Count > 5 ? list[5] : default;
+    }
+
     public static long FindLCM(this List<long> numbers)
     {
         // Ensure the list is not empty

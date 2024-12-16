@@ -26,7 +26,7 @@ public class Day15 : Day
                 continue;
             }
 
-            var currentRobot = newCoord;
+            var newRobot = newCoord;
 
             // find first either . or #
             while (newCoordChar == 'O')
@@ -38,13 +38,13 @@ public class Day15 : Day
             if (newCoordChar == '#') continue;
             
             g[newCoord] = 'O';
-            var tr = robot;
-            robot = currentRobot;
+            g[robot] = '.';
+
+            robot = newRobot;
             g[robot] = '@';
-            g[tr] = '.';
         }
 
-
+        
         g.WhereWithCoord((c, _) => c == 'O')
             .Sum(x => x.Coord.r * 100 + x.Coord.c).Dump();
     }
@@ -158,11 +158,9 @@ public class Day15 : Day
                         g[pair] = '.';
                     }
 
-                    var temp = robot;
+                    g[robot] = '.';
                     robot = g.Move(robot, md).coord;
-
                     g[robot] = '@';
-                    g[temp] = '.';
                 }
             }
         }

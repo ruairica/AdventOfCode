@@ -34,15 +34,6 @@ public class Day6 :Day
         visited.Count.Dump();
     }
 
-    private Dir TurnRight(Dir dir) =>
-        dir switch
-        {
-            Dir.Up => Dir.Right,
-            Dir.Down => Dir.Left,
-            Dir.Left => Dir.Up,
-            Dir.Right => Dir.Down,
-        };
-
     public override void Part2()
     {
         var g = new Grid<char>(Text().CharGrid());

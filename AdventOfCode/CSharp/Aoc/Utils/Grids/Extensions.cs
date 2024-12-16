@@ -42,4 +42,24 @@ public static class GridExtensions
     }
 
     public static int ManhattanDistance(this Coord current, Coord target) => Math.Abs(current.r - target.r) + Math.Abs(current.c - target.c);
+
+    // refactor this
+    public static Dir TurnRight(Dir dir) =>
+        dir switch
+        {
+            Dir.Up => Dir.Right,
+            Dir.Down => Dir.Left,
+            Dir.Left => Dir.Up,
+            Dir.Right => Dir.Down,
+        };
+
+    public static Dir TurnLeft(Dir dir) =>
+        dir switch
+        {
+            Dir.Up => Dir.Left,
+            Dir.Down => Dir.Right,
+            Dir.Left => Dir.Down,
+            Dir.Right => Dir.Up,
+        };
+
 }

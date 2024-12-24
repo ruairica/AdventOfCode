@@ -121,7 +121,7 @@ public static class ListExtensions
         return lcm;
     }
 
-    public static IEnumerable<int> Differences(this IReadOnlyList<int> nums) => nums.Skip(1).Select((val, index) => val - nums[index - 1]);
+    public static IEnumerable<int> Differences(this IReadOnlyList<int> nums) => nums.Skip(1).Select((val, index) => val - nums[index]);
 
     // Helper method to find the LCM of two numbers
     private static long FindLCM(long a, long b)

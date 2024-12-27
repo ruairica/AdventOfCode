@@ -1127,7 +1127,7 @@ public class Tasks2023
             .Select(r => r.index)
             .ToHashSet();
 
-        var indexesOfColsToScale = g1.GetAllColumns()
+        var indexesOfColsToScale = g1.Columns()
             .Index()
             .Where(x => x.val.All(x => x == '.'))
             .Select(r => r.index)
@@ -1498,7 +1498,7 @@ public class Tasks2023
             }
 
             // cols
-            var cols = g.GetAllColumns();
+            var cols = g.Columns();
 
             for (var i = 1; i < cols.Count; i++)
             {
@@ -1640,7 +1640,7 @@ public class Tasks2023
                 }
             }
 
-            var cols = g.GetAllColumns();
+            var cols = g.Columns();
 
             for (var i = 1; i < cols.Count; i++)
             {

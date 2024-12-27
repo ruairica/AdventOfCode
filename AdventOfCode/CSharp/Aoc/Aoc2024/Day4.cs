@@ -13,7 +13,7 @@ public class Day4 : Day
         count += g.GetAllRows().Sum(Count);
 
         // vert
-        count += g.GetAllColumns().Sum(Count);
+        count += g.Columns().Sum(Count);
 
         // go across the top row
         foreach (var c in Range(0, g.Width))

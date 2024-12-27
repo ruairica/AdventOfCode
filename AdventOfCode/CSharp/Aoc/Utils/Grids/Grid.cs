@@ -25,6 +25,11 @@ public class Grid<T>
         Height = grid.Count;
     }
 
+    public Grid(string grid)
+    {
+
+    }
+
     public void ForEachWithCoord(Action<T, Coord> action)
     {
         for (var r = 0; r < Height; r++)
@@ -98,7 +103,7 @@ public class Grid<T>
         return grid.ConvertAll(x => x);
     }
 
-    public List<List<T>> GetAllColumns()
+    public List<List<T>> Columns()
     {
         return Enumerable.Range(0, Width)
             .Select(

@@ -79,8 +79,7 @@ public class Day19 : Day
                 ans += WaysToTarget(target[t.Length..]);
             }
 
-            cache.Add(target, ans);
-            return ans;
+            return cache[target] = ans;
         }
     }
 }

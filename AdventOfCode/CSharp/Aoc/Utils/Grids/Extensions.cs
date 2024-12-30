@@ -30,6 +30,7 @@ public static class GridExtensions
             .ToList();
     }
 
+    // TODO have a flag for diags and dirs
     public static List<(Coord coord, Dir dir)> GetValidAdjacentNoDiagWithDir(this Coord coord, int Width, int Height)
     {
         return dirsNoDiagsDir

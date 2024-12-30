@@ -25,9 +25,8 @@ public class Grid<T>
         Height = grid.Count;
     }
 
-    public Grid(string grid)
+    public Grid(T[][] grid) : this(grid.Select(x => x.ToList()).ToList())
     {
-
     }
 
     public void ForEachWithCoord(Action<T, Coord> action)
@@ -164,6 +163,8 @@ public class Grid<T>
     public List<Coord> GetValidAdjacentIncludingDiag(Coord coord) =>
         coord.GetValidAdjacentIncludingDiag(this.Width, this.Height);
 
+    // TODO make diag a boolean flag on this, maybe do the same with the one
+    // that gives directions
     public List<Coord> GetValidAdjacentNoDiag(Coord coord) =>
         coord.GetValidAdjacentNoDiag(this.Width, this.Height);
 
